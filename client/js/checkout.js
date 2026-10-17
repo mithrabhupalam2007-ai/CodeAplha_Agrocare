@@ -156,6 +156,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     UI.mountNav();
     UI.mountFooter();
+    if (!UI.requireLogin()) return; // shop is only reachable after login
 
     const hasItems = renderSummary();
     if (!hasItems) {

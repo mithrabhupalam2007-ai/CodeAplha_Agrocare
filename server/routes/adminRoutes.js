@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const {
   dashboard,
+  listProducts: listProductsAdmin,
   listOrders,
   updateOrderStatus,
   listCustomers,
@@ -15,6 +16,8 @@ const { protect, requireAdmin } = require('../middleware/auth');
 router.use(protect, requireAdmin);
 
 router.get('/dashboard', dashboard);
+
+router.get('/products', listProductsAdmin);
 
 router.get('/orders', listOrders);
 router.patch('/orders/:id', updateOrderStatus);

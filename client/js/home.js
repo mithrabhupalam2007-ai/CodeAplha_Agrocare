@@ -8,7 +8,7 @@
     const el = article('p-card');
     const stockCls = p.stockQuantity <= 0 ? 'out' : p.stockQuantity <= 5 ? 'low' : 'in';
     const stockTxt =
-      p.stockQuantity <= 0 ? 'Out of stock' : p.stockQuantity <= 5 ? `Only ${p.stockQuantity} left` : 'In stock';
+      p.stockQuantity <= 0 ? 'Out of Stock' : p.stockQuantity <= 5 ? `Only ${p.stockQuantity} left` : 'In stock';
     const inWishlist = (authStore.user && authStore.user.wishlist || []).includes(p._id);
 
     el.innerHTML = `
@@ -16,7 +16,7 @@
         <div class="p-card__flags">
           ${p.bestseller ? '<span class="badge badge--amber">Bestseller</span>' : ''}
           ${p.featured ? '<span class="badge badge--green">Featured</span>' : ''}
-          ${p.stockQuantity <= 0 ? '<span class="badge badge--red">Sold out</span>' : ''}
+          ${p.stockQuantity <= 0 ? '<span class="badge badge--red">Out of Stock</span>' : ''}
         </div>
         <button class="p-card__wish ${inWishlist ? 'on' : ''}" type="button" aria-label="Add to wishlist" data-wish>${I.heart}</button>
         <a href="/pages/product-details.html?id=${p._id}">
@@ -36,7 +36,7 @@
       </div>
       <div class="p-card__actions">
         <button class="btn btn--primary" type="button" data-add ${p.stockQuantity <= 0 ? 'disabled' : ''}>
-          ${p.stockQuantity <= 0 ? 'Out of stock' : 'Add to Cart'}
+          ${p.stockQuantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
         </button>
         <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
       </div>`;
@@ -149,6 +149,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     UI.mountNav();
     UI.mountFooter();
+    if (!UI.requireLogin()) return; // shop is only reachable after login
     wireNewsletter();
 
     loadCategories();

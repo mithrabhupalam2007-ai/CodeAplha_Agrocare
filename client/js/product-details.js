@@ -140,7 +140,7 @@
     document.title = `${product.name} — AgroShield`;
     $('head-title').textContent = product.name;
     $('head-sub').textContent = `${product.brand} · ${product.category} · ${product.packSize}`;
-    $('crumb').innerHTML = `<a href="/">Home</a><span>/</span><a href="/pages/products.html">Products</a><span>/</span><a href="/pages/products.html?category=${encodeURIComponent(product.category)}">${UI.esc(product.category)}</a><span>/</span><span class="current">${UI.esc(product.name)}</span>`;
+    $('crumb').innerHTML = `<a href="/pages/home.html">Home</a><span>/</span><a href="/pages/products.html">Products</a><span>/</span><a href="/pages/products.html?category=${encodeURIComponent(product.category)}">${UI.esc(product.category)}</a><span>/</span><span class="current">${UI.esc(product.name)}</span>`;
 
     $('pdp-image').src = product.image;
     $('pdp-image').alt = product.name;
@@ -155,8 +155,9 @@
 
     const stock = $('pdp-stock');
     if (product.stockQuantity <= 0) {
-      stock.innerHTML = '<span class="dot"></span><span class="text-danger">Out of stock</span>';
+      stock.innerHTML = '<span class="dot"></span><span class="text-danger">Out of Stock</span>';
       $('add-cart').disabled = true;
+      $('buy-now').disabled = true;
       $('qty-input').max = 1;
     } else if (product.stockQuantity <= 5) {
       stock.innerHTML = `<span class="dot"></span><span style="color:var(--amber)">Only ${product.stockQuantity} left in stock</span>`;
@@ -202,6 +203,17 @@
       toast(`${qty} × ${product.name} added to cart`);
     });
 
+    $('buy-now').addEventListener('click', () => {
+      if (!product) return;
+      if (product.stockQuantity <= 0) {
+        toast('This product is out of stock.', 'error');
+        return;
+      }
+      cart.add(UI.cartLine(product), currentQty());
+      UI.refreshBadges();
+      location.href = '/pages/checkout.html';
+    });
+
     $('add-wish').addEventListener('click', async (e) => {
       if (!product) return;
       if (!UI.requireLogin()) return;
@@ -230,6 +242,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     UI.mountNav();
     UI.mountFooter();
+    if (!UI.requireLogin()) return; // shop is only reachable after login
     wire();
 
     // reflect initial wishlist state once loaded

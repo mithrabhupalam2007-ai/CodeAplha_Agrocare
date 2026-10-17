@@ -15,11 +15,14 @@ const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
  * Real numbers aggregated from the Order/Product/User collections.
  */
 const dashboard = asyncHandler(async (req, res) => {
-  const [totalProducts, activeProducts, totalCustomers, totalOrders, revenueAgg, statusAgg, lowStock, recentOrdersRaw, monthlySales, topProducts] =
+  const [totalProducts, activeProducts, inStockProducts, outOfStockProducts, totalCustomers, totalUsers, totalOrders, revenueAgg, statusAgg, lowStock, recentOrdersRaw, monthlySales, topProducts] =
     await Promise.all([
       Product.countDocuments(),
       Product.countDocuments({ active: true }),
+      Product.countDocuments({ active: true, stockQuantity: { $gt: 0 } }),
+      Product.countDocuments({ active: true, stockQuantity: 0 }),
       User.countDocuments({ role: 'customer' }),
+      User.countDocuments(),
       Order.countDocuments(),
       Order.aggregate([
         { $match: { orderStatus: { $ne: 'Cancelled' } } },
@@ -74,7 +77,10 @@ const dashboard = asyncHandler(async (req, res) => {
       totalProducts,
       activeProducts,
       inactiveProducts: totalProducts - activeProducts,
+      inStockProducts,
+      outOfStockProducts,
       totalCustomers,
+      totalUsers,
       totalOrders,
       paidOrders,
       revenue,
@@ -87,6 +93,53 @@ const dashboard = asyncHandler(async (req, res) => {
     recentOrders: recentOrdersRaw,
     monthlySales,
     topProducts,
+  });
+});
+
+/** GET /api/admin/products — product list for the dashboard (includes inactive items). */
+const listProducts = asyncHandler(async (req, res) => {
+  const q = req.query;
+  const filter = {};
+
+  if (q.status === 'active') filter.active = true;
+  else if (q.status === 'inactive') filter.active = false;
+  else if (q.status === 'instock') {
+    filter.active = true;
+    filter.stockQuantity = { $gt: 0 };
+  } else if (q.status === 'outofstock') {
+    filter.active = true;
+    filter.stockQuantity = 0;
+  }
+
+  if (q.category && String(q.category).trim()) filter.category = String(q.category).trim();
+  if (q.search && String(q.search).trim()) {
+    const rx = new RegExp(String(q.search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    filter.$or = [{ name: rx }, { brand: rx }, { category: rx }];
+  }
+
+  const page = Math.max(1, parseInt(q.page, 10) || 1);
+  const limit = Math.min(48, Math.max(1, parseInt(q.limit, 10) || 12));
+
+  const [products, total] = await Promise.all([
+    Product.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    Product.countDocuments(filter),
+  ]);
+
+  res.json({
+    success: true,
+    products,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
   });
 });
 
@@ -291,6 +344,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
 
 module.exports = {
   dashboard,
+  listProducts,
   listOrders,
   updateOrderStatus,
   listCustomers,

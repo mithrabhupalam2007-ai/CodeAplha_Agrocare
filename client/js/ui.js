@@ -73,7 +73,7 @@ const UI = (() => {
 
   /* ---------------- navbar ---------------- */
   const NAV_LINKS = [
-    { href: '/', label: 'Home', match: (p) => p === '/' },
+    { href: '/pages/home.html', label: 'Home', match: (p) => p.includes('home.html') },
     { href: '/pages/products.html', label: 'All Products', match: (p) => p.includes('products') && !location.search },
     { href: '/pages/products.html?type=Seeds', label: 'Seeds', match: () => new URLSearchParams(location.search).get('type') === 'Seeds' },
     { href: '/pages/products.html?type=Pesticides', label: 'Pesticides', match: () => new URLSearchParams(location.search).get('type') === 'Pesticides' },
@@ -92,7 +92,7 @@ const UI = (() => {
       <a class="skip-link" href="#main">Skip to content</a>
       <header class="nav">
         <div class="container nav__inner">
-          <a class="brand" href="/" aria-label="AgroShield home">
+          <a class="brand" href="/pages/home.html" aria-label="AgroShield home">
             <span class="brand__mark">${I.leaf}</span>
             Agro<em>Shield</em>
           </a>
@@ -118,7 +118,7 @@ const UI = (() => {
             ${
               user
                 ? `<a class="icon-btn" href="${user.role === 'admin' ? '/pages/admin.html' : '/pages/account.html'}" title="${esc(user.name)}" aria-label="My account">${I.user}</a>`
-                : `<a class="icon-btn" href="/pages/login.html" title="Login" aria-label="Login">${I.user}</a>`
+                : `<a class="icon-btn" href="/" title="Login" aria-label="Login">${I.user}</a>`
             }
             <button class="icon-btn nav__burger" type="button" aria-label="Menu" data-burger>${I.menu}</button>
           </div>
@@ -172,7 +172,7 @@ const UI = (() => {
         <div class="container">
           <div class="footer__grid">
             <div>
-              <a class="brand" href="/"><span class="brand__mark">${I.leaf}</span>Agro<em>Shield</em></a>
+              <a class="brand" href="/pages/home.html"><span class="brand__mark">${I.leaf}</span>Agro<em>Shield</em></a>
               <p>Your one-stop agricultural marketplace for quality seeds, crop protection products, fertilizers and everyday farming essentials — built for Indian farmers and gardeners.</p>
               <p class="mb-0" style="font-size:.8rem;opacity:.75;">Demo e-commerce project. Pesticide listings use clearly labelled demo data.</p>
             </div>
@@ -192,8 +192,8 @@ const UI = (() => {
                 <li><a href="/pages/account.html">My Account</a></li>
                 <li><a href="/pages/account.html#orders">Track My Orders</a></li>
                 <li><a href="/pages/cart.html">Shopping Cart</a></li>
-                <li><a href="/#faq">FAQs</a></li>
-                <li><a href="/#reviews">Customer Reviews</a></li>
+                <li><a href="/pages/home.html#faq">FAQs</a></li>
+                <li><a href="/pages/home.html#reviews">Customer Reviews</a></li>
               </ul>
             </div>
             <div>
@@ -209,7 +209,7 @@ const UI = (() => {
           <div class="footer__bottom">
             <span>© ${new Date().getFullYear()} AgroShield — demo project for internship presentation.</span>
             <span class="footer__legal">
-              <a href="/#safety">Product Safety Info</a>
+              <a href="/pages/home.html#safety">Product Safety Info</a>
               <a href="/#faq">FAQs</a>
               <a href="/pages/account.html">Privacy &amp; Account</a>
               <a href="/pages/admin.html">Admin</a>
@@ -220,21 +220,22 @@ const UI = (() => {
   }
 
   /* ---------------- guards ---------------- */
-  /** Send the visitor to login, remembering where to come back to. */
+  /** Send the visitor to the login selection page, remembering where to come back to. */
   function requireLogin() {
     if (authStore.isLoggedIn) return true;
     const returnTo = location.pathname + location.search + location.hash;
-    location.href = `/pages/login.html?next=${encodeURIComponent(returnTo)}`;
+    location.href = `/?next=${encodeURIComponent(returnTo)}`;
     return false;
   }
 
+  /** Admin pages/APIs: never trust the frontend — the server checks the role too. */
   function requireAdmin() {
     if (authStore.isAdmin) return true;
     if (authStore.isLoggedIn) {
-      toast('Administrator access required.', 'error');
-      setTimeout(() => (location.href = '/pages/account.html'), 900);
+      toast('Administrator access required. Redirecting you back home.', 'error');
+      setTimeout(() => (location.href = '/pages/home.html'), 1200);
     } else {
-      location.href = '/pages/login.html?next=' + encodeURIComponent('/pages/admin.html');
+      location.href = '/pages/admin-login.html';
     }
     return false;
   }

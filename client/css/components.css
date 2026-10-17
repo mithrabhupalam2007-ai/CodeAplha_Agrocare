@@ -536,6 +536,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
+.back-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--green-700);
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+.back-link:hover { text-decoration: underline; }
 .auth-art {
   position: relative;
   background: var(--green-900);

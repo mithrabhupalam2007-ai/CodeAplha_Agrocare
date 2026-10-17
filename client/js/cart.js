@@ -106,6 +106,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     UI.mountNav();
     UI.mountFooter();
+    if (!UI.requireLogin()) return; // shop is only reachable after login
     render();
     document.addEventListener('cart:changed', render);
     if (authStore.isLoggedIn) authStore.refresh();

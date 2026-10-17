@@ -24,7 +24,7 @@
     <section class="page-head">
       <div class="container">
         <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="/">Home</a><span>/</span><span class="current">Admin</span>
+          <a href="/pages/home.html">Home</a><span>/</span><span class="current">Admin</span>
         </nav>
         <h1>Admin Dashboard</h1>
         <p>Products, orders, customers and sales — all live from MongoDB.</p>
@@ -40,19 +40,31 @@
           <nav class="side-nav" aria-label="Admin sections">
             <button class="active" data-tab="dashboard">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>
-              Dashboard
+              Dashboard Overview
             </button>
             <button data-tab="products">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 8-9-5-9 5v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></svg>
-              Products
+              Manage Products
+            </button>
+            <button data-tab="add-product">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              Add New Product
+            </button>
+            <button data-tab="inventory">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7 12 3 4 7v10l8 4 8-4Z"/><path d="m4 7 8 4 8-4"/><path d="M12 11v10"/></svg>
+              Inventory Management
+            </button>
+            <button data-tab="outofstock">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              Out-of-Stock Products
             </button>
             <button data-tab="orders">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17V5H2v12h2"/><path d="M14 9h4l4 4v4h-2"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></svg>
-              Orders
+              Manage Orders
             </button>
             <button data-tab="customers">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Customers
+              Manage Customers
             </button>
             <button data-tab="categories">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
@@ -68,10 +80,12 @@
             <!-- ============ DASHBOARD ============ -->
             <div class="tab-panel" data-panel="dashboard">
               <div class="stat-grid" id="stat-grid">
-                <div class="stat-card"><span class="lbl">Total revenue</span><span class="val" id="s-revenue">—</span><span class="sub" id="s-rev-sub"></span></div>
+                <div class="stat-card"><span class="lbl">Total products</span><span class="val" id="s-products">—</span><span class="sub" id="s-products-sub"></span></div>
+                <div class="stat-card"><span class="lbl">Products in stock</span><span class="val" id="s-instock">—</span><span class="sub">active &amp; available</span></div>
+                <div class="stat-card" id="oos-card"><span class="lbl">Out-of-stock products</span><span class="val" id="s-oos">—</span><span class="sub">need restocking</span></div>
                 <div class="stat-card"><span class="lbl">Total orders</span><span class="val" id="s-orders">—</span><span class="sub" id="s-orders-sub"></span></div>
-                <div class="stat-card"><span class="lbl">Customers</span><span class="val" id="s-customers">—</span><span class="sub">registered accounts</span></div>
-                <div class="stat-card"><span class="lbl">Products</span><span class="val" id="s-products">—</span><span class="sub" id="s-products-sub"></span></div>
+                <div class="stat-card"><span class="lbl">Registered users</span><span class="val" id="s-users">—</span><span class="sub" id="s-users-sub"></span></div>
+                <div class="stat-card"><span class="lbl">Total revenue</span><span class="val" id="s-revenue">—</span><span class="sub" id="s-rev-sub"></span></div>
                 <div class="stat-card" id="lowstock-card"><span class="lbl">Low stock alerts</span><span class="val" id="s-lowstock">—</span><span class="sub" id="s-lowstock-sub"></span></div>
               </div>
 
@@ -132,6 +146,44 @@
                 </table>
               </div>
               <div class="pager" id="prod-pager"></div>
+            </div>
+
+            <!-- ============ INVENTORY MANAGEMENT ============ -->
+            <div class="tab-panel hidden" data-panel="inventory">
+              <div class="admin-bar">
+                <h2>Inventory Management</h2>
+                <div class="tools">
+                  <input type="search" id="inv-search" placeholder="Search products..." aria-label="Search inventory" />
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Image</th><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Visibility</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="inv-table"><tr><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager" id="inv-pager"></div>
+            </div>
+
+            <!-- ============ OUT-OF-STOCK PRODUCTS ============ -->
+            <div class="tab-panel hidden" data-panel="outofstock">
+              <div class="admin-bar">
+                <h2>Out-of-Stock Products</h2>
+                <div class="tools">
+                  <input type="search" id="oos-search" placeholder="Search products..." aria-label="Search out-of-stock products" />
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Image</th><th>Product</th><th>Category</th><th>Price</th><th>Restock</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="oos-table"><tr><td colspan="6"><div class="spinner"></div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager" id="oos-pager"></div>
             </div>
 
             <!-- ============ ORDERS ============ -->

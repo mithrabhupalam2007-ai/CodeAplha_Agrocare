@@ -8,9 +8,10 @@ const {
 } = require('../controllers/productController');
 const { protect, requireAdmin } = require('../middleware/auth');
 
-// Public catalogue
-router.get('/', listProducts);
-router.get('/:id', getProduct);
+// Catalogue — a logged-in session is required (the shop is behind the login
+// selection page). Admin write access is enforced separately below.
+router.get('/', protect, listProducts);
+router.get('/:id', protect, getProduct);
 
 // Administrator management
 router.post('/', protect, requireAdmin, createProduct);

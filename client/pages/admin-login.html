@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/auth.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main" class="auth-wrap">
+    <aside class="auth-art">
+      <img src="/images/categories/farming-tools.jpg" alt="Farming tools and equipment" />
+      <div class="auth-art__content">
+        <h2>AgroShield Admin</h2>
+        <p>Manage products, inventory, orders and customers across the store.</p>
+      </div>
+    </aside>
+
+    <section class="auth-form-side">
+      <div class="auth-card">
+        <a class="back-link" href="/">&larr; Back to login options</a>
+        <span class="eyebrow">Administrator</span>
+        <h1>Admin Login</h1>
+        <p class="sub">Sign in with your administrator email or username.</p>
+
+        <div class="alert" id="auth-alert" role="alert"></div>
+
+        <form id="admin-login-form" novalidate>
+          <div class="field">
+            <label for="admin-identifier">Email or username</label>
+            <input class="input" id="admin-identifier" name="identifier" type="text" autocomplete="username" placeholder="admin@agroshield.in or username" required />
+            <span class="field-error" data-err="identifier"></span>
+          </div>
+
+          <div class="field">
+            <label for="admin-password">Password</label>
+            <div class="pw-wrap">
+              <input class="input" id="admin-password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required />
+              <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
+            </div>
+            <span class="field-error" data-err="password"></span>
+          </div>
+
+          <button class="btn btn--primary btn--block btn--lg" id="admin-submit-btn" type="submit">Login as Admin</button>
+        </form>
+
+        <p class="switch">Are you a customer? <a href="/pages/login.html"><b>Login as User</b></a></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

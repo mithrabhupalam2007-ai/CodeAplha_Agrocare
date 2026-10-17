@@ -8,28 +8,39 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 
 ## ✨ Features
 
+### Login selection (entry page)
+- **`/` is a login selection page** — visitors choose *Login as Admin* or *Login as User* before anything else
+- The home page, catalogue, cart, checkout and account pages are **not accessible before login** (enforced by the server *and* client-side guards, with `?next=` return-to support)
+
 ### Customer
+- **User login / registration** — email + password login, full registration (name, email, phone, password, delivery address), back buttons to the selection page
 - **Home page** — hero banner, shop-by-category cards, featured/bestseller/seasonal product rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
 - **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options, Load More pagination, empty states
-- **Product details** — specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, related products, quantity picker
+- **Product details** — specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, related products, quantity picker, **Add to Cart / Buy Now / Wishlist**
+- **Out of stock handling** — “Out of Stock” badge, disabled Add to Cart & Buy Now buttons, and the backend rejects orders for unavailable products (with a clear message if stock runs out at checkout)
 - **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar
 - **Checkout** — address form with validation, Cash on Delivery + clearly-labelled demo payment, server-side price/stock verification
 - **Orders** — confirmation page, My Orders with status timeline, self-cancellation (Placed/Confirmed only) with automatic restock
 - **Account** — profile editing, saved address, wishlist, change password, logout
 - **Auth** — register/login with field validation, bcrypt hashing, JWT (httpOnly cookie + bearer fallback)
 
-### Admin (`/pages/admin.html`)
-- Dashboard: revenue, orders, customers, low-stock alerts, monthly sales chart, top products, status split, recent orders
-- Product CRUD (create / edit / deactivate / permanent delete)
-- Order management with status transitions + automatic restock on cancel
-- Customer list with order counts and lifetime spend
-- Category management (create / edit / delete, blocked while products use the category)
+### Admin (`/pages/admin-login.html` → `/pages/admin.html`)
+- **Separate admin login** — email *or* username + password; only accounts with `role: admin` are accepted (verified on the backend)
+- **Dashboard Overview** — total products, products in stock, out-of-stock products, total orders, registered users, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
+- **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items
+- **Add New Product** — one-click entry in the sidebar that opens the product form
+- **Inventory Management** — quick per-product stock updates + visibility toggle
+- **Out-of-Stock Products** — focused list with inline restocking
+- **Manage Orders** — status transitions + automatic restock on cancel
+- **Manage Customers** — order counts and lifetime spend
+- **Categories** — create / edit / delete, blocked while products use the category
 
 ### Security
 - bcrypt password hashing (cost 10) — plain-text passwords never stored
 - JWT signed with a server-side secret (`.env`, never exposed to the frontend)
-- Role-based authorization middleware (`protect` + `requireAdmin`) on every admin route
-- Registration always creates `role: customer` — no self-service admin signup
+- **Server-side login wall**: protected HTML pages redirect to the selection page without a valid signed session; product/category APIs require authentication
+- Role-based authorization middleware (`protect` + `requireAdmin`) on every admin route and the admin page itself
+- Registration always creates `role: customer` — no self-service admin signup; roles are never read from the request body
 - Rate limiting on auth endpoints (50 req/15 min, 20 sign-ups/hour)
 - Helmet security headers, CORS allow-list, MongoDB operator sanitization
 - Ownership checks: customers can only read/cancel **their own** orders
@@ -55,24 +66,27 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 ```
 .
 ├── client/                     # static frontend (served by Express)
-│   ├── index.html              # home page
+│   ├── index.html              # login selection page (site entry point)
 │   ├── css/
 │   │   ├── variables.css       # design tokens (forest green / beige palette)
 │   │   ├── base.css            # reset, buttons, forms, utilities
 │   │   ├── layout.css          # navbar, hero, footer, page headers
-│   │   └── components.css      # cards, cart, checkout, admin, toast, modal
+│   │   ├── components.css      # cards, cart, checkout, admin, toast, modal
+│   │   └── entry.css           # login selection landing page
 │   ├── js/
 │   │   ├── api.js              # fetch wrapper + auth strategy
 │   │   ├── store.js            # cart (localStorage) + auth cache
 │   │   ├── ui.js               # icons, toasts, navbar/footer, guards
+│   │   ├── entry.js            # selection page (?next= support)
 │   │   ├── home.js  products.js  product-details.js
 │   │   ├── cart.js  checkout.js  order-confirmation.js
 │   │   └── auth.js  account.js   admin.js
 │   ├── images/                 # hero, categories, product images
-│   └── pages/                  # products, details, cart, checkout, auth, account, admin
+│   └── pages/                  # home, products, details, cart, checkout,
+│                               # login, register, admin-login, account, admin
 │
 ├── server/                     # backend
-│   ├── server.js               # app entry: security, static serving, routes
+│   ├── server.js               # app entry: security, login wall, static serving, routes
 │   ├── config/db.js            # MongoDB connection
 │   ├── models/                 # User, Product, Order, Category, Newsletter
 │   ├── controllers/            # auth, product, order, user, admin, category
@@ -140,7 +154,7 @@ npm start             # production
 npm run dev           # development (auto-restart on changes)
 ```
 
-Open **http://localhost:5050** — Express serves both the API and the frontend.
+Open **http://localhost:5050** — you will land on the **login selection page**; choose *Login as User* (register first) or *Login as Admin* with the credentials above. Express serves both the API and the frontend.
 
 **Live Server users:** `client/` can also be opened via VS Code Live Server (`:5500`/`:8080`/`:8000`); `api.js` automatically switches to `http://localhost:5050/api` and sends the JWT as a bearer token.
 
@@ -148,12 +162,12 @@ Open **http://localhost:5050** — Express serves both the API and the frontend.
 
 ## 👤 Demo credentials
 
-| Role | Email | Password |
-|---|---|---|
-| Administrator | `admin@agroshield.in` | `Admin@1234` |
-| Customer | register your own account | — |
+| Role | Email | Password | Username (admin login) |
+|---|---|---|---|
+| Administrator | `admin@agroshield.in` | `Admin@1234` | `AgroShield Admin` |
+| Customer | register your own account | — | — |
 
-> Change `ADMIN_PASSWORD` in `.env` and re-run `npm run create-admin` for anything beyond local demos.
+> Change `ADMIN_PASSWORD` in `.env` and re-run `npm run create-admin` for anything beyond local demos. The admin login page accepts **either** the admin email or the admin username.
 
 ---
 
@@ -164,20 +178,20 @@ Base URL: `http://localhost:5050/api`
 ### Auth
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/auth/register` | — | Create customer account (rate-limited) |
-| POST | `/auth/login` | — | Get JWT + httpOnly cookie (rate-limited) |
+| POST | `/auth/register` | — | Create customer account (rate-limited; always `role: customer`) |
+| POST | `/auth/login` | — | `identifier` (email **or** username) + `password`; optional `loginAs: 'admin'` only restricts, never grants, admin access (rate-limited) |
 | GET | `/auth/me` | user | Current user profile |
 | POST | `/auth/logout` | — | Clear session cookie |
 
 ### Catalogue
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/products` | — | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, sort, page, limit` |
-| GET | `/products/:id` | — | Detail + related products |
+| GET | `/products` | user | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, sort, page, limit` |
+| GET | `/products/:id` | user | Detail + related products |
 | POST | `/products` | admin | Create product |
 | PATCH | `/products/:id` | admin | Update product |
 | DELETE | `/products/:id` | admin | Deactivate (`?permanent=true` to delete) |
-| GET | `/categories` | — | Categories with live product counts |
+| GET | `/categories` | user | Categories with live product counts |
 | POST | `/newsletter` | — | Subscribe |
 
 ### Orders (customer)
@@ -198,7 +212,8 @@ Base URL: `http://localhost:5050/api`
 ### Admin (all require `role: admin`)
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/admin/dashboard` | Stats, sales chart, low stock, top products, recent orders |
+| GET | `/admin/dashboard` | Stats (products, in/out of stock, orders, users, revenue), sales chart, low stock, top products, recent orders |
+| GET | `/admin/products` | Product list **including inactive items** — `status=active|inactive|instock|outofstock`, `search`, `category`, `page`, `limit` |
 | GET | `/admin/orders` | All orders with search/status filter + pagination |
 | PATCH | `/admin/orders/:id` | Update order/payment status (restocks on cancel) |
 | GET | `/admin/customers` | Customers with order counts and spend |
@@ -214,13 +229,17 @@ Verified against a running instance (see §15 of the project prompt):
 
 - [x] Registration: valid data, duplicate email (409), weak password, password mismatch, invalid phone/PIN
 - [x] Login: correct credentials, wrong password (generic 401), missing auth (401)
+- [x] Login selection page is the site entry; protected pages redirect to `/?next=…` when logged out
+- [x] Admin login: by email **and** by username; customer credentials rejected on the admin page (403); customers blocked from `/pages/admin.html` and all admin APIs
+- [x] Product/category APIs return 401 without a valid session
 - [x] Product data loaded from MongoDB (34 products, 9 categories)
 - [x] Search / category / price / stock / crop filters, all 7 sort orders, empty state, pagination
+- [x] Out-of-stock: badge + disabled Add to Cart/Buy Now in the UI, backend rejects checkout for unavailable stock with a clear message
 - [x] Cart quantity updates, stock caps, subtotal/delivery/total math
 - [x] Checkout: server-side price recomputation, stock validation, failed-order stock rollback, atomic decrement (no overselling)
 - [x] Customers **cannot** read other customers' orders (403) or anonymous requests (401)
 - [x] Ordinary users **cannot** reach admin endpoints (403)
-- [x] Admin: product create/edit/deactivate/delete, category CRUD (delete blocked while in use), order status updates (invalid statuses rejected)
+- [x] Admin: dashboard in/out-of-stock + user counts, product create/edit/deactivate/delete, inventory stock updates, out-of-stock list, category CRUD (delete blocked while in use), order status updates (invalid statuses rejected)
 - [x] Order cancellation restores stock; cancelled orders excluded from revenue
 - [x] Empty states, loading spinners, API error messages on every page
 - [x] Responsive layouts at desktop / tablet / mobile breakpoints

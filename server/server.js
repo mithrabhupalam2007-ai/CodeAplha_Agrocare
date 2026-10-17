@@ -38,15 +38,21 @@ function createApp() {
     })
   );
 
-  // CORS for trusted frontend origins (e.g. VS Code Live Server on :5500)
+  // CORS for trusted frontend origins (e.g. VS Code Live Server on :5500).
+  // In development any localhost/127.0.0.1 port is accepted so the site also
+  // works when opened through a local dev server; production should rely on
+  // the explicit CLIENT_ORIGIN allow-list.
   const allowedOrigins = (process.env.CLIENT_ORIGIN || '')
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
+  const isLocalOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   app.use(
     cors({
       origin(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        if (!origin || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && isLocalOrigin(origin))) {
+          return callback(null, true);
+        }
         callback(new Error('Origin not allowed by CORS'));
       },
       credentials: true,
@@ -61,6 +67,51 @@ function createApp() {
   app.use((req, res, next) => {
     if (req.body && typeof req.body === 'object') req.body = mongoSanitize(req.body);
     next();
+  });
+
+  // ---------- Login wall for the shopping pages ----------
+  // Defence in depth: even if someone requests an HTML page directly, the
+  // server refuses to hand it out without a valid signed session (the JWT is
+  // httpOnly cookie or an Authorization header). Static assets (css/js/images)
+  // and the public pages (selection, logins, register) are never blocked.
+  const { verifyToken } = require('./utils/token');
+  const LOGIN_PAGE = '/';
+  const PROTECTED_PAGES = [
+    '/pages/home.html',
+    '/pages/products.html',
+    '/pages/product-details.html',
+    '/pages/cart.html',
+    '/pages/checkout.html',
+    '/pages/order-confirmation.html',
+    '/pages/account.html',
+  ];
+  const ADMIN_PAGES = ['/pages/admin.html'];
+
+  app.use((req, res, next) => {
+    if (req.method !== 'GET') return next();
+    const page = req.path;
+    if (!PROTECTED_PAGES.includes(page) && !ADMIN_PAGES.includes(page)) return next();
+
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ')
+      ? header.slice(7).trim()
+      : (req.cookies && req.cookies.agroshield_token) || '';
+
+    if (!token) return res.redirect(`${LOGIN_PAGE}?next=${encodeURIComponent(page)}`);
+
+    let payload;
+    try {
+      payload = verifyToken(token);
+    } catch (err) {
+      return res.redirect(`${LOGIN_PAGE}?next=${encodeURIComponent(page)}`);
+    }
+
+    // The role claim is signed by this server, so it is trustworthy here.
+    if (ADMIN_PAGES.includes(page) && payload.role !== 'admin') {
+      return res.redirect('/pages/admin-login.html');
+    }
+
+    return next();
   });
 
   if (process.env.NODE_ENV !== 'production') {

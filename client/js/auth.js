@@ -47,6 +47,20 @@
     return ok;
   }
 
+  function validateAdminLogin() {
+    const rules = {
+      identifier: (v) => (v.trim().length >= 3 ? '' : 'Enter your admin email or username.'),
+      password: (v) => (v ? '' : 'Password is required.'),
+    };
+    let ok = true;
+    Object.entries(rules).forEach(([f, fn]) => {
+      const msg = fn(fieldValue(f));
+      showError(f, msg);
+      if (msg) ok = false;
+    });
+    return ok;
+  }
+
   function validateRegister() {
     const pw = fieldValue('password');
     const rules = {
@@ -101,11 +115,21 @@
   }
 
   /* ---------------- post-login redirect ---------------- */
-  function nextAfterLogin(user) {
+  function safeNext() {
     const params = new URLSearchParams(location.search);
     const next = params.get('next');
-    if (next && next.startsWith('/')) return next;
-    return user.role === 'admin' ? '/pages/admin.html' : '/';
+    // Only allow redirects to our own pages (open-redirect protection).
+    if (next && /^\/pages\/[a-z-]+\.html/i.test(next)) return next;
+    return '';
+  }
+
+  function nextAfterLogin(user) {
+    const next = safeNext();
+    if (next) {
+      if (next.startsWith('/pages/admin')) return user.role === 'admin' ? next : '/pages/home.html';
+      return next;
+    }
+    return user.role === 'admin' ? '/pages/admin.html' : '/pages/home.html';
   }
 
   /* ---------------- submit handlers ---------------- */
@@ -135,6 +159,46 @@
     } finally {
       btn.disabled = false;
       btn.textContent = 'Login';
+    }
+  }
+
+  async function handleAdminLogin(e) {
+    e.preventDefault();
+    $('auth-alert').classList.remove('show');
+    if (!validateAdminLogin()) return;
+
+    const btn = $('admin-submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Verifying...';
+
+    try {
+      // The server still owns authentication: it checks the credentials and
+      // returns the role stored in the database. `loginAs: 'admin'` only asks
+      // the server to refuse non-admin accounts on this page — it can never
+      // grant admin rights.
+      const data = await api.post('/auth/login', {
+        identifier: fieldValue('identifier').trim(),
+        password: fieldValue('password'),
+        loginAs: 'admin',
+      });
+
+      if (!data.user || data.user.role !== 'admin') {
+        flash('error', 'These credentials are not an administrator account. Please use "Login as User".');
+        return;
+      }
+
+      api.setToken(data.token);
+      authStore.user = data.user;
+      document.dispatchEvent(new CustomEvent('auth:changed'));
+      flash('success', 'Welcome back, administrator!');
+      toast('Admin login successful.');
+      setTimeout(() => (location.href = '/pages/admin.html'), 500);
+    } catch (err) {
+      flash('error', err.message);
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Login as Admin';
     }
   }
 
@@ -194,6 +258,25 @@
 
     const loginForm = $('login-form');
     const registerForm = $('register-form');
+    const adminLoginForm = $('admin-login-form');
+
+    if (adminLoginForm) {
+      adminLoginForm.addEventListener('submit', handleAdminLogin);
+      adminLoginForm.querySelectorAll('input').forEach((i) =>
+        i.addEventListener('blur', () => {
+          if (i.name === 'identifier' && i.value.trim().length < 3) {
+            showError('identifier', 'Enter your admin email or username.');
+          }
+          if (i.name === 'password' && !i.value) showError('password', 'Password is required.');
+        })
+      );
+      // An administrator already signed in goes straight to the dashboard.
+      if (authStore.isLoggedIn) {
+        authStore.refresh().then((u) => {
+          if (u && u.role === 'admin') location.href = '/pages/admin.html';
+        });
+      }
+    }
 
     if (loginForm) {
       loginForm.addEventListener('submit', handleLogin);

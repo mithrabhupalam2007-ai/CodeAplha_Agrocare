@@ -16,6 +16,21 @@
       });
       return;
     }
+
+    // "Add New Product" is a shortcut: it shows the product list in the
+    // background and opens the add-product form on top of it.
+    if (name === 'add-product') {
+      document.querySelectorAll('.side-nav button').forEach((b) =>
+        b.classList.toggle('active', b.dataset.tab === 'add-product')
+      );
+      document.querySelectorAll('.tab-panel').forEach((p) =>
+        p.classList.toggle('hidden', p.dataset.panel !== 'products')
+      );
+      loadProducts();
+      openProductModal();
+      return;
+    }
+
     document.querySelectorAll('.side-nav button').forEach((b) =>
       b.classList.toggle('active', b.dataset.tab === name)
     );
@@ -25,6 +40,8 @@
 
     if (name === 'dashboard') loadDashboard();
     if (name === 'products') loadProducts();
+    if (name === 'inventory') loadInventory('inventory');
+    if (name === 'outofstock') loadInventory('outofstock');
     if (name === 'orders') loadOrders();
     if (name === 'customers') loadCustomers();
     if (name === 'categories') loadCategories();
@@ -43,6 +60,11 @@
       $('s-customers').textContent = s.totalCustomers.toLocaleString('en-IN');
       $('s-products').textContent = s.totalProducts.toLocaleString('en-IN');
       $('s-products-sub').textContent = `${s.activeProducts} active · ${s.inactiveProducts} inactive`;
+      $('s-instock').textContent = (s.inStockProducts ?? 0).toLocaleString('en-IN');
+      $('s-oos').textContent = (s.outOfStockProducts ?? 0).toLocaleString('en-IN');
+      $('oos-card').classList.toggle('alerted', (s.outOfStockProducts || 0) > 0);
+      $('s-users').textContent = (s.totalUsers ?? s.totalCustomers).toLocaleString('en-IN');
+      $('s-users-sub').textContent = `${s.totalCustomers} customer(s)`;
       $('s-lowstock').textContent = s.lowStockCount;
       $('s-lowstock-sub').textContent = `threshold: ≤ ${s.lowStockThreshold} units`;
       $('lowstock-card').classList.toggle('alerted', s.lowStockCount > 0);
@@ -108,11 +130,12 @@
     tbody.innerHTML = '<tr><td colspan="7"><div class="spinner"></div></td></tr>';
     try {
       const [data, cats] = await Promise.all([
+        // /admin/products also returns inactive items, so admins can manage everything.
         api.get(
-          '/products' +
-            api.qs({ search: prodState.search, category: prodState.category, page: prodState.page, limit: 10, sort: 'newest' })
+          '/admin/products' +
+            api.qs({ search: prodState.search, category: prodState.category, page: prodState.page, limit: 10 })
         ),
-        api.get('/categories'),
+        api.get('/admin/categories'),
       ]);
 
       // category dropdowns (filters + modal)
@@ -248,7 +271,105 @@
         : await api.post('/products', payload);
       toast(data.message);
       $('product-modal').classList.remove('open');
-      loadProducts();
+      const activeTab = document.querySelector('.side-nav button.active');
+      if (activeTab && activeTab.dataset.tab === 'add-product') switchTab('products');
+      else loadProducts();
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+
+  /* ================= inventory / out-of-stock ================= */
+  const listState = {
+    inventory: { page: 1, search: '' },
+    outofstock: { page: 1, search: '' },
+  };
+
+  function stockBadge(qty) {
+    if (qty <= 0) return '<span class="badge badge--red">Out of stock</span>';
+    if (qty <= 5) return `<span class="badge badge--amber">${qty} left</span>`;
+    return `<span class="badge badge--green">${qty} in stock</span>`;
+  }
+
+  async function loadInventory(view) {
+    const isOOS = view === 'outofstock';
+    const st = listState[view];
+    const tbody = $(isOOS ? 'oos-table' : 'inv-table');
+    tbody.innerHTML = `<tr><td colspan="${isOOS ? 6 : 7}"><div class="spinner"></div></td></tr>`;
+
+    try {
+      const data = await api.get(
+        '/admin/products' +
+          api.qs({
+            status: isOOS ? 'outofstock' : '',
+            search: st.search,
+            page: st.page,
+            limit: 12,
+          })
+      );
+
+      tbody.innerHTML = data.products.length
+        ? data.products
+            .map((p) => {
+              const img = `<td><img src="${UI.esc(p.image)}" alt="" /></td>`;
+              const name = `<td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.esc(p.packSize)}</span></td>`;
+              const price = `<td>${UI.inr(p.price)}</td>`;
+              const stockInput = `
+                <td>
+                  <div class="cell-actions">
+                    <input type="number" min="0" step="1" value="${p.stockQuantity}" data-stock-input="${p._id}" style="width:84px;padding:6px 8px;border:1.5px solid var(--line-strong);border-radius:6px;font-size:.85rem;" aria-label="Stock quantity for ${UI.esc(p.name)}" />
+                    <button class="btn btn--primary btn--sm" data-stock-save="${p._id}" data-name="${UI.esc(p.name)}">Update</button>
+                  </div>
+                </td>`;
+              const editBtn = `<button class="btn btn--ghost btn--sm" data-edit="${p._id}">Edit</button>`;
+
+              if (isOOS) {
+                return `<tr>
+                  ${img}${name}<td>${UI.esc(p.category)}</td>${price}
+                  ${stockInput}
+                  <td><div class="cell-actions">${editBtn}</div></td>
+                </tr>`;
+              }
+              return `<tr>
+                ${img}${name}${price}${stockInput}
+                <td>${stockBadge(p.stockQuantity)}</td>
+                <td><span class="badge ${p.active ? 'badge--green' : 'badge--grey'}">${p.active ? 'Active' : 'Inactive'}</span></td>
+                <td><div class="cell-actions">${editBtn}</div></td>
+              </tr>`;
+            })
+            .join('')
+        : `<tr><td colspan="${isOOS ? 6 : 7}" class="text-center text-muted" style="padding:30px;">${
+            isOOS ? 'Nice — no products are out of stock right now.' : 'No products match your search.'
+          }</td></tr>`;
+
+      renderPager($(isOOS ? 'oos-pager' : 'inv-pager'), data.pagination, (p) => {
+        st.page = p;
+        loadInventory(view);
+      });
+
+      tbody.querySelectorAll('[data-stock-save]').forEach((b) =>
+        b.addEventListener('click', () => updateStock(b.dataset.stockSave, b.dataset.name, view))
+      );
+      tbody.querySelectorAll('[data-edit]').forEach((b) =>
+        b.addEventListener('click', () => openProductModal(b.dataset.edit))
+      );
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="${isOOS ? 6 : 7}"><div class="alert show alert--error">${UI.esc(err.message)}</div></td></tr>`;
+    }
+  }
+
+  async function updateStock(id, name, view) {
+    const input = document.querySelector(`[data-stock-input="${id}"]`);
+    const qty = Number(input ? input.value : NaN);
+    if (!Number.isInteger(qty) || qty < 0) {
+      toast('Stock must be a whole number of 0 or more.', 'error');
+      return;
+    }
+    try {
+      const data = await api.patch(`/products/${id}`, { stockQuantity: qty });
+      toast(`${name}: stock set to ${qty}`);
+      loadInventory(view);
+      if (view === 'outofstock' && qty > 0) toast(`${name} is back in stock ✓`);
     } catch (err) {
       toast(err.message, 'error');
     }
@@ -464,12 +585,22 @@
     $('product-form').addEventListener('submit', saveProduct);
     $('category-form').addEventListener('submit', saveCategory);
 
+    const closeModal = (bd) => {
+      bd.classList.remove('open');
+      // Closing the product form while "Add New Product" is active returns
+      // the admin to the Manage Products tab.
+      const activeTab = document.querySelector('.side-nav button.active');
+      if (bd.id === 'product-modal' && activeTab && activeTab.dataset.tab === 'add-product') {
+        switchTab('products');
+      }
+    };
+
     document.querySelectorAll('.modal-backdrop').forEach((bd) => {
       bd.querySelectorAll('[data-close]').forEach((b) =>
-        b.addEventListener('click', () => bd.classList.remove('open'))
+        b.addEventListener('click', () => closeModal(bd))
       );
       bd.addEventListener('click', (e) => {
-        if (e.target === bd) bd.classList.remove('open');
+        if (e.target === bd) closeModal(bd);
       });
     });
 
@@ -500,6 +631,25 @@
       ordState.status = e.target.value;
       ordState.page = 1;
       loadOrders();
+    });
+
+    let invTimer;
+    $('inv-search').addEventListener('input', (e) => {
+      clearTimeout(invTimer);
+      invTimer = setTimeout(() => {
+        listState.inventory.search = e.target.value.trim();
+        listState.inventory.page = 1;
+        loadInventory('inventory');
+      }, 350);
+    });
+    let oosTimer;
+    $('oos-search').addEventListener('input', (e) => {
+      clearTimeout(oosTimer);
+      oosTimer = setTimeout(() => {
+        listState.outofstock.search = e.target.value.trim();
+        listState.outofstock.page = 1;
+        loadInventory('outofstock');
+      }, 350);
     });
 
     loadDashboard();
