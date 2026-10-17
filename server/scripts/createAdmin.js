@@ -3,7 +3,9 @@
  *
  *   npm run create-admin
  *
- * Uses ADMIN_EMAIL / ADMIN_PASSWORD / ADMIN_NAME from server/.env.
+ * Uses ADMIN_EMAIL / ADMIN_NAME (and optional ADMIN_PASSWORD) from server/.env.
+ * AgroShield uses email-only login (demo mode), so ADMIN_PASSWORD is only
+ * stored when provided — it is never required to sign in.
  * Self-registration can NEVER create an admin — this script is the
  * only supported path, which keeps the role protected.
  */
@@ -17,8 +19,8 @@ async function createAdmin() {
   const password = process.env.ADMIN_PASSWORD || '';
   const name = process.env.ADMIN_NAME || 'AgroShield Administrator';
 
-  if (!password || password.length < 8) {
-    console.error('[admin] ADMIN_PASSWORD must be at least 8 characters (set it in server/.env).');
+  if (password && password.length < 8) {
+    console.error('[admin] ADMIN_PASSWORD, when set, must be at least 8 characters.');
     process.exit(1);
   }
 
@@ -28,15 +30,15 @@ async function createAdmin() {
   if (existing) {
     existing.role = 'admin';
     existing.name = name;
-    existing.password = password; // re-hashed by the pre-save hook
+    if (password) existing.password = password; // re-hashed by the pre-save hook
     await existing.save();
     console.log(`[admin] Updated existing account ${email} to the admin role.`);
   } else {
-    await User.create({ name, email, phone: '9000000000', password, role: 'admin' });
+    await User.create({ name, email, phone: '9000000000', ...(password ? { password } : {}), role: 'admin' });
     console.log(`[admin] Created administrator account: ${email}`);
   }
 
-  console.log('[admin] Log in at /pages/login.html with these credentials.');
+  console.log(`[admin] Log in with the email ${email} on /pages/admin-login.html (email-only demo auth).`);
   await disconnectDB();
   process.exit(0);
 }

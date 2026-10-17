@@ -43,7 +43,10 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      // OPTIONAL: AgroShield now uses email-only login (development demo
+      // mode — see README security notice). The field is kept so legacy
+      // accounts that already have a bcrypt hash remain valid and so a
+      // future return to password/magic-link auth needs no migration.
       minlength: [8, 'Password must be at least 8 characters'],
       select: false,
     },
@@ -58,9 +61,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/** Hash the password whenever it is created or changed. */
+/** Hash the password whenever it is created or changed (legacy accounts only). */
 userSchema.pre('save', async function hashPassword(next) {
-  if (!this.isModified('password')) return next();
+  if (!this.password || !this.isModified('password')) return next();
   const rounds = Number(process.env.BCRYPT_ROUNDS) || 10;
   this.password = await bcrypt.hash(this.password, rounds);
   next();

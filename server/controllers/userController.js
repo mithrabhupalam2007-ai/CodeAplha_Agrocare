@@ -46,23 +46,6 @@ const updateProfile = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Profile updated.', user: user.toSafeJSON() });
 });
 
-/** PATCH /api/users/password — requires the current password. */
-const changePassword = asyncHandler(async (req, res) => {
-  const { currentPassword, newPassword } = req.body || {};
-
-  const err = v.password(newPassword);
-  if (err) throw new ApiError(400, err);
-
-  const user = await User.findById(req.user._id).select('+password');
-  const matches = await user.comparePassword(String(currentPassword || ''));
-  if (!matches) throw new ApiError(400, 'Your current password is incorrect.');
-
-  user.password = String(newPassword); // hashed by the pre-save hook
-  await user.save();
-
-  res.json({ success: true, message: 'Password changed successfully.' });
-});
-
 /** GET /api/users/wishlist — populated with currently active products. */
 const getWishlist = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).populate({
@@ -97,7 +80,6 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
 module.exports = {
   getProfile,
   updateProfile,
-  changePassword,
   getWishlist,
   addToWishlist,
   removeFromWishlist,

@@ -1,6 +1,7 @@
 /**
  * Account page: profile editing, order history with cancellation,
- * wishlist management, password change and logout.
+ * wishlist management, profile updates and logout. AgroShield uses
+ * email-only login, so there is no password management here.
  */
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -253,39 +254,6 @@
     }
   }
 
-  /* ================= password ================= */
-  async function changePassword(e) {
-    e.preventDefault();
-    const box = $('pw-alert');
-    box.classList.remove('show');
-    const current = $('cur-pw').value;
-    const next = $('new-pw').value;
-    const confirmPw = $('conf-pw').value;
-
-    if (next.length < 8 || !/[a-zA-Z]/.test(next) || !/\d/.test(next)) {
-      box.className = 'alert show alert--error';
-      box.textContent = 'New password must be at least 8 characters with letters and numbers.';
-      return;
-    }
-    if (next !== confirmPw) {
-      box.className = 'alert show alert--error';
-      box.textContent = 'New passwords do not match.';
-      return;
-    }
-
-    try {
-      const data = await api.patch('/users/password', { currentPassword: current, newPassword: next });
-      box.className = 'alert show alert--success';
-      box.textContent = data.message;
-      $('pw-form').reset();
-      toast(data.message);
-    } catch (err) {
-      box.className = 'alert show alert--error';
-      box.textContent = err.message;
-      toast(err.message, 'error');
-    }
-  }
-
   /* ================= boot ================= */
   document.addEventListener('DOMContentLoaded', async () => {
     UI.mountNav();
@@ -304,21 +272,11 @@
       b.addEventListener('click', () => switchTab(b.dataset.tab))
     );
     $('profile-form').addEventListener('submit', saveProfile);
-    $('pw-form').addEventListener('submit', changePassword);
     $('order-filter').addEventListener('change', () => renderOrders(ordersCache));
-
-    document.querySelectorAll('[data-pw-toggle]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const input = btn.parentElement.querySelector('input');
-        const showing = input.type === 'text';
-        input.type = showing ? 'password' : 'text';
-        btn.textContent = showing ? 'Show' : 'Hide';
-      });
-    });
 
     // deep link: account.html#orders / #wishlist etc.
     const hash = location.hash.replace('#', '');
-    const valid = ['profile', 'orders', 'wishlist', 'password'];
+    const valid = ['profile', 'orders', 'wishlist'];
     switchTab(valid.includes(hash) ? hash : 'profile');
     if (!valid.includes(hash)) loadOrders();
 

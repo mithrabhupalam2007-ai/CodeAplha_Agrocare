@@ -566,6 +566,7 @@
 
 .auth-form-side { display: grid; place-items: center; padding: 48px 24px; background: var(--beige-50); }
 .auth-card { width: min(460px, 100%); }
+.auth-card .auth-brand { justify-content: center; margin-bottom: 4px; }
 .auth-card h1 { font-size: 1.7rem; margin-bottom: 6px; }
 .auth-card > p.sub { color: var(--muted); font-size: 0.94rem; margin-bottom: 26px; }
 .auth-card .switch { text-align: center; font-size: 0.92rem; margin-top: 20px; color: var(--muted); }

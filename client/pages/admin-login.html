@@ -31,33 +31,33 @@
 
     <section class="auth-form-side">
       <div class="auth-card">
+        <a class="brand auth-brand" href="/" aria-label="AgroShield home">
+          <span class="brand__mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+          </span>
+          Agro<em>Shield</em>
+        </a>
         <a class="back-link" href="/">&larr; Back to login options</a>
         <span class="eyebrow">Administrator</span>
         <h1>Admin Login</h1>
-        <p class="sub">Sign in with your administrator email or username.</p>
+        <p class="sub">Sign in with your registered administrator email address.</p>
 
         <div class="alert" id="auth-alert" role="alert"></div>
 
         <form id="admin-login-form" novalidate>
           <div class="field">
-            <label for="admin-identifier">Email or username</label>
-            <input class="input" id="admin-identifier" name="identifier" type="text" autocomplete="username" placeholder="admin@agroshield.in or username" required />
-            <span class="field-error" data-err="identifier"></span>
+            <label for="admin-email">Email address</label>
+            <input class="input" id="admin-email" name="email" type="email" autocomplete="email" placeholder="admin@agroshield.in" required />
+            <span class="field-error" data-err="email"></span>
           </div>
 
-          <div class="field">
-            <label for="admin-password">Password</label>
-            <div class="pw-wrap">
-              <input class="input" id="admin-password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required />
-              <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
-            </div>
-            <span class="field-error" data-err="password"></span>
-          </div>
-
-          <button class="btn btn--primary btn--block btn--lg" id="admin-submit-btn" type="submit">Login as Admin</button>
+          <button class="btn btn--primary btn--block btn--lg" id="admin-submit-btn" type="submit">Login</button>
         </form>
 
         <p class="switch">Are you a customer? <a href="/pages/login.html"><b>Login as User</b></a></p>
+        <p class="text-center link-quiet" style="font-size:.76rem;margin-top:12px;">
+          ⚠️ Demo mode — admin access here requires only the registered email. Never expose this mode on a public site.
+        </p>
       </div>
     </section>
   </main>

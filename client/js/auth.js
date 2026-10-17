@@ -1,7 +1,10 @@
 /**
- * Shared auth logic for login.html and register.html.
- * Validates every field client-side, then calls the API. Real rules
- * (duplicate email, wrong password) are enforced by the server too.
+ * Shared auth logic for login.html, admin-login.html and register.html.
+ *
+ * AgroShield uses EMAIL-ONLY login (development demo mode): the server
+ * verifies the email against MongoDB and checks the account's role there.
+ * This file only does friendly format checks — every authorisation decision
+ * (does the account exist, is it a customer/admin) belongs to the server.
  */
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -32,48 +35,18 @@
     return el ? el.value : '';
   }
 
-  /* ---------------- validators ---------------- */
+  /* ---------------- validators (email-only auth) ---------------- */
   function validateLogin() {
-    const rules = {
-      email: (v) => (EMAIL_RE.test(v.trim()) ? '' : 'Enter a valid email address.'),
-      password: (v) => (v ? '' : 'Password is required.'),
-    };
-    let ok = true;
-    Object.entries(rules).forEach(([f, fn]) => {
-      const msg = fn(fieldValue(f));
-      showError(f, msg);
-      if (msg) ok = false;
-    });
-    return ok;
-  }
-
-  function validateAdminLogin() {
-    const rules = {
-      identifier: (v) => (v.trim().length >= 3 ? '' : 'Enter your admin email or username.'),
-      password: (v) => (v ? '' : 'Password is required.'),
-    };
-    let ok = true;
-    Object.entries(rules).forEach(([f, fn]) => {
-      const msg = fn(fieldValue(f));
-      showError(f, msg);
-      if (msg) ok = false;
-    });
-    return ok;
+    const msg = EMAIL_RE.test(fieldValue('email').trim()) ? '' : 'Enter a valid email address.';
+    showError('email', msg);
+    return !msg;
   }
 
   function validateRegister() {
-    const pw = fieldValue('password');
     const rules = {
       name: (v) => (v.trim().length >= 2 ? '' : 'Full name is required (min 2 characters).'),
       email: (v) => (EMAIL_RE.test(v.trim()) ? '' : 'Enter a valid email address.'),
       phone: (v) => (PHONE_RE.test(v.trim()) ? '' : 'Enter a valid 10-digit Indian mobile number.'),
-      password: (v) => {
-        if (v.length < 8) return 'Password must be at least 8 characters.';
-        if (!/[a-zA-Z]/.test(v)) return 'Password must contain at least one letter.';
-        if (!/\d/.test(v)) return 'Password must contain at least one number.';
-        return '';
-      },
-      confirmPassword: (v) => (v === pw ? '' : 'Passwords do not match.'),
       line1: (v) => (v.trim().length >= 3 ? '' : 'Address line is required.'),
       city: (v) => (v.trim().length >= 2 ? '' : 'City is required.'),
       state: (v) => (v.trim().length >= 2 ? '' : 'State is required.'),
@@ -86,32 +59,6 @@
       if (msg) ok = false;
     });
     return ok;
-  }
-
-  /* ---------------- password widgets ---------------- */
-  function wirePasswordWidgets() {
-    document.querySelectorAll('[data-pw-toggle]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const input = btn.parentElement.querySelector('input');
-        const showing = input.type === 'text';
-        input.type = showing ? 'password' : 'text';
-        btn.textContent = showing ? 'Show' : 'Hide';
-      });
-    });
-
-    const pwInput = document.querySelector('#register-form [name="password"]');
-    const meter = $('pw-strength');
-    if (pwInput && meter) {
-      pwInput.addEventListener('input', () => {
-        const v = pwInput.value;
-        let score = 0;
-        if (v.length >= 8) score += 1;
-        if (/[a-zA-Z]/.test(v) && /\d/.test(v)) score += 1;
-        if (v.length >= 12) score += 1;
-        if (/[^a-zA-Z0-9]/.test(v)) score += 1;
-        meter.className = 'pw-strength ' + ['', 'weak', 'fair', 'good', 'strong'][score];
-      });
-    }
   }
 
   /* ---------------- post-login redirect ---------------- */
@@ -145,7 +92,6 @@
     try {
       const data = await api.post('/auth/login', {
         email: fieldValue('email').trim(),
-        password: fieldValue('password'),
       });
       api.setToken(data.token);
       authStore.user = data.user;
@@ -154,7 +100,12 @@
       toast(data.message);
       setTimeout(() => (location.href = nextAfterLogin(data.user)), 500);
     } catch (err) {
-      flash('error', err.message);
+      // 404 = this email has no account yet — point the visitor at signup.
+      if (err.status === 404) {
+        flash('error', `${err.message} Click "Create an account" below to sign up.`);
+      } else {
+        flash('error', err.message);
+      }
       toast(err.message, 'error');
     } finally {
       btn.disabled = false;
@@ -165,25 +116,24 @@
   async function handleAdminLogin(e) {
     e.preventDefault();
     $('auth-alert').classList.remove('show');
-    if (!validateAdminLogin()) return;
+    if (!validateLogin()) return;
 
     const btn = $('admin-submit-btn');
     btn.disabled = true;
     btn.textContent = 'Verifying...';
 
     try {
-      // The server still owns authentication: it checks the credentials and
+      // The server owns authentication: it looks the email up in MongoDB and
       // returns the role stored in the database. `loginAs: 'admin'` only asks
       // the server to refuse non-admin accounts on this page — it can never
       // grant admin rights.
       const data = await api.post('/auth/login', {
-        identifier: fieldValue('identifier').trim(),
-        password: fieldValue('password'),
+        email: fieldValue('email').trim(),
         loginAs: 'admin',
       });
 
       if (!data.user || data.user.role !== 'admin') {
-        flash('error', 'These credentials are not an administrator account. Please use "Login as User".');
+        flash('error', 'This account is not an administrator. Please use "Login as User".');
         return;
       }
 
@@ -198,7 +148,7 @@
       toast(err.message, 'error');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Login as Admin';
+      btn.textContent = 'Login';
     }
   }
 
@@ -221,8 +171,6 @@
         name: fieldValue('name').trim(),
         email: fieldValue('email').trim(),
         phone: fieldValue('phone').trim(),
-        password: fieldValue('password'),
-        confirmPassword: fieldValue('confirmPassword'),
         address: {
           line1: fieldValue('line1').trim(),
           line2: fieldValue('line2').trim(),
@@ -252,9 +200,17 @@
     }
   }
 
+  function wireEmailBlur(form) {
+    if (!form) return;
+    form.querySelectorAll('input[name="email"]').forEach((i) =>
+      i.addEventListener('blur', () =>
+        showError('email', EMAIL_RE.test(i.value.trim()) ? '' : 'Enter a valid email address.')
+      )
+    );
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     UI.mountNav();
-    wirePasswordWidgets();
 
     const loginForm = $('login-form');
     const registerForm = $('register-form');
@@ -262,14 +218,7 @@
 
     if (adminLoginForm) {
       adminLoginForm.addEventListener('submit', handleAdminLogin);
-      adminLoginForm.querySelectorAll('input').forEach((i) =>
-        i.addEventListener('blur', () => {
-          if (i.name === 'identifier' && i.value.trim().length < 3) {
-            showError('identifier', 'Enter your admin email or username.');
-          }
-          if (i.name === 'password' && !i.value) showError('password', 'Password is required.');
-        })
-      );
+      wireEmailBlur(adminLoginForm);
       // An administrator already signed in goes straight to the dashboard.
       if (authStore.isLoggedIn) {
         authStore.refresh().then((u) => {
@@ -280,12 +229,7 @@
 
     if (loginForm) {
       loginForm.addEventListener('submit', handleLogin);
-      loginForm.querySelectorAll('input').forEach((i) =>
-        i.addEventListener('blur', () => {
-          if (i.name === 'email') showError('email', EMAIL_RE.test(i.value.trim()) ? '' : 'Enter a valid email address.');
-          if (i.name === 'password' && !i.value) showError('password', 'Password is required.');
-        })
-      );
+      wireEmailBlur(loginForm);
       // Already logged in? Go where they wanted.
       if (authStore.isLoggedIn) {
         authStore.refresh().then((u) => {
@@ -296,11 +240,7 @@
 
     if (registerForm) {
       registerForm.addEventListener('submit', handleRegister);
-      registerForm.querySelectorAll('[name="confirmPassword"]').forEach((i) =>
-        i.addEventListener('blur', () =>
-          showError('confirmPassword', i.value === fieldValue('password') ? '' : 'Passwords do not match.')
-        )
-      );
+      wireEmailBlur(registerForm);
     }
   });
 })();

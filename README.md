@@ -13,7 +13,7 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 - The home page, catalogue, cart, checkout and account pages are **not accessible before login** (enforced by the server *and* client-side guards, with `?next=` return-to support)
 
 ### Customer
-- **User login / registration** — email + password login, full registration (name, email, phone, password, delivery address), back buttons to the selection page
+- **User login / registration** — **email-only login** (no password field), registration collects name, email, phone and delivery address, back buttons to the selection page
 - **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), shop-by-category cards, **Newly Released Products** (live from the database, newest first, with an empty state), Featured, Featured Seeds, Crop Protection, Recently Added and Farming Essentials rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
 - **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options, Load More pagination, empty states
 - **Product cards** — image, name, category, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons
@@ -23,12 +23,12 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 - **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar, **live re-check of every line against the database** (unavailable items are clearly labelled and **checkout is blocked** until the cart is purchasable)
 - **Checkout** — address form with validation, Cash on Delivery + clearly-labelled demo payment, pre-submit availability check, server-side price/stock verification
 - **Orders** — confirmation page, My Orders with status timeline, self-cancellation (Placed/Confirmed only) with automatic restock
-- **Account** — profile editing, saved address, change password, logout; the navbar account menu links to Profile, Orders, Wishlist and Logout
+- **Account** — profile editing, saved address, logout; the navbar account menu links to Profile, Orders, Wishlist and Logout
 - **Policies page** — shipping information, privacy policy and terms (`/pages/legal.html`), linked from the footer
-- **Auth** — register/login with field validation, bcrypt hashing, JWT (httpOnly cookie + bearer fallback)
+- **Auth** — email-only register/login with field validation, JWT session (httpOnly cookie + bearer fallback)
 
 ### Admin (`/pages/admin-login.html` → `/pages/admin.html`)
-- **Separate admin login** — email *or* username + password; only accounts with `role: admin` are accepted (verified on the backend)
+- **Separate admin login** — email only; only accounts with `role: admin` are accepted (verified on the backend against the database record)
 - **Dashboard Overview** — total products, active products, in-stock, out-of-stock, **newly released**, total orders, registered customers, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
 - **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items, with *new* and *manually blocked* badges
 - **Add New Product** — form with name, category, description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, crops, specifications, **label & safety information**, batch number & expiry
@@ -49,15 +49,27 @@ available  ⇔  active  AND  stockQuantity > 0  AND  manualOutOfStock = false
 The database is authoritative: the same rule is applied by the backend for catalogue responses (`available` + `stockStatus` on every product), for the checkout validation and atomic stock decrement, and it drives every button/badge on the storefront.
 
 ### Security
-- bcrypt password hashing (cost 10) — plain-text passwords never stored
-- JWT signed with a server-side secret (`.env`, never exposed to the frontend)
+
+> ### ⚠️ Security notice — email-only login is a low-security demo mode
+> This build authenticates **by email address alone**. Knowing an email is
+> the only check, so anyone who knows a registered address can sign in as
+> that user — including administrator accounts. This simplified mode is for
+> **local development and demonstration only**.
+> - **Do not** deploy email-only login on a publicly accessible production site.
+> - **Do not** protect real administrator accounts with it; privileged access must never depend solely on knowing an email address.
+> - Before production, add real verification: a **one-time emailed code**, a **magic login link**, or **password authentication**. The `User.password` field (bcrypt hash) and `comparePassword()` are kept in the codebase so passwords can be re-enabled without a data migration.
+
+Other protections in place:
+
+- JWT signed with a server-side secret (`.env`, never exposed to the frontend), with expiry (`JWT_EXPIRES_IN`, default `7d`); logout clears the session cookie
 - **Server-side login wall**: protected HTML pages redirect to the selection page without a valid signed session; product/category APIs require authentication
-- Role-based authorization middleware (`protect` + `requireAdmin`) on every admin route and the admin page itself
-- Registration always creates `role: customer` — no self-service admin signup; roles are never read from the request body
+- Role-based authorization middleware (`protect` + `requireAdmin`) on every admin route and the admin page itself — **the role always comes from the MongoDB record**, never from the request body or the login page used
+- Registration always creates `role: customer` — no self-service admin signup; the admin account is only provisioned by `npm run create-admin`
 - Rate limiting on auth endpoints (50 req/15 min, 20 sign-ups/hour)
 - Helmet security headers, CORS allow-list, MongoDB operator sanitization
 - Ownership checks: customers can only read/cancel **their own** orders
 - All prices, delivery charges and totals recomputed on the server at checkout (browser totals are never trusted)
+- Legacy accounts that still carry a bcrypt hash keep working — hashes are never stored or transmitted in plain text and are not re-hashed
 
 ---
 
@@ -68,7 +80,7 @@ The database is authoritative: the same rule is applied by the backend for catal
 | Frontend | HTML5, CSS3, vanilla JavaScript (no frameworks) |
 | Backend | Node.js + Express.js (REST API) |
 | Database | MongoDB + Mongoose |
-| Auth | bcryptjs + JSONwebtoken (JWT in httpOnly cookie, bearer fallback) |
+| Auth | JSONwebtoken (JWT in httpOnly cookie, bearer fallback) — email-only demo login; bcryptjs retained for legacy password hashes |
 | Security | helmet, cors, express-rate-limit, mongo-sanitize |
 | Images | Wikimedia Commons photographs + generated SVG pack-shots |
 
@@ -150,7 +162,7 @@ Then edit `server/.env`:
 | `JWT_EXPIRES_IN` | Token lifetime | `7d` |
 | `CLIENT_ORIGIN` | Comma-separated CORS allow-list | `http://127.0.0.1:5500,http://localhost:5500` |
 | `NODE_ENV` | `development` or `production` | `development` |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Bootstrap admin credentials | — |
+| `ADMIN_EMAIL` / `ADMIN_NAME` (optional `ADMIN_PASSWORD`) | Bootstrap admin account (email-only login) | — |
 
 > ⚠️ Port **5000** is occupied by macOS AirPlay on many Macs — that is why `5050` is the default.
 
@@ -168,7 +180,7 @@ npm start             # production
 npm run dev           # development (auto-restart on changes)
 ```
 
-Open **http://localhost:5050** — you will land on the **login selection page**; choose *Login as User* (register first) or *Login as Admin* with the credentials above. Express serves both the API and the frontend.
+Open **http://localhost:5050** — you will land on the **login selection page**; choose *Login as User* (register first) or *Login as Admin* (admin email below). Express serves both the API and the frontend.
 
 **Live Server users:** `client/` can also be opened via VS Code Live Server (`:5500`/`:8080`/`:8000`); `api.js` automatically switches to `http://localhost:5050/api` and sends the JWT as a bearer token.
 
@@ -176,12 +188,12 @@ Open **http://localhost:5050** — you will land on the **login selection page**
 
 ## 👤 Demo credentials
 
-| Role | Email | Password | Username (admin login) |
-|---|---|---|---|
-| Administrator | `admin@agroshield.in` | `Admin@1234` | `AgroShield Admin` |
-| Customer | register your own account | — | — |
+| Role | Email | How to sign in |
+|---|---|---|
+| Administrator | `admin@agroshield.in` | Admin Login page — enter the email, click **Login** |
+| Customer | register your own account | User Login page — enter your email, click **Login** |
 
-> Change `ADMIN_PASSWORD` in `.env` and re-run `npm run create-admin` for anything beyond local demos. The admin login page accepts **either** the admin email or the admin username.
+> ⚠️ Email-only demo auth: anyone who knows an email can sign in as its owner. Change nothing here for local demos; implement OTP/magic-link/password login before any real deployment (see the security notice above).
 
 ---
 
@@ -192,8 +204,8 @@ Base URL: `http://localhost:5050/api`
 ### Auth
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/auth/register` | — | Create customer account (rate-limited; always `role: customer`) |
-| POST | `/auth/login` | — | `identifier` (email **or** username) + `password`; optional `loginAs: 'admin'` only restricts, never grants, admin access (rate-limited) |
+| POST | `/auth/register` | — | Create customer account from `name`, `email`, `phone`, `address` — no password (rate-limited; always `role: customer`) |
+| POST | `/auth/login` | — | **Email-only**: `{ email }` (+ optional `loginAs: 'admin'` which only restricts, never grants, admin access); 404 for an unregistered email, 403 for a role mismatch (rate-limited) |
 | GET | `/auth/me` | user | Current user profile |
 | POST | `/auth/logout` | — | Clear session cookie |
 
@@ -228,7 +240,6 @@ Base URL: `http://localhost:5050/api`
 | Method | Endpoint | Auth |
 |---|---|---|
 | GET / PATCH | `/users/profile` | user |
-| PATCH | `/users/password` | user |
 | GET / POST / DELETE | `/users/wishlist[/:productId]` | user |
 
 ### Admin (all require `role: admin`)
@@ -257,10 +268,11 @@ Base URL: `http://localhost:5050/api`
 
 Verified against a running instance (see §15 of the project prompt):
 
-- [x] Registration: valid data, duplicate email (409), weak password, password mismatch, invalid phone/PIN
-- [x] Login: correct credentials, wrong password (generic 401), unknown email/username (generic 401 — never a 500), missing auth (401)
+- [x] Registration: valid data without any password field, duplicate email (409), invalid phone/PIN rejected
+- [x] Email-only login: registered email succeeds, unregistered email rejected with a clear 404 message (no stack traces), invalid email format → 400, missing auth (401)
 - [x] Login selection page is the site entry; protected pages redirect to `/?next=…` when logged out
-- [x] Admin login: by email **and** by username; customer credentials rejected on the admin page (403); customers blocked from `/pages/admin.html` and all admin APIs
+- [x] Admin login: by email; customer email rejected on the admin page (403); admin email rejected on the user login page (403); customers blocked from `/pages/admin.html` and all admin APIs
+- [x] Sessions expire (JWT `exp`) — an expired token gets 401; logout clears the cookie so the session is invalid immediately
 - [x] Product/category APIs return 401 without a valid session
 - [x] Product data loaded from MongoDB (34 products, 9 categories)
 - [x] Search / category / price / stock / crop filters, all 7 sort orders, empty state, pagination
@@ -273,7 +285,7 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Order cancellation restores stock; cancelled orders excluded from revenue
 - [x] Empty states, loading spinners, API error messages on every page
 - [x] Responsive layouts at desktop / tablet / mobile breakpoints
-- [x] Password change (wrong current password rejected), profile update, wishlist sync
+- [x] Profile update, wishlist sync
 - [x] Home page New Releases section shows the flagged database products (newest first) with an empty state when none are flagged
 - [x] Product cards/details show MRP + discount % only when a genuine discount (mrp > price) exists
 - [x] PDP gallery thumbnails + zoom lightbox; related carousel excludes the current product and shows ≥ 8 real database items
@@ -292,7 +304,7 @@ Verified against a running instance (see §15 of the project prompt):
 
 ## 🗄️ Database design
 
-**User** — name, email (unique), phone, password hash (bcrypt, `select:false`), role (`customer|admin`), saved address, wishlist, timestamps
+**User** — name, email (unique), phone, optional password hash (bcrypt, `select:false` — kept for legacy accounts / a future return to password auth; unused by email-only demo login), role (`customer|admin`), saved address, wishlist, timestamps
 
 **Product** — name, slug, description, category, type, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured/bestseller/seasonal flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
 

@@ -31,10 +31,16 @@
 
     <section class="auth-form-side">
       <div class="auth-card">
+        <a class="brand auth-brand" href="/" aria-label="AgroShield home">
+          <span class="brand__mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+          </span>
+          Agro<em>Shield</em>
+        </a>
         <a class="back-link" href="/">&larr; Back to login options</a>
         <span class="eyebrow">Sign in</span>
         <h1>Login to your account</h1>
-        <p class="sub">Enter your registered email and password.</p>
+        <p class="sub">Enter your registered email address to continue.</p>
 
         <div class="alert" id="auth-alert" role="alert"></div>
 
@@ -45,21 +51,15 @@
             <span class="field-error" data-err="email"></span>
           </div>
 
-          <div class="field">
-            <label for="password">Password</label>
-            <div class="pw-wrap">
-              <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required />
-              <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
-            </div>
-            <span class="field-error" data-err="password"></span>
-          </div>
-
           <button class="btn btn--primary btn--block btn--lg" id="submit-btn" type="submit">Login</button>
         </form>
 
         <p class="switch">New to AgroShield? <a href="/pages/register.html"><b>Create an account</b></a></p>
         <p class="text-center link-quiet" style="font-size:.82rem;">
           Administrator? <a href="/pages/admin-login.html"><b>Use the Admin Login</b></a>
+        </p>
+        <p class="text-center link-quiet" style="font-size:.76rem;margin-top:12px;">
+          🔒 Demo mode — you sign in with your email address only (no password). Not for production use.
         </p>
       </div>
     </section>

@@ -23,8 +23,9 @@ function clearAuthCookie(res) {
 
 /**
  * POST /api/auth/register
- * Creates a customer account. The role is ALWAYS customer —
- * there is no way to self-register as an administrator.
+ * Creates a customer account from name, email, phone and address — there is
+ * no password step (email-only demo auth) and no way to self-register as an
+ * administrator; the role is ALWAYS customer.
  */
 const register = asyncHandler(async (req, res) => {
   const body = req.body || {};
@@ -33,20 +34,17 @@ const register = asyncHandler(async (req, res) => {
   const rawPhone = typeof body.phone === 'string' ? body.phone.trim() : '';
   const address = body.address && typeof body.address === 'object' ? body.address : {};
 
+  // Email-only signup: name, email, phone and delivery address — no password
+  // (a leftover password field in the request is simply ignored).
   v.assertValid({
     name: v.requiredString(name, 'Full name', { min: 2, max: 80 }),
     email: v.email(rawEmail),
     phone: v.phone(rawPhone),
-    password: v.password(body.password),
     addressLine1: v.requiredString(address.line1, 'Address line', { min: 3, max: 120 }),
     city: v.requiredString(address.city, 'City', { min: 2, max: 60 }),
     state: v.requiredString(address.state, 'State', { min: 2, max: 60 }),
     pincode: v.pincode(address.pincode),
   });
-
-  if (body.password !== body.confirmPassword) {
-    throw new ApiError(400, 'Passwords do not match.');
-  }
 
   const existing = await User.findOne({ email: rawEmail }).lean();
   if (existing) throw new ApiError(409, 'An account with this email address already exists. Please log in.');
@@ -55,7 +53,6 @@ const register = asyncHandler(async (req, res) => {
     name,
     email: rawEmail,
     phone: rawPhone,
-    password: body.password, // hashed by the pre-save hook, never stored plain
     role: 'customer', // explicit — cannot be overridden by the request body
     address: {
       line1: String(address.line1).trim(),
@@ -78,85 +75,64 @@ const register = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/auth/login
- * Verifies credentials and starts a session.
+ * POST /api/auth/login — EMAIL-ONLY LOGIN (development demo mode).
  *
- * Accepts either an email address or a username (the account's full name)
- * through `identifier`, plus plain `email` for backwards compatibility.
- * The role used for authorisation always comes from the DATABASE record —
- * any role-like field sent by the client is ignored.
+ * SECURITY NOTICE: knowing an email address is the ONLY check here — email
+ * alone does not prove the person owns that mailbox. This simplified,
+ * low-security mode is acceptable for local development/demo use ONLY.
+ * Do NOT deploy it on a publicly accessible site or protect real
+ * administrator accounts with it. Before production, add real verification
+ * (one-time emailed code, magic login link, or password authentication).
+ *
+ * Flow: validate email format -> look up the account in MongoDB ->
+ * verify its role (admin page requires role 'admin', user page requires
+ * role 'customer') -> issue a signed, expiring session (JWT cookie).
+ *
+ * The role used for authorisation ALWAYS comes from the DATABASE record —
+ * `loginAs` may only RESTRICT access on the admin page; it can never grant
+ * admin rights, and any role-like field sent by the client is ignored.
  */
 const login = asyncHandler(async (req, res) => {
   const body = req.body || {};
-  const rawId =
-    (typeof body.identifier === 'string' && body.identifier.trim()) ||
+  const rawEmail =
     (typeof body.email === 'string' && body.email.trim()) ||
+    (typeof body.identifier === 'string' && body.identifier.trim()) ||
     '';
-  const rawPassword = typeof body.password === 'string' ? body.password : '';
+  const isAdminLogin = body.loginAs === 'admin';
 
-  v.assertValid({
-    identifier: v.requiredString(rawId, 'Email or username', { min: 3, max: 120 }),
-    password: v.requiredString(rawPassword, 'Password'),
-  });
+  const emailErr = v.email(rawEmail);
+  if (emailErr) throw new ApiError(400, emailErr);
+  const email = rawEmail.toLowerCase();
 
-  const genericError = new ApiError(401, 'Invalid credentials. Please check your email/username and password.');
-
-  // Development-only diagnostic log (identities are masked, passwords never logged).
+  // Development-only diagnostic log (address is masked, no secrets logged).
   const logLoginFailure = (reason) => {
     if (process.env.NODE_ENV === 'production') return;
-    const shown = rawId.includes('@')
-      ? rawId.trim().toLowerCase().replace(/^(.{2}).*(@.+)$/, '$1***$2')
-      : `username "${rawId.trim()}"`;
-    console.log(`[auth] login failed (${reason}) for ${shown}`);
+    const shown = email.replace(/^(.{2}).*(@.+)$/, '$1***$2');
+    console.log(`[auth] ${isAdminLogin ? 'admin' : 'user'} login failed (${reason}) for ${shown}`);
   };
 
-  let user = null;
-  if (rawId.includes('@')) {
-    // Email login — normalised exactly like registration (trim + lowercase).
-    const err = v.email(rawId);
-    if (err) throw new ApiError(400, err);
-    user = await User.findOne({ email: rawId.trim().toLowerCase() }).select('+password');
-    if (!user) {
-      logLoginFailure('unknown email');
-      throw genericError;
-    }
-  } else {
-    // Username login: exact, case-insensitive full-name match.
-    // Only accepted when the match is unambiguous (limit 2 -> length must be 1).
-    const esc = rawId.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const matches = await User.find({ name: new RegExp(`^${esc}$`, 'i') })
-      .select('+password')
-      .limit(2);
-    if (matches.length !== 1) {
-      logLoginFailure(matches.length === 0 ? 'unknown username' : 'ambiguous username');
-      throw genericError;
-    }
-    user = matches[0];
+  const user = await User.findOne({ email });
+  if (!user) {
+    logLoginFailure('unregistered email');
+    throw new ApiError(
+      404,
+      isAdminLogin
+        ? 'No account is registered with this email address. Please check the email or contact the store owner.'
+        : 'This email address is not registered. Please create an account first.'
+    );
   }
 
-  // Never call comparePassword() on a null user or without a stored hash —
-  // either case is treated as invalid credentials, not as a server error.
-  if (!user || !user.password) {
-    logLoginFailure('missing password hash');
-    throw genericError;
-  }
-
-  const matches = await user.comparePassword(rawPassword);
-  if (!matches) {
-    logLoginFailure('wrong password');
-    throw genericError;
-  }
-
-  // Optional UX guard used by the Admin Login page: `loginAs: 'admin'` may only
-  // RESTRICT access (admins can still log in through the user login), it never
-  // grants it. Authorisation for admin APIs/pages always relies on the role in
-  // the database record.
-  if (body.loginAs === 'admin' && user.role !== 'admin') {
-    logLoginFailure('non-admin account on admin login');
+  // --- role checks, server-side, against the database record ---
+  if (isAdminLogin && user.role !== 'admin') {
+    logLoginFailure('customer account on admin login');
     throw new ApiError(403, 'This account does not have administrator access. Please use "Login as User" instead.');
   }
+  if (!isAdminLogin && user.role !== 'customer') {
+    logLoginFailure('admin account on user login');
+    throw new ApiError(403, 'This is an administrator account. Please sign in from the Admin Login page.');
+  }
 
-  const token = signToken(user);
+  const token = signToken(user); // signed + expiring (JWT_EXPIRES_IN, default 7d)
   setAuthCookie(res, token);
 
   // role comes from the database record, never from the request body.

@@ -31,6 +31,12 @@
 
     <section class="auth-form-side">
       <div class="auth-card">
+        <a class="brand auth-brand" href="/" aria-label="AgroShield home">
+          <span class="brand__mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+          </span>
+          Agro<em>Shield</em>
+        </a>
         <a class="back-link" href="/">&larr; Back to login options</a>
         <span class="eyebrow">Register</span>
         <h1>Create your account</h1>
@@ -58,25 +64,9 @@
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="field">
-              <label for="password">Password</label>
-              <div class="pw-wrap">
-                <input class="input" id="password" name="password" type="password" autocomplete="new-password" placeholder="Min 8 chars, letters + numbers" required />
-                <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
-              </div>
-              <div class="pw-strength" id="pw-strength"><i></i><i></i><i></i><i></i></div>
-              <span class="field-error" data-err="password"></span>
-            </div>
-            <div class="field">
-              <label for="confirmPassword">Confirm password</label>
-              <div class="pw-wrap">
-                <input class="input" id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repeat password" required />
-                <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
-              </div>
-              <span class="field-error" data-err="confirmPassword"></span>
-            </div>
-          </div>
+          <p class="text-muted" style="font-size:.85rem;margin:-6px 0 16px;">
+            No password needed — you will sign in with your email address.
+          </p>
 
           <fieldset style="border:1.5px solid var(--line-strong);border-radius:var(--r-s);padding:16px;margin:0 0 18px;">
             <legend style="font-size:.86rem;font-weight:700;padding:0 6px;color:var(--green-900);">Delivery address</legend>
