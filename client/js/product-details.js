@@ -56,23 +56,37 @@
   function wireLightbox() {
     const box = $('lightbox');
     const img = $('lightbox-img');
-    $('pdp-image').addEventListener('click', () => {
+
+    /* Open ONLY on demand — clicking the product image or the zoom button.
+       The modal's visibility is the `.open` class (plus the synced `hidden`
+       attribute); it is never left open from page load. */
+    const open = () => {
       if (!product) return;
       img.src = $('pdp-image').src;
       img.alt = product.name;
       box.hidden = false;
-      document.body.style.overflow = 'hidden';
-    });
+      box.classList.add('open'); // CSS: .lightbox.open { display: flex }
+      document.body.style.overflow = 'hidden'; // freeze background scroll
+      $('lightbox-close').focus();
+    };
+
+    /* Close restores page brightness (backdrop removed), scrolling and
+       interaction, and returns focus to the zoom control. */
     const close = () => {
+      box.classList.remove('open');
       box.hidden = true;
       document.body.style.overflow = '';
+      $('pdp-zoom-btn').focus();
     };
+
+    $('pdp-image').addEventListener('click', open);
+    $('pdp-zoom-btn').addEventListener('click', open);
     $('lightbox-close').addEventListener('click', close);
     box.addEventListener('click', (e) => {
-      if (e.target === box) close();
+      if (e.target === box) close(); // click outside the image -> backdrop
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !box.hidden) close();
+      if (e.key === 'Escape' && box.classList.contains('open')) close();
     });
   }
 
@@ -256,15 +270,21 @@
         if (on) {
           await api.del(`/users/wishlist/${p._id}`);
           btn.classList.remove('on');
-          authStore.user.wishlist = (authStore.user.wishlist || []).filter((id) => id !== p._id);
+          // assign through the setter — authStore.user is a fresh object per read
+          authStore.user = {
+            ...authStore.user,
+            wishlist: (authStore.user.wishlist || []).filter((id) => id !== p._id),
+          };
           toast('Removed from wishlist', 'info');
         } else {
           await api.post(`/users/wishlist/${p._id}`);
           btn.classList.add('on');
-          authStore.user.wishlist = [...new Set([...(authStore.user.wishlist || []), p._id])];
+          authStore.user = {
+            ...authStore.user,
+            wishlist: [...new Set([...(authStore.user.wishlist || []), p._id])],
+          };
           toast('Added to wishlist');
         }
-        localStorage.setItem('agroshield_user', JSON.stringify(authStore.user));
         UI.refreshBadges();
       } catch (err) {
         toast(err.message, 'error');
@@ -385,16 +405,23 @@
       try {
         if (wished) {
           await api.del(`/users/wishlist/${product._id}`);
-          authStore.user.wishlist = authStore.user.wishlist.filter((id) => id !== product._id);
+          // authStore.user is a getter (fresh object each read) — assign the
+          // whole object so the setter persists the change to localStorage.
+          authStore.user = {
+            ...authStore.user,
+            wishlist: (authStore.user.wishlist || []).filter((id) => id !== product._id),
+          };
           btn.innerHTML = '♡ Wishlist';
           toast('Removed from wishlist', 'info');
         } else {
           await api.post(`/users/wishlist/${product._id}`);
-          authStore.user.wishlist = [...new Set([...(authStore.user.wishlist || []), product._id])];
+          authStore.user = {
+            ...authStore.user,
+            wishlist: [...new Set([...(authStore.user.wishlist || []), product._id])],
+          };
           btn.innerHTML = '♥ In Wishlist';
           toast('Added to wishlist');
         }
-        localStorage.setItem('agroshield_user', JSON.stringify(authStore.user));
         UI.refreshBadges();
       } catch (err) {
         toast(err.message, 'error');

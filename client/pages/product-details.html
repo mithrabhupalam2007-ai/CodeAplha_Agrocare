@@ -40,8 +40,8 @@
             <!-- ============ GALLERY ============ -->
             <div>
               <div class="pdp__gallery">
-                <img id="pdp-image" src="" alt="" title="Click to enlarge" />
-                <span class="pdp__zoom-hint" aria-hidden="true">🔍 Click image to zoom</span>
+                <img id="pdp-image" src="" alt="" />
+                <button class="pdp__zoom-hint" type="button" id="pdp-zoom-btn">🔍 Click image to zoom</button>
                 <span class="pdp__avail-badge" id="pdp-avail-badge"></span>
               </div>
               <div class="pdp__thumbs" id="pdp-thumbs" hidden></div>
@@ -158,7 +158,7 @@
   <!-- Image zoom lightbox -->
   <div class="lightbox" id="lightbox" hidden>
     <button class="lightbox__close" type="button" id="lightbox-close" aria-label="Close zoom view">×</button>
-    <img id="lightbox-img" src="" alt="Enlarged product image" />
+    <img id="lightbox-img" src="" alt="" />
   </div>
 </body>
 </html>

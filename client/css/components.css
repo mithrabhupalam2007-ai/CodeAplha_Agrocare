@@ -828,7 +828,7 @@
   margin-left: 8px;
 }
 
-/* ---------------- PDP gallery: zoom hint, availability badge, thumbs ---------------- */
+/* ---------------- PDP gallery: zoom hint (button), availability badge, thumbs ---------------- */
 /* (.pdp__gallery is sticky — that already acts as the containing block for
    the absolutely-positioned badge/hint.) */
 .pdp__gallery img { cursor: zoom-in; }
@@ -839,10 +839,26 @@
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
+  font-family: inherit;
   font-size: 0.74rem;
   padding: 4px 10px;
   color: var(--muted);
-  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+.pdp__zoom-hint:hover {
+  background: var(--white);
+  color: var(--green-700);
+  border-color: var(--green-700);
+}
+/* Helpful zoom text only when appropriate: revealed when the customer
+   hovers/focuses the gallery; always visible on touch devices (no hover). */
+.pdp__gallery .pdp__zoom-hint { opacity: 0; }
+.pdp__gallery:hover .pdp__zoom-hint,
+.pdp__gallery:focus-within .pdp__zoom-hint { opacity: 1; }
+@media (hover: none) {
+  .pdp__gallery .pdp__zoom-hint { opacity: 1; }
 }
 .pdp__avail-badge {
   position: absolute;
@@ -947,20 +963,26 @@
   .carousel__card { flex: 0 0 78%; min-width: 0; }
 }
 
-/* ---------------- Image zoom lightbox ---------------- */
+/* ---------------- Image zoom lightbox ----------------
+   Visibility is driven ONLY by the `.open` class that product-details.js
+   toggles (same pattern as .modal-backdrop.open). The old rule below set
+   `display: flex` unconditionally, which overrode the element's `hidden`
+   attribute and left the dark overlay stuck open from page load. */
 .lightbox {
   position: fixed;
   inset: 0;
   background: rgba(15, 32, 22, 0.92);
-  display: flex;
+  display: none; /* closed by default — opens ONLY on demand */
   align-items: center;
   justify-content: center;
   padding: 40px;
   z-index: 200;
 }
+.lightbox.open { display: flex; }
 .lightbox img {
-  max-width: min(1100px, 94vw);
+  max-width: min(1100px, 100%);
   max-height: 88vh;
+  min-width: 0;
   border-radius: var(--r-m);
   box-shadow: var(--sh-l);
   object-fit: contain;
@@ -973,14 +995,23 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: none;
-  background: var(--beige-200);
-  color: var(--green-900);
+  border: 2px solid var(--green-700);
+  background: var(--white);
+  color: var(--green-800);
   font-size: 1.6rem;
   line-height: 1;
   cursor: pointer;
+  z-index: 1;
+  box-shadow: var(--sh-m);
 }
-.lightbox__close:hover { background: var(--white); }
+.lightbox__close:hover { background: var(--beige-200); }
+.lightbox__close:focus-visible { outline: 3px solid var(--green-600); outline-offset: 2px; }
+
+@media (max-width: 640px) {
+  .lightbox { padding: 16px; }
+  .lightbox__close { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 1.35rem; }
+  .lightbox img { max-height: 82vh; }
+}
 
 /* ---------------- Cart: unavailable item states ---------------- */
 .cart-item--blocked {
