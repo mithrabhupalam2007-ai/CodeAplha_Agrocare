@@ -16,9 +16,57 @@ const SORT_OPTIONS = {
   name_asc: { name: 1 },
   name_desc: { name: -1 },
   newest: { createdAt: -1 },
+  release: { releaseDate: -1, createdAt: -1 },
   rating: { rating: -1, reviewCount: -1 },
   featured: { featured: -1, rating: -1 },
 };
+
+const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
+
+/**
+ * Decorate a lean product document with the fields every client page needs:
+ * - `available`     — the single source of truth for "can this be bought?"
+ * - `stockStatus`   — 'in' | 'low' | 'out' (manual blocks included)
+ * - `discountPercent` — only set when a genuine discount (mrp > price) exists
+ *
+ * Rule: available = active AND stockQuantity > 0 AND manualOutOfStock === false
+ */
+function decorate(p) {
+  // Accept both lean plain objects and full mongoose documents.
+  const src = p && typeof p.toObject === 'function' ? p.toObject() : p;
+  const out = { ...src };
+  out.available = Boolean(src.active && src.stockQuantity > 0 && !src.manualOutOfStock);
+  if (!src.active) out.stockStatus = 'unavailable';
+  else if (src.manualOutOfStock || src.stockQuantity <= 0) out.stockStatus = 'out';
+  else if (src.stockQuantity <= LOW_STOCK_THRESHOLD) out.stockStatus = 'low';
+  else out.stockStatus = 'in';
+  if (Number(src.mrp) > Number(src.price) && Number(src.price) > 0) {
+    out.discountPercent = Math.round(((src.mrp - src.price) / src.mrp) * 100);
+  } else {
+    out.discountPercent = 0;
+  }
+  return out;
+}
+
+/** Decorate an array of lean product docs. */
+const decorateAll = (items) => items.map(decorate);
+
+/** Build a URL slug from a product name (best effort, called on create). */
+async function buildSlug(name) {
+  const base =
+    String(name)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80) || 'product';
+  let slug = base;
+  for (let i = 2; i < 50; i += 1) {
+    const clash = await Product.exists({ slug });
+    if (!clash) return slug;
+    slug = `${base}-${i}`;
+  }
+  return `${base}-${Date.now().toString(36)}`;
+}
 
 /**
  * GET /api/products
@@ -52,11 +100,17 @@ const listProducts = asyncHandler(async (req, res) => {
     if (Number.isNaN(max)) throw new ApiError(400, 'maxPrice must be a number.');
     filter.price = { ...(filter.price || {}), $lte: max };
   }
-  if (q.inStock === 'true') filter.stockQuantity = { $gt: 0 };
-  if (q.inStock === 'false') filter.stockQuantity = 0;
+  if (q.inStock === 'true') {
+    filter.stockQuantity = { $gt: 0 };
+    filter.manualOutOfStock = { $ne: true };
+  }
+  if (q.inStock === 'false') {
+    filter.$or = [{ stockQuantity: 0 }, { manualOutOfStock: true }];
+  }
   if (q.featured === 'true') filter.featured = true;
   if (q.bestseller === 'true') filter.bestseller = true;
   if (q.seasonal === 'true') filter.seasonal = true;
+  if (q.newRelease === 'true') filter.isNewRelease = true;
 
   const sort = SORT_OPTIONS[q.sort] || SORT_OPTIONS.featured;
 
@@ -70,7 +124,7 @@ const listProducts = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    products: items,
+    products: decorateAll(items),
     pagination: {
       page,
       limit,
@@ -93,16 +147,72 @@ const getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findOne({ _id: id, active: true }).lean();
   if (!product) throw new ApiError(404, 'Product not found.');
 
-  const related = await Product.find({
+  const related = await relatedQuery(product, 4);
+
+  res.json({ success: true, product: decorate(product), related: decorateAll(related) });
+});
+
+/** Shared query for related products: same category first, then popular actives. */
+async function relatedQuery(product, limit) {
+  const sameCategory = await Product.find({
     active: true,
     category: product.category,
     _id: { $ne: product._id },
   })
     .sort({ rating: -1 })
-    .limit(4)
+    .limit(limit)
     .lean();
 
-  res.json({ success: true, product, related });
+  if (sameCategory.length >= Math.min(3, limit)) return sameCategory;
+
+  // Not enough siblings — top up with other active products.
+  const topUp = await Product.find({
+    active: true,
+    _id: { $ne: product._id, $nin: sameCategory.map((p) => p._id) },
+  })
+    .sort({ rating: -1 })
+    .limit(limit - sameCategory.length)
+    .lean();
+
+  return [...sameCategory, ...topUp];
+}
+
+/**
+ * GET /api/products/:id/related
+ * Dedicated endpoint for the "You May Also Like" carousel (never includes
+ * the current product itself).
+ */
+const getRelated = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.isValidObjectId(id)) throw new ApiError(400, 'Invalid product id.');
+
+  const product = await Product.findById(id).lean();
+  if (!product) throw new ApiError(404, 'Product not found.');
+
+  const limit = Math.min(12, Math.max(4, parseInt(req.query.limit, 10) || 8));
+  const related = await relatedQuery(product, limit);
+  res.json({ success: true, related: decorateAll(related) });
+});
+
+/**
+ * GET /api/products/new-releases
+ * Products flagged as newly released by an administrator, newest first.
+ * Falls back to the newest active products when nothing is flagged yet,
+ * so the home section always reflects real database data.
+ */
+const newReleases = asyncHandler(async (req, res) => {
+  const limit = Math.min(24, Math.max(1, parseInt(req.query.limit, 10) || 8));
+
+  let items = await Product.find({ active: true, isNewRelease: true })
+    .sort({ releaseDate: -1, createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  if (!items.length) {
+    items = await Product.find({ active: true }).sort({ createdAt: -1 }).limit(limit).lean();
+  }
+
+  res.json({ success: true, products: decorateAll(items) });
 });
 
 /** Validate + normalize a product payload shared by create/update. */
@@ -146,6 +256,32 @@ function parseProductBody(body, { partial = false } = {}) {
     else out.price = Math.round(price * 100) / 100;
   } else if (!partial) {
     errors.price = 'Price is required';
+  }
+
+  if (body.mrp !== undefined && body.mrp !== null && body.mrp !== '') {
+    const mrp = Number(body.mrp);
+    if (Number.isNaN(mrp) || mrp < 0) errors.mrp = 'MRP must be a non-negative number';
+    else out.mrp = Math.round(mrp * 100) / 100;
+  } else if (body.mrp === null || body.mrp === '') {
+    out.mrp = null; // allow clearing the original price
+  }
+
+  if (body.images !== undefined) {
+    if (!Array.isArray(body.images)) errors.images = 'Images must be an array of paths';
+    else {
+      out.images = body.images
+        .filter((i) => typeof i === 'string' && i.trim())
+        .map((i) => i.trim().slice(0, 300))
+        .slice(0, 6);
+    }
+  }
+
+  if (body.releaseDate !== undefined && body.releaseDate !== null && body.releaseDate !== '') {
+    const d = new Date(body.releaseDate);
+    if (Number.isNaN(d.getTime())) errors.releaseDate = 'Release date must be a valid date';
+    else out.releaseDate = d;
+  } else if (body.releaseDate === null || body.releaseDate === '') {
+    out.releaseDate = null;
   }
 
   if (body.stockQuantity !== undefined) {
@@ -217,7 +353,7 @@ function parseProductBody(body, { partial = false } = {}) {
     if (Object.keys(batch).length) out.batch = batch;
   }
 
-  for (const flag of ['featured', 'bestseller', 'seasonal', 'active', 'isDemoData']) {
+  for (const flag of ['featured', 'bestseller', 'seasonal', 'active', 'isDemoData', 'isNewRelease', 'manualOutOfStock']) {
     if (body[flag] !== undefined) out[flag] = Boolean(body[flag]);
   }
 
@@ -228,6 +364,8 @@ function parseProductBody(body, { partial = false } = {}) {
 /** POST /api/products (admin) */
 const createProduct = asyncHandler(async (req, res) => {
   const data = parseProductBody(req.body);
+  data.slug = await buildSlug(data.name);
+  if (data.isNewRelease && !data.releaseDate) data.releaseDate = new Date();
   const product = await Product.create(data);
   res.status(201).json({ success: true, message: 'Product created.', product });
 });
@@ -240,10 +378,13 @@ const updateProduct = asyncHandler(async (req, res) => {
   const data = parseProductBody(req.body, { partial: true });
   if (Object.keys(data).length === 0) throw new ApiError(400, 'No valid fields supplied for update.');
 
+  // Turning on the new-release flag without a date stamps it as "now".
+  if (data.isNewRelease === true && !data.releaseDate) data.releaseDate = new Date();
+
   const product = await Product.findByIdAndUpdate(id, { $set: data }, { new: true, runValidators: true });
   if (!product) throw new ApiError(404, 'Product not found.');
 
-  res.json({ success: true, message: 'Product updated.', product });
+  res.json({ success: true, message: 'Product updated.', product: decorate(product) });
 });
 
 /**
@@ -270,7 +411,11 @@ const deleteProduct = asyncHandler(async (req, res) => {
 module.exports = {
   listProducts,
   getProduct,
+  getRelated,
+  newReleases,
   createProduct,
   updateProduct,
   deleteProduct,
+  decorate,
+  decorateAll,
 };

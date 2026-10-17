@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shipping, Privacy &amp; Terms — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/pages/home.html">Home</a><span>/</span><span class="current">Shipping &amp; Policies</span>
+        </nav>
+        <h1>Shipping, Privacy &amp; Terms</h1>
+        <p>Delivery information and the policies that apply when you shop on AgroShield.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container" style="max-width:860px;">
+        <div class="panel" id="shipping">
+          <h3>🚚 Shipping Information</h3>
+          <ul>
+            <li><b>Delivery timeline:</b> orders are typically delivered in 2–5 business days within serviceable PIN codes.</li>
+            <li><b>Delivery charges:</b> a flat ₹49 applies to orders below ₹499; orders of ₹499 and above ship free.</li>
+            <li><b>Order tracking:</b> every order receives an order ID (for example <code>AS-YYYYMMDD-XXXXXX</code>) that can be tracked from <em>My Account → My Orders</em>. Statuses progress through Placed → Confirmed → Processing → Shipped → Delivered.</li>
+            <li><b>Cancellations:</b> orders can be cancelled before they are dispatched; the stock is returned to inventory automatically.</li>
+            <li><b>Demonstration store:</b> this is a demo project — no physical goods are shipped and no real payments are collected (Cash on Delivery and a clearly-labelled demo payment option are simulated).</li>
+          </ul>
+        </div>
+
+        <div class="panel" id="privacy" style="margin-top:22px;">
+          <h3>🔒 Privacy Policy</h3>
+          <p>AgroShield collects only the information needed to run the store:</p>
+          <ul>
+            <li><b>Account details</b> — name, email, phone number and delivery address, provided by you at registration and used for login, order fulfilment and support.</li>
+            <li><b>Order history</b> — products ordered, quantities, prices and delivery addresses, retained to provide order tracking and cancellations.</li>
+            <li><b>Session token</b> — after login a signed authentication token is stored in a secure, httpOnly cookie so you stay signed in. Logging out removes it.</li>
+            <li><b>Shopping cart</b> — cart contents are kept in your own browser (localStorage) and are never sent to the server until you place an order.</li>
+          </ul>
+          <p>We do not sell your data. Passwords are stored only as salted hashes and cannot be read by anyone, including administrators. You can request deletion of your account data by contacting
+            <a href="mailto:support@agroshield.example">support@agroshield.example</a>.</p>
+        </div>
+
+        <div class="panel" id="terms" style="margin-top:22px;">
+          <h3>📜 Terms of Service</h3>
+          <ul>
+            <li>By registering you confirm the details you provide are accurate and that you will keep your login credentials secure.</li>
+            <li>Product availability and prices are confirmed at the time an order is placed; the store re-verifies stock and pricing on the server before an order is accepted.</li>
+            <li>Seed germination figures, pesticide label/registration content and manufacturer details shown in this project are <b>clearly labelled demo data</b> and must not be relied upon for real agricultural decisions.</li>
+            <li>Sale of pesticides and seeds in India is subject to the Insecticides Act, 1968 and applicable state licensing. A real deployment requires valid registrations, licences and verified product labels.</li>
+            <li>Any misuse of the platform — including fraudulent orders or attempts to access administrator areas — will result in account termination.</li>
+          </ul>
+          <p class="text-muted">Last updated: October 2026 · Questions? Write to support@agroshield.example</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>

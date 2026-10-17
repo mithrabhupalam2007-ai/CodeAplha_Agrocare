@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
+const { decorateAll } = require('./productController');
 const v = require('../utils/validators');
 
 /** GET /api/users/profile */
@@ -67,9 +68,13 @@ const getWishlist = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).populate({
     path: 'wishlist',
     match: { active: true },
-    select: 'name price packSize image category type stockQuantity rating reviewCount brand',
+    select:
+      'name price mrp packSize image images category type stockQuantity manualOutOfStock active rating reviewCount brand',
   });
-  res.json({ success: true, wishlist: user.wishlist });
+  // Decorate with the shared availability fields (available / stockStatus /
+  // discountPercent) so the wishlist page can show live status.
+  const items = decorateAll(user.wishlist.map((p) => p.toObject()));
+  res.json({ success: true, wishlist: items });
 });
 
 /** POST /api/users/wishlist/:productId */

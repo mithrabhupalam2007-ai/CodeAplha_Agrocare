@@ -510,3 +510,47 @@
 .breadcrumb a:hover { color: #fff; }
 .breadcrumb span { color: rgba(255, 255, 255, 0.55); }
 .breadcrumb .current { color: #fff; font-weight: 600; }
+
+/* ---------------- Account dropdown (nav) ---------------- */
+.user-menu { position: relative; }
+.user-menu__pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-m);
+  box-shadow: var(--sh-l);
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+  z-index: 60;
+}
+.user-menu__pop.open { display: flex; }
+.user-menu__name {
+  display: block;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: var(--green-900);
+  font-size: 0.9rem;
+}
+.user-menu__name small { display: block; font-weight: 500; color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+.user-menu__pop a,
+.user-menu__pop button {
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  border-radius: var(--r-s);
+  font-size: 0.88rem;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.user-menu__pop a:hover,
+.user-menu__pop button:hover { background: var(--beige-100); color: var(--green-700); }
+.user-menu__pop button { color: var(--danger); }

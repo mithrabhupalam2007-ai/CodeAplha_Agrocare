@@ -1,16 +1,19 @@
 /**
- * Product details page: full product data, quantity picker, add to cart,
- * wishlist toggle and related products.
+ * Product details page: image gallery + zoom lightbox, full product data,
+ * availability (out-of-stock) states, quantity picker, add to cart,
+ * wishlist toggle and the related-products carousel.
  */
 (() => {
   let product = null;
   let related = [];
+  let galleryImages = [];
 
   const $ = (id) => document.getElementById(id);
+  const isAvailable = () => Boolean(product && product.available !== false);
 
   function currentQty() {
     const input = $('qty-input');
-    const max = Math.max(1, product ? product.stockQuantity : 1);
+    const max = isAvailable() ? Math.max(1, product.stockQuantity) : 1;
     let n = parseInt(input.value, 10);
     if (Number.isNaN(n) || n < 1) n = 1;
     if (n > max) n = max;
@@ -18,6 +21,62 @@
     return n;
   }
 
+  /* ---------------- gallery ---------------- */
+  function renderGallery() {
+    galleryImages = [product.image, ...(product.images || []).filter(Boolean)].filter(
+      (src, i, arr) => arr.indexOf(src) === i
+    );
+    const main = $('pdp-image');
+    main.src = product.image;
+    main.alt = product.name;
+
+    const thumbs = $('pdp-thumbs');
+    if (galleryImages.length > 1) {
+      thumbs.hidden = false;
+      thumbs.innerHTML = galleryImages
+        .map(
+          (src, i) =>
+            `<button class="pdp__thumb ${i === 0 ? 'on' : ''}" type="button" data-src="${UI.esc(src)}">
+               <img src="${UI.esc(src)}" alt="${UI.esc(product.name)} view ${i + 1}" loading="lazy" />
+             </button>`
+        )
+        .join('');
+      thumbs.querySelectorAll('.pdp__thumb').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          main.src = btn.dataset.src;
+          thumbs.querySelectorAll('.pdp__thumb').forEach((b) => b.classList.toggle('on', b === btn));
+        });
+      });
+    } else {
+      thumbs.hidden = true;
+      thumbs.innerHTML = '';
+    }
+  }
+
+  function wireLightbox() {
+    const box = $('lightbox');
+    const img = $('lightbox-img');
+    $('pdp-image').addEventListener('click', () => {
+      if (!product) return;
+      img.src = $('pdp-image').src;
+      img.alt = product.name;
+      box.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+    const close = () => {
+      box.hidden = true;
+      document.body.style.overflow = '';
+    };
+    $('lightbox-close').addEventListener('click', close);
+    box.addEventListener('click', (e) => {
+      if (e.target === box) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !box.hidden) close();
+    });
+  }
+
+  /* ---------------- info panels ---------------- */
   function renderSpecs() {
     const rows = [
       ['Brand / manufacturer', product.brand],
@@ -25,7 +84,11 @@
       ['Product type', product.type],
       ['Pack size', product.packSize],
       ['Price', `${UI.inr(product.price)} per ${product.packSize}`],
-      ['Stock', product.stockQuantity > 0 ? `${product.stockQuantity} units available` : 'Currently out of stock'],
+      ['Availability', isAvailable() ? `${product.stockQuantity} units available` : 'Currently out of stock'],
+      [
+        'Release date',
+        product.releaseDate ? UI.formatDate(product.releaseDate) : product.createdAt ? UI.formatDate(product.createdAt) : '',
+      ],
       ...(product.crops && product.crops.length ? [['Approved crops / intended use', product.crops.join(', ') + ' (demo data)']] : []),
       ...(product.specifications || []).map((s) => [s.label, s.value]),
     ].filter(([, v]) => v);
@@ -47,7 +110,7 @@
     if (s.variety) rows.push(['Seed variety', s.variety]);
     if (s.cropType) rows.push(['Crop type', s.cropType]);
     if (s.germinationPercent) rows.push(['Germination', `${s.germinationPercent}% (demo claim, not lab verified)`]);
-    if (s.daysToGerminate) rows.push(['Time to germination', s.daysToGermination]);
+    if (s.daysToGerminate) rows.push(['Time to germination', s.daysToGerminate]);
     if (s.sowingInstructions) rows.push(['Sowing instructions', s.sowingInstructions]);
 
     $('seed-body').innerHTML = rows
@@ -90,29 +153,131 @@
       .join('');
   }
 
+  /* ---------------- availability UI ---------------- */
+  function renderAvailability() {
+    const available = isAvailable();
+    const stock = $('pdp-stock');
+    const badge = $('pdp-avail-badge');
+    const oos = $('pdp-oos');
+
+    $('qty-input').max = available ? product.stockQuantity : 1;
+    $('add-cart').disabled = !available;
+    $('buy-now').disabled = !available;
+    $('qty-minus').disabled = !available;
+
+    if (!available) {
+      const label = product.stockStatus === 'unavailable' ? 'Unavailable' : 'Out of Stock';
+      stock.innerHTML = `<span class="dot"></span><span class="text-danger">${label}</span>`;
+      badge.textContent = label;
+      badge.className = 'pdp__avail-badge pdp__avail-badge--out';
+      oos.classList.remove('hidden');
+      if (product.stockStatus !== 'unavailable' && !product.manualOutOfStock && product.stockQuantity > 0) {
+        // should not happen, but never trust stale data
+        oos.querySelector('p').textContent = 'This product is currently unavailable. Please check back later.';
+      }
+    } else if (product.stockStatus === 'low') {
+      stock.innerHTML = `<span class="dot"></span><span style="color:var(--amber)">Low stock — only ${product.stockQuantity} left</span>`;
+      badge.textContent = `Low Stock · ${product.stockQuantity}`;
+      badge.className = 'pdp__avail-badge pdp__avail-badge--low';
+      oos.classList.add('hidden');
+    } else {
+      stock.innerHTML = '<span class="dot"></span><span class="text-success">In Stock</span>';
+      badge.textContent = 'In Stock';
+      badge.className = 'pdp__avail-badge pdp__avail-badge--in';
+      oos.classList.add('hidden');
+    }
+
+    // genuine discount only (backend sets discountPercent when mrp > price)
+    if (product.discountPercent > 0) {
+      $('pdp-mrp').textContent = UI.inr(product.mrp);
+      $('pdp-discount').textContent = `${product.discountPercent}% off`;
+      $('pdp-discount').hidden = false;
+    } else {
+      $('pdp-mrp').textContent = '';
+      $('pdp-discount').hidden = true;
+    }
+  }
+
+  /* ---------------- related carousel ---------------- */
   function relatedCard(p) {
     const d = document.createElement('article');
-    d.className = 'p-card';
+    d.className = 'p-card carousel__card';
+    const available = p.available !== false;
+    const stockTxt = !available
+      ? p.stockStatus === 'unavailable'
+        ? 'Unavailable'
+        : 'Out of Stock'
+      : p.stockStatus === 'low'
+        ? `Low Stock · ${p.stockQuantity}`
+        : 'In Stock';
+    const stockCls = !available ? 'out' : p.stockStatus === 'low' ? 'low' : 'in';
+    const wished = ((authStore.user && authStore.user.wishlist) || []).includes(p._id);
+
     d.innerHTML = `
       <div class="p-card__media">
+        <div class="p-card__flags">
+          ${p.discountPercent > 0 ? `<span class="badge badge--red">${p.discountPercent}% off</span>` : ''}
+          ${!available ? '<span class="badge badge--red">Out of Stock</span>' : ''}
+        </div>
+        <button class="p-card__wish ${wished ? 'on' : ''}" type="button" aria-label="Toggle wishlist" data-wish>${I.heart}</button>
         <a href="/pages/product-details.html?id=${p._id}"><img src="${UI.esc(p.image)}" alt="${UI.esc(p.name)}" loading="lazy" /></a>
       </div>
       <div class="p-card__body">
         <span class="p-card__cat">${UI.esc(p.category)}</span>
         <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${UI.esc(p.name)}</a></h3>
-        <div class="p-card__meta"><span>${UI.esc(p.packSize)}</span></div>
-        <div class="p-card__price-row"><span class="price">${UI.inr(p.price)}</span></div>
+        <div class="p-card__meta">
+          <span>${UI.esc(p.packSize)}</span>
+          <span class="p-card__stock ${stockCls}"><span class="dot"></span>${stockTxt}</span>
+        </div>
+        <div class="p-card__price-row">
+          <span class="price">${UI.inr(p.price)}</span>
+          ${p.discountPercent > 0 ? `<span class="price-old">${UI.inr(p.mrp)}</span>` : ''}
+        </div>
       </div>
       <div class="p-card__actions">
-        <button class="btn btn--primary" type="button" data-add ${p.stockQuantity <= 0 ? 'disabled' : ''}>${p.stockQuantity <= 0 ? 'Out of stock' : 'Add to Cart'}</button>
+        <button class="btn btn--primary" type="button" data-add ${available ? '' : 'disabled'}>
+          ${available ? 'Add to Cart' : 'Out of Stock'}
+        </button>
         <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
       </div>`;
+
     d.querySelector('[data-add]').addEventListener('click', () => {
+      if (!available) return;
       cart.add(UI.cartLine(p), 1);
       UI.refreshBadges();
       toast(`${p.name} added to cart`);
     });
+
+    d.querySelector('[data-wish]').addEventListener('click', async (e) => {
+      if (!UI.requireLogin()) return;
+      const btn = e.currentTarget;
+      const on = btn.classList.contains('on');
+      try {
+        if (on) {
+          await api.del(`/users/wishlist/${p._id}`);
+          btn.classList.remove('on');
+          authStore.user.wishlist = (authStore.user.wishlist || []).filter((id) => id !== p._id);
+          toast('Removed from wishlist', 'info');
+        } else {
+          await api.post(`/users/wishlist/${p._id}`);
+          btn.classList.add('on');
+          authStore.user.wishlist = [...new Set([...(authStore.user.wishlist || []), p._id])];
+          toast('Added to wishlist');
+        }
+        localStorage.setItem('agroshield_user', JSON.stringify(authStore.user));
+        UI.refreshBadges();
+      } catch (err) {
+        toast(err.message, 'error');
+      }
+    });
     return d;
+  }
+
+  function wireCarousel() {
+    const track = $('related-grid');
+    const step = () => Math.max(240, Math.round(track.clientWidth * 0.8));
+    $('rel-prev').addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    $('rel-next').addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
   }
 
   async function load() {
@@ -126,7 +291,13 @@
     try {
       const data = await api.get(`/products/${id}`);
       product = data.product;
-      related = data.related || [];
+      // Fetch a fuller carousel set (dedicated endpoint, never includes self).
+      try {
+        const rel = await api.get(`/products/${id}/related?limit=8`);
+        related = rel.related || [];
+      } catch (_) {
+        related = data.related || [];
+      }
     } catch (err) {
       $('loader').classList.add('hidden');
       $('not-found').classList.remove('hidden');
@@ -142,8 +313,6 @@
     $('head-sub').textContent = `${product.brand} · ${product.category} · ${product.packSize}`;
     $('crumb').innerHTML = `<a href="/pages/home.html">Home</a><span>/</span><a href="/pages/products.html">Products</a><span>/</span><a href="/pages/products.html?category=${encodeURIComponent(product.category)}">${UI.esc(product.category)}</a><span>/</span><span class="current">${UI.esc(product.name)}</span>`;
 
-    $('pdp-image').src = product.image;
-    $('pdp-image').alt = product.name;
     $('pdp-cat').textContent = product.category;
     $('pdp-name').textContent = product.name;
     $('pdp-stars').textContent = UI.stars(product.rating);
@@ -153,19 +322,8 @@
     $('pdp-price').textContent = UI.inr(product.price);
     $('pdp-pack').textContent = `per ${product.packSize}`;
 
-    const stock = $('pdp-stock');
-    if (product.stockQuantity <= 0) {
-      stock.innerHTML = '<span class="dot"></span><span class="text-danger">Out of Stock</span>';
-      $('add-cart').disabled = true;
-      $('buy-now').disabled = true;
-      $('qty-input').max = 1;
-    } else if (product.stockQuantity <= 5) {
-      stock.innerHTML = `<span class="dot"></span><span style="color:var(--amber)">Only ${product.stockQuantity} left in stock</span>`;
-      $('qty-input').max = product.stockQuantity;
-    } else {
-      stock.innerHTML = '<span class="dot"></span><span class="text-success">In stock</span>';
-      $('qty-input').max = product.stockQuantity;
-    }
+    renderGallery();
+    renderAvailability();
 
     if (product.isDemoData) $('pdp-demo').classList.remove('hidden');
 
@@ -176,14 +334,19 @@
 
     // related products
     const relGrid = $('related-grid');
-    if (related.length) {
-      related.forEach((p) => relGrid.appendChild(relatedCard(p)));
+    relGrid.innerHTML = '';
+    const relItems = related.filter((p) => p._id !== product._id);
+    if (relItems.length) {
+      relItems.forEach((p) => relGrid.appendChild(relatedCard(p)));
     } else {
       $('related-section').classList.add('hidden');
     }
   }
 
   function wire() {
+    wireLightbox();
+    wireCarousel();
+
     $('qty-minus').addEventListener('click', () => {
       const input = $('qty-input');
       input.value = Math.max(1, (parseInt(input.value, 10) || 1) - 1);
@@ -196,7 +359,7 @@
     $('qty-input').addEventListener('change', currentQty);
 
     $('add-cart').addEventListener('click', () => {
-      if (!product) return;
+      if (!product || !isAvailable()) return;
       const qty = currentQty();
       cart.add(UI.cartLine(product), qty);
       UI.refreshBadges();
@@ -205,8 +368,8 @@
 
     $('buy-now').addEventListener('click', () => {
       if (!product) return;
-      if (product.stockQuantity <= 0) {
-        toast('This product is out of stock.', 'error');
+      if (!isAvailable()) {
+        toast('This product is currently unavailable.', 'error');
         return;
       }
       cart.add(UI.cartLine(product), currentQty());

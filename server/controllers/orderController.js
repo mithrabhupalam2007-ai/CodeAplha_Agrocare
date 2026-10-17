@@ -65,6 +65,11 @@ const createOrder = asyncHandler(async (req, res) => {
   for (const [id, qty] of wanted) {
     const product = byId.get(id);
     if (!product) throw new ApiError(400, 'One or more products in your cart are no longer available.');
+    // Same availability rule as the storefront: active AND stock > 0 AND
+    // not manually blocked by an administrator.
+    if (product.manualOutOfStock) {
+      throw new ApiError(409, `"${product.name}" is currently unavailable. Please remove it from your cart.`);
+    }
     if (product.stockQuantity < qty) {
       throw new ApiError(
         409,
@@ -75,11 +80,12 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Atomic conditional decrement: only succeeds while stock is sufficient,
-    // so two simultaneous checkouts can never oversell the same unit.
+    // Atomic conditional decrement: only succeeds while stock is sufficient
+    // and the product is still purchasable, so two simultaneous checkouts can
+    // never oversell the same unit.
     for (const { product, qty } of items) {
       const result = await Product.findOneAndUpdate(
-        { _id: product._id, active: true, stockQuantity: { $gte: qty } },
+        { _id: product._id, active: true, manualOutOfStock: { $ne: true }, stockQuantity: { $gte: qty } },
         { $inc: { stockQuantity: -qty } },
         { new: true }
       );

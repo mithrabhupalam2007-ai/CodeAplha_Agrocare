@@ -6,6 +6,7 @@ const Category = require('../models/Category');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { ORDER_STATUSES } = require('../models/Order');
+const { decorate, decorateAll } = require('./productController');
 const v = require('../utils/validators');
 
 const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
@@ -15,12 +16,14 @@ const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
  * Real numbers aggregated from the Order/Product/User collections.
  */
 const dashboard = asyncHandler(async (req, res) => {
-  const [totalProducts, activeProducts, inStockProducts, outOfStockProducts, totalCustomers, totalUsers, totalOrders, revenueAgg, statusAgg, lowStock, recentOrdersRaw, monthlySales, topProducts] =
+  const [totalProducts, activeProducts, inStockProducts, outOfStockProducts, newReleases, totalCustomers, totalUsers, totalOrders, revenueAgg, statusAgg, lowStock, recentOrdersRaw, monthlySales, topProducts] =
     await Promise.all([
       Product.countDocuments(),
       Product.countDocuments({ active: true }),
-      Product.countDocuments({ active: true, stockQuantity: { $gt: 0 } }),
-      Product.countDocuments({ active: true, stockQuantity: 0 }),
+      // available = active AND stock > 0 AND not manually blocked
+      Product.countDocuments({ active: true, stockQuantity: { $gt: 0 }, manualOutOfStock: { $ne: true } }),
+      Product.countDocuments({ active: true, $or: [{ stockQuantity: 0 }, { manualOutOfStock: true }] }),
+      Product.countDocuments({ active: true, isNewRelease: true }),
       User.countDocuments({ role: 'customer' }),
       User.countDocuments(),
       Order.countDocuments(),
@@ -29,7 +32,7 @@ const dashboard = asyncHandler(async (req, res) => {
         { $group: { _id: null, revenue: { $sum: '$total' }, count: { $sum: 1 } } },
       ]),
       Order.aggregate([{ $group: { _id: '$orderStatus', count: { $sum: 1 } } }]),
-      Product.find({ active: true, stockQuantity: { $lte: LOW_STOCK_THRESHOLD } })
+      Product.find({ active: true, manualOutOfStock: { $ne: true }, stockQuantity: { $gt: 0, $lte: LOW_STOCK_THRESHOLD } })
         .sort({ stockQuantity: 1 })
         .limit(20)
         .lean(),
@@ -79,6 +82,7 @@ const dashboard = asyncHandler(async (req, res) => {
       inactiveProducts: totalProducts - activeProducts,
       inStockProducts,
       outOfStockProducts,
+      newReleases,
       totalCustomers,
       totalUsers,
       totalOrders,
@@ -106,9 +110,13 @@ const listProducts = asyncHandler(async (req, res) => {
   else if (q.status === 'instock') {
     filter.active = true;
     filter.stockQuantity = { $gt: 0 };
+    filter.manualOutOfStock = { $ne: true };
   } else if (q.status === 'outofstock') {
     filter.active = true;
-    filter.stockQuantity = 0;
+    filter.$or = [{ stockQuantity: 0 }, { manualOutOfStock: true }];
+  } else if (q.status === 'newrelease') {
+    filter.active = true;
+    filter.isNewRelease = true;
   }
 
   if (q.category && String(q.category).trim()) filter.category = String(q.category).trim();
@@ -131,7 +139,7 @@ const listProducts = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    products,
+    products: decorateAll(products),
     pagination: {
       page,
       limit,
@@ -141,6 +149,140 @@ const listProducts = asyncHandler(async (req, res) => {
       hasPrev: page > 1,
     },
   });
+});
+
+/** GET /api/admin/products/out-of-stock — auto (qty 0) AND manual blocks. */
+const listOutOfStock = asyncHandler(async (req, res) => {
+  const q = req.query;
+  const filter = { active: true, $or: [{ stockQuantity: 0 }, { manualOutOfStock: true }] };
+  const and = [];
+
+  if (q.reason === 'manual') {
+    delete filter.$or;
+    filter.manualOutOfStock = true;
+  } else if (q.reason === 'quantity') {
+    delete filter.$or;
+    filter.stockQuantity = 0;
+    filter.manualOutOfStock = { $ne: true };
+  }
+  if (q.search && String(q.search).trim()) {
+    const rx = new RegExp(String(q.search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    and.push({ $or: [{ name: rx }, { brand: rx }, { category: rx }] });
+  }
+  if (and.length) filter.$and = and;
+
+  const page = Math.max(1, parseInt(q.page, 10) || 1);
+  const limit = Math.min(48, Math.max(1, parseInt(q.limit, 10) || 12));
+
+  const [products, total] = await Promise.all([
+    Product.find(filter)
+      .sort({ manualOutOfStock: -1, stockQuantity: 1, name: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    Product.countDocuments(filter),
+  ]);
+
+  res.json({
+    success: true,
+    products: decorateAll(products),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
+  });
+});
+
+function requireValidId(req) {
+  if (!mongoose.isValidObjectId(req.params.id)) throw new ApiError(400, 'Invalid product id.');
+}
+
+/** GET /api/admin/products/:id — full product record, even when inactive. */
+const getProductAdmin = asyncHandler(async (req, res) => {
+  requireValidId(req);
+  const product = await Product.findById(req.params.id).lean();
+  if (!product) throw new ApiError(404, 'Product not found.');
+  res.json({ success: true, product: decorate(product) });
+});
+
+/** PATCH /api/admin/products/:id/price — change the selling price (and optional MRP). */
+const updatePrice = asyncHandler(async (req, res) => {
+  requireValidId(req);
+  const { price, mrp } = req.body || {};
+  const set = {};
+
+  if (price !== undefined) {
+    const p = Number(price);
+    if (Number.isNaN(p) || p < 0) throw new ApiError(400, 'Price must be a non-negative number.');
+    set.price = Math.round(p * 100) / 100;
+  }
+  if (mrp !== undefined) {
+    if (mrp === null || mrp === '') set.mrp = null;
+    else {
+      const m = Number(mrp);
+      if (Number.isNaN(m) || m < 0) throw new ApiError(400, 'MRP must be a non-negative number.');
+      set.mrp = Math.round(m * 100) / 100;
+    }
+  }
+  if (!Object.keys(set).length) throw new ApiError(400, 'Supply a price and/or mrp value.');
+
+  const product = await Product.findByIdAndUpdate(req.params.id, { $set: set }, { new: true, runValidators: true });
+  if (!product) throw new ApiError(404, 'Product not found.');
+  res.json({ success: true, message: `Price updated for "${product.name}".`, product: decorate(product) });
+});
+
+/** PATCH /api/admin/products/:id/stock — restock / adjust quantity. */
+const updateStock = asyncHandler(async (req, res) => {
+  requireValidId(req);
+  const body = req.body || {};
+  const stock = Number(body.stockQuantity);
+  if (!Number.isInteger(stock) || stock < 0) {
+    throw new ApiError(400, 'Stock quantity must be a whole number of 0 or more.');
+  }
+
+  // A manual block can optionally be cleared together with the restock, which
+  // restores availability once active && stock > 0.
+  const set = { stockQuantity: stock };
+  if (body.clearManualOutOfStock === true) set.manualOutOfStock = false;
+
+  const product = await Product.findByIdAndUpdate(req.params.id, { $set: set }, { new: true, runValidators: true });
+  if (!product) throw new ApiError(404, 'Product not found.');
+
+  res.json({ success: true, message: `Stock updated to ${stock} for "${product.name}".`, product: decorate(product) });
+});
+
+/** PATCH /api/admin/products/:id/availability — active flag + manual out-of-stock + new release. */
+const updateAvailability = asyncHandler(async (req, res) => {
+  requireValidId(req);
+  const body = req.body || {};
+  const set = {};
+  if (body.active !== undefined) set.active = Boolean(body.active);
+  if (body.manualOutOfStock !== undefined) set.manualOutOfStock = Boolean(body.manualOutOfStock);
+  if (body.isNewRelease !== undefined) {
+    set.isNewRelease = Boolean(body.isNewRelease);
+    if (set.isNewRelease && !body.releaseDate) set.releaseDate = new Date();
+  }
+  if (body.releaseDate !== undefined) {
+    if (body.releaseDate === null || body.releaseDate === '') set.releaseDate = null;
+    else {
+      const d = new Date(body.releaseDate);
+      if (Number.isNaN(d.getTime())) throw new ApiError(400, 'Release date must be a valid date.');
+      set.releaseDate = d;
+    }
+  }
+  if (!Object.keys(set).length) {
+    throw new ApiError(400, 'Supply active, manualOutOfStock, isNewRelease and/or releaseDate.');
+  }
+
+  const product = await Product.findByIdAndUpdate(req.params.id, { $set: set }, { new: true, runValidators: true });
+  if (!product) throw new ApiError(404, 'Product not found.');
+
+  const state = product.active && product.stockQuantity > 0 && !product.manualOutOfStock ? 'available' : 'unavailable';
+  res.json({ success: true, message: `"${product.name}" is now ${state}.`, product: decorate(product) });
 });
 
 /** GET /api/admin/orders — full order list with filters + pagination. */
@@ -345,6 +487,11 @@ const deleteCategory = asyncHandler(async (req, res) => {
 module.exports = {
   dashboard,
   listProducts,
+  getProductAdmin,
+  listOutOfStock,
+  updatePrice,
+  updateStock,
+  updateAvailability,
   listOrders,
   updateOrderStatus,
   listCustomers,

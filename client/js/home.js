@@ -3,20 +3,26 @@
  * newsletter subscription.
  */
 (() => {
-  /* Build a product card element shared by all three rails. */
+  /* Build a product card element shared by every home-page rail. */
   function productCard(p) {
     const el = article('p-card');
-    const stockCls = p.stockQuantity <= 0 ? 'out' : p.stockQuantity <= 5 ? 'low' : 'in';
-    const stockTxt =
-      p.stockQuantity <= 0 ? 'Out of Stock' : p.stockQuantity <= 5 ? `Only ${p.stockQuantity} left` : 'In stock';
-    const inWishlist = (authStore.user && authStore.user.wishlist || []).includes(p._id);
+    // Availability comes from the backend (active AND stock > 0 AND not
+    // manually blocked) — never re-derived in the browser.
+    const available = p.available !== false;
+    const stockCls = !available ? 'out' : p.stockStatus === 'low' ? 'low' : 'in';
+    const stockTxt = !available
+      ? p.stockStatus === 'unavailable' ? 'Unavailable' : 'Out of Stock'
+      : p.stockStatus === 'low' ? `Low Stock · ${p.stockQuantity} left` : 'In Stock';
+    const inWishlist = ((authStore.user && authStore.user.wishlist) || []).includes(p._id);
 
     el.innerHTML = `
       <div class="p-card__media">
         <div class="p-card__flags">
+          ${p.isNewRelease ? '<span class="badge badge--green">New</span>' : ''}
           ${p.bestseller ? '<span class="badge badge--amber">Bestseller</span>' : ''}
           ${p.featured ? '<span class="badge badge--green">Featured</span>' : ''}
-          ${p.stockQuantity <= 0 ? '<span class="badge badge--red">Out of Stock</span>' : ''}
+          ${p.discountPercent > 0 ? `<span class="badge badge--red">${p.discountPercent}% off</span>` : ''}
+          ${!available ? '<span class="badge badge--red">Out of Stock</span>' : ''}
         </div>
         <button class="p-card__wish ${inWishlist ? 'on' : ''}" type="button" aria-label="Add to wishlist" data-wish>${I.heart}</button>
         <a href="/pages/product-details.html?id=${p._id}">
@@ -32,16 +38,18 @@
         </div>
         <div class="p-card__price-row">
           <span class="price">${UI.inr(p.price)}</span>
+          ${p.discountPercent > 0 ? `<span class="price-old">${UI.inr(p.mrp)}</span>` : ''}
         </div>
       </div>
       <div class="p-card__actions">
-        <button class="btn btn--primary" type="button" data-add ${p.stockQuantity <= 0 ? 'disabled' : ''}>
-          ${p.stockQuantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+        <button class="btn btn--primary" type="button" data-add ${available ? '' : 'disabled'}>
+          ${available ? 'Add to Cart' : 'Out of Stock'}
         </button>
         <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
       </div>`;
 
     el.querySelector('[data-add]').addEventListener('click', () => {
+      if (!available) return;
       cart.add(UI.cartLine(p), 1);
       UI.refreshBadges();
       toast(`${p.name} added to cart`);
@@ -146,6 +154,25 @@
     });
   }
 
+  /** New Releases uses its dedicated endpoint (isNewRelease flag + releaseDate). */
+  async function loadNewReleases() {
+    const grid = document.getElementById('new-releases-grid');
+    if (!grid) return;
+    skeleton(grid);
+    try {
+      const data = await api.get('/products/new-releases?limit=8');
+      grid.innerHTML = '';
+      if (!data.products.length) {
+        grid.innerHTML =
+          '<div class="empty-state"><p>No new products have been released yet. Check back soon!</p><a class="btn btn--primary btn--sm" href="/pages/products.html">Browse all products</a></div>';
+        return;
+      }
+      data.products.forEach((p) => grid.appendChild(productCard(p)));
+    } catch (err) {
+      grid.innerHTML = `<div class="alert show alert--error">${UI.esc(err.message)}</div>`;
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
     UI.mountNav();
     UI.mountFooter();
@@ -153,9 +180,12 @@
     wireNewsletter();
 
     loadCategories();
+    loadNewReleases();
     loadProducts('featured-grid', { featured: true, limit: 4, sort: 'featured' });
     loadProducts('seed-grid', { type: 'Seeds', bestseller: true, limit: 4, sort: 'rating' });
-    loadProducts('seasonal-grid', { seasonal: true, limit: 4, sort: 'newest' });
+    loadProducts('crop-grid', { type: 'Pesticides', limit: 4, sort: 'rating' });
+    loadProducts('recent-grid', { limit: 4, sort: 'newest' });
+    loadProducts('essentials-grid', { type: 'Farming Essentials', limit: 4, sort: 'featured' });
 
     if (authStore.isLoggedIn) await authStore.refresh();
     UI.refreshBadges();

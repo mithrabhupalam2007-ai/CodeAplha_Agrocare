@@ -117,6 +117,8 @@ const login = asyncHandler(async (req, res) => {
     if (matches.length === 1) user = matches[0];
   }
 
+  if (!user) throw genericError;
+
   const matches = await user.comparePassword(rawPassword);
   if (!matches) throw genericError;
 

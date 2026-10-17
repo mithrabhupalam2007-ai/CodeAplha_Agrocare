@@ -54,6 +54,15 @@ const Store = (() => {
       writeCart(readCart().filter((i) => i.id !== id));
     },
 
+    /** Merge partial updates (price/stock refresh from the live catalogue). */
+    patch(id, patch) {
+      const items = readCart();
+      const it = items.find((i) => i.id === id);
+      if (!it) return;
+      Object.assign(it, patch);
+      writeCart(items);
+    },
+
     clear() {
       writeCart([]);
     },

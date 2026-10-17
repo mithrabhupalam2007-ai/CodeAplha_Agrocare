@@ -40,8 +40,11 @@
             <!-- ============ GALLERY ============ -->
             <div>
               <div class="pdp__gallery">
-                <img id="pdp-image" src="" alt="" />
+                <img id="pdp-image" src="" alt="" title="Click to enlarge" />
+                <span class="pdp__zoom-hint" aria-hidden="true">🔍 Click image to zoom</span>
+                <span class="pdp__avail-badge" id="pdp-avail-badge"></span>
               </div>
+              <div class="pdp__thumbs" id="pdp-thumbs" hidden></div>
               <div class="demo-note hidden" id="pdp-demo" style="margin-top:14px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                 <span>Demo product data — this listing exists for demonstration only. Verify actual label, registration and licensing information before any real transaction.</span>
@@ -63,9 +66,17 @@
               <div class="pdp__price-box">
                 <div>
                   <span class="price price--lg" id="pdp-price"></span>
+                  <span class="price-old" id="pdp-mrp"></span>
+                  <span class="badge badge--red" id="pdp-discount" hidden></span>
                   <span class="pack" id="pdp-pack"></span>
                 </div>
                 <div class="pdp__stock" id="pdp-stock"></div>
+              </div>
+
+              <!-- Highly visible out-of-stock state (forest green + beige) -->
+              <div class="pdp__oos hidden" id="pdp-oos">
+                <strong>Out of Stock</strong>
+                <p>This product is currently unavailable. Please check back later.</p>
               </div>
 
               <div class="pdp__actions">
@@ -77,6 +88,7 @@
                 <button class="btn btn--primary btn--lg" id="add-cart" type="button">Add to Cart</button>
                 <button class="btn btn--dark btn--lg" id="buy-now" type="button">Buy Now</button>
                 <button class="btn btn--outline btn--lg" id="add-wish" type="button">♡ Wishlist</button>
+                <a class="pdp__back" href="/pages/products.html">← Back to Products</a>
               </div>
 
               <div class="pdp__perks">
@@ -113,15 +125,21 @@
             </div>
           </div>
 
-          <!-- ============ RELATED ============ -->
+          <!-- ============ RELATED CAROUSEL ============ -->
           <section class="section section--tight" id="related-section">
             <div class="section-head">
               <div>
                 <span class="eyebrow">You may also like</span>
-                <h2>Related products</h2>
+                <h2>Related Products</h2>
+              </div>
+              <div class="carousel__nav">
+                <button class="carousel__btn" type="button" id="rel-prev" aria-label="Scroll related products left">‹</button>
+                <button class="carousel__btn" type="button" id="rel-next" aria-label="Scroll related products right">›</button>
               </div>
             </div>
-            <div class="product-grid" id="related-grid"></div>
+            <div class="carousel" id="related-carousel">
+              <div class="carousel__track" id="related-grid"></div>
+            </div>
           </section>
         </div>
 
@@ -136,5 +154,11 @@
   </main>
 
   <div id="site-footer"></div>
+
+  <!-- Image zoom lightbox -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox__close" type="button" id="lightbox-close" aria-label="Close zoom view">×</button>
+    <img id="lightbox-img" src="" alt="Enlarged product image" />
+  </div>
 </body>
 </html>

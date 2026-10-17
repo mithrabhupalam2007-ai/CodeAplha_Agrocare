@@ -45,6 +45,7 @@
         <div class="cart-layout hidden" id="cart-layout">
           <div class="panel">
             <h2>Your items <span class="badge badge--green" id="cart-count"></span></h2>
+            <div class="alert alert--error" id="cart-alert"></div>
             <div id="cart-items"></div>
             <div style="margin-top:18px;">
               <a class="btn btn--ghost btn--sm" href="/pages/products.html">← Continue shopping</a>
@@ -61,7 +62,7 @@
             </div>
             <div class="summary-row summary-row--total"><span>Total</span><b id="sum-total">₹0</b></div>
             <div class="summary-note">Delivery and stock are recalculated on the server when the order is placed.</div>
-            <a class="btn btn--primary btn--block btn--lg" href="/pages/checkout.html">Proceed to Checkout</a>
+            <a class="btn btn--primary btn--block btn--lg" id="checkout-btn" href="/pages/checkout.html">Proceed to Checkout</a>
           </aside>
         </div>
       </div>

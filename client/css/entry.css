@@ -6,7 +6,7 @@
 body.entry-page {
   min-height: 100vh;
   margin: 0;
-  background: var(--green-900, #14351f);
+  background: var(--green-900, #193526);
   font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
   color: #1f2d23;
   display: flex;
@@ -34,7 +34,7 @@ body.entry-page {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(10, 32, 19, 0.86) 0%, rgba(10, 32, 19, 0.72) 45%, rgba(6, 22, 13, 0.92) 100%);
+    linear-gradient(180deg, rgba(20, 42, 29, 0.88) 0%, rgba(20, 42, 29, 0.74) 45%, rgba(15, 32, 22, 0.94) 100%);
 }
 
 /* Layout ------------------------------------------------------ */
@@ -56,7 +56,7 @@ body.entry-page {
   height: 42px;
   border-radius: 13px;
   background: #fff;
-  color: var(--green-700, #2f7a3d);
+  color: var(--green-700, #234832);
   display: grid;
   place-items: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
@@ -71,7 +71,7 @@ body.entry-page {
 }
 .entry-brand__name em {
   font-style: normal;
-  color: var(--green-300, #a5d6a7);
+  color: var(--green-300, #cfe3d3);
 }
 
 /* Intro ------------------------------------------------------- */
@@ -124,7 +124,7 @@ body.entry-page {
 
 .entry-card--admin .entry-card__icon {
   background: linear-gradient(135deg, #e8f3ea, #d3e8d6);
-  color: var(--green-700, #2f7a3d);
+  color: var(--green-700, #234832);
 }
 .entry-card--user .entry-card__icon {
   background: linear-gradient(135deg, #fdf3e0, #f6e3c2);
@@ -135,7 +135,7 @@ body.entry-page {
   font-family: var(--font-display, 'Playfair Display', serif);
   font-size: 1.35rem;
   margin: 0 0 8px;
-  color: var(--green-900, #14351f);
+  color: var(--green-900, #193526);
 }
 .entry-card > p {
   color: var(--muted, #5f6f64);
@@ -155,7 +155,7 @@ body.entry-page {
   flex: 0 0 auto !important;
 }
 .entry-card__foot a {
-  color: var(--green-700, #2f7a3d);
+  color: var(--green-700, #234832);
   font-weight: 600;
   text-decoration: none;
 }

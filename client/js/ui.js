@@ -109,7 +109,7 @@ const UI = (() => {
             <input type="search" name="q" placeholder="Search seeds, tools..." value="${esc(q)}" aria-label="Search products" />
           </form>
           <div class="nav__actions">
-            <a class="icon-btn" href="/pages/account.html#wishlist" title="Wishlist" aria-label="Wishlist">
+            <a class="icon-btn" href="/pages/wishlist.html" title="Wishlist" aria-label="Wishlist">
               ${I.heart}<span class="count-badge" data-wish-count hidden>0</span>
             </a>
             <a class="icon-btn" href="/pages/cart.html" title="Cart" aria-label="Shopping cart">
@@ -117,7 +117,17 @@ const UI = (() => {
             </a>
             ${
               user
-                ? `<a class="icon-btn" href="${user.role === 'admin' ? '/pages/admin.html' : '/pages/account.html'}" title="${esc(user.name)}" aria-label="My account">${I.user}</a>`
+                ? `<div class="user-menu" data-user-menu>
+                    <button class="icon-btn" type="button" title="${esc(user.name)}" aria-label="Account menu" aria-haspopup="true" data-user-toggle>${I.user}</button>
+                    <div class="user-menu__pop" data-user-pop>
+                      <span class="user-menu__name">${esc(user.name)}<small>${esc(user.email)}</small></span>
+                      <a href="/pages/account.html">My Account</a>
+                      <a href="/pages/account.html#orders">My Orders</a>
+                      <a href="/pages/wishlist.html">Wishlist</a>
+                      ${user.role === 'admin' ? '<a href="/pages/admin.html">Admin Dashboard</a>' : ''}
+                      <button type="button" data-nav-logout>Logout</button>
+                    </div>
+                  </div>`
                 : `<a class="icon-btn" href="/" title="Login" aria-label="Login">${I.user}</a>`
             }
             <button class="icon-btn nav__burger" type="button" aria-label="Menu" data-burger>${I.menu}</button>
@@ -136,6 +146,24 @@ const UI = (() => {
     mount.querySelector('[data-burger]').addEventListener('click', () => {
       mount.querySelector('[data-mobile-menu]').classList.toggle('open');
     });
+
+    // Account dropdown (profile / orders / wishlist / logout)
+    const userMenu = mount.querySelector('[data-user-menu]');
+    if (userMenu) {
+      const pop = userMenu.querySelector('[data-user-pop]');
+      userMenu.querySelector('[data-user-toggle]').addEventListener('click', (e) => {
+        e.stopPropagation();
+        pop.classList.toggle('open');
+      });
+      pop.querySelector('[data-nav-logout]').addEventListener('click', async () => {
+        await authStore.logout();
+        toast('Logged out.', 'info');
+        setTimeout(() => (location.href = '/'), 350);
+      });
+      document.addEventListener('click', (e) => {
+        if (!userMenu.contains(e.target)) pop.classList.remove('open');
+      });
+    }
 
     mount.querySelectorAll('[data-nav-search]').forEach((form) => {
       form.addEventListener('submit', (e) => {
@@ -192,6 +220,7 @@ const UI = (() => {
                 <li><a href="/pages/account.html">My Account</a></li>
                 <li><a href="/pages/account.html#orders">Track My Orders</a></li>
                 <li><a href="/pages/cart.html">Shopping Cart</a></li>
+                <li><a href="/pages/legal.html#shipping">Shipping Information</a></li>
                 <li><a href="/pages/home.html#faq">FAQs</a></li>
                 <li><a href="/pages/home.html#reviews">Customer Reviews</a></li>
               </ul>
@@ -210,8 +239,10 @@ const UI = (() => {
             <span>© ${new Date().getFullYear()} AgroShield — demo project for internship presentation.</span>
             <span class="footer__legal">
               <a href="/pages/home.html#safety">Product Safety Info</a>
-              <a href="/#faq">FAQs</a>
-              <a href="/pages/account.html">Privacy &amp; Account</a>
+              <a href="/pages/home.html#faq">FAQs</a>
+              <a href="/pages/legal.html#shipping">Shipping</a>
+              <a href="/pages/legal.html#privacy">Privacy Policy</a>
+              <a href="/pages/legal.html#terms">Terms</a>
               <a href="/pages/admin.html">Admin</a>
             </span>
           </div>

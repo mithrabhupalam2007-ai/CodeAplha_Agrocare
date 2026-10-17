@@ -92,16 +92,27 @@
   function card(p) {
     const d = document.createElement('article');
     d.className = 'p-card';
-    const stockCls = p.stockQuantity <= 0 ? 'out' : p.stockQuantity <= 5 ? 'low' : 'in';
-    const stockTxt = p.stockQuantity <= 0 ? 'Out of Stock' : p.stockQuantity <= 5 ? `Only ${p.stockQuantity} left` : 'In stock';
+    // Backend is the source of truth for availability:
+    // available = active AND stock > 0 AND manualOutOfStock === false
+    const available = p.available !== false;
+    const stockCls = !available ? 'out' : p.stockStatus === 'low' ? 'low' : 'in';
+    const stockTxt = !available
+      ? p.stockStatus === 'unavailable'
+        ? 'Unavailable'
+        : 'Out of Stock'
+      : p.stockStatus === 'low'
+        ? `Low Stock · ${p.stockQuantity} left`
+        : 'In Stock';
     const wished = ((authStore.user && authStore.user.wishlist) || []).includes(p._id);
 
     d.innerHTML = `
       <div class="p-card__media">
         <div class="p-card__flags">
+          ${p.isNewRelease ? '<span class="badge badge--green">New</span>' : ''}
           ${p.bestseller ? '<span class="badge badge--amber">Bestseller</span>' : ''}
           ${p.featured ? '<span class="badge badge--green">Featured</span>' : ''}
-          ${p.stockQuantity <= 0 ? '<span class="badge badge--red">Out of Stock</span>' : ''}
+          ${p.discountPercent > 0 ? `<span class="badge badge--red">${p.discountPercent}% off</span>` : ''}
+          ${!available ? '<span class="badge badge--red">Out of Stock</span>' : ''}
         </div>
         <button class="p-card__wish ${wished ? 'on' : ''}" type="button" aria-label="Toggle wishlist" data-wish>${I.heart}</button>
         <a href="/pages/product-details.html?id=${p._id}"><img src="${UI.esc(p.image)}" alt="${UI.esc(p.name)}" loading="lazy" /></a>
@@ -113,16 +124,20 @@
           <span>${UI.esc(p.packSize)}</span>
           <span class="p-card__stock ${stockCls}"><span class="dot"></span>${stockTxt}</span>
         </div>
-        <div class="p-card__price-row"><span class="price">${UI.inr(p.price)}</span></div>
+        <div class="p-card__price-row">
+          <span class="price">${UI.inr(p.price)}</span>
+          ${p.discountPercent > 0 ? `<span class="price-old">${UI.inr(p.mrp)}</span>` : ''}
+        </div>
       </div>
       <div class="p-card__actions">
-        <button class="btn btn--primary" type="button" data-add ${p.stockQuantity <= 0 ? 'disabled' : ''}>
-          ${p.stockQuantity <= 0 ? 'Out of Stock' : 'Add to Cart'}
+        <button class="btn btn--primary" type="button" data-add ${available ? '' : 'disabled'}>
+          ${available ? 'Add to Cart' : 'Out of Stock'}
         </button>
         <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
       </div>`;
 
     d.querySelector('[data-add]').addEventListener('click', () => {
+      if (!available) return;
       cart.add(UI.cartLine(p), 1);
       UI.refreshBadges();
       toast(`${p.name} added to cart`);

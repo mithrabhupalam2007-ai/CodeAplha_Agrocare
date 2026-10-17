@@ -19,6 +19,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const miscRoutes = require('./routes/miscRoutes');
 
@@ -84,6 +85,7 @@ function createApp() {
     '/pages/checkout.html',
     '/pages/order-confirmation.html',
     '/pages/account.html',
+    '/pages/wishlist.html',
   ];
   const ADMIN_PAGES = ['/pages/admin.html'];
 
@@ -130,6 +132,7 @@ function createApp() {
   app.use('/api/products', productRoutes);
   app.use('/api/orders', orderRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/wishlist', wishlistRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api', miscRoutes);
   app.use('/api', notFound);

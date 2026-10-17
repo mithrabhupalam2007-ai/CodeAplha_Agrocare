@@ -26,7 +26,7 @@ const CATEGORIES = [
   { name: 'Fungicides', type: 'Pesticides', image: '/images/categories/fungicides.jpg', description: 'Demo fungicide listings for fungal disease management.' },
   { name: 'Herbicides', type: 'Pesticides', image: '/images/categories/herbicides.jpg', description: 'Demo weed-management listings for field and orchard use.' },
   { name: 'Fertilizers', type: 'Fertilizers', image: '/images/categories/fertilizers.jpg', description: 'Organic manures, NPK blends and micronutrients for healthy soil.' },
-  { name: 'Organic and Biological Crop Protection', type: 'Pesticides', image: '/images/categories/organic-bio.jpg', description: 'Neem-based and microbial demo products for low-chemical farming.' },
+  { name: 'Bio-pesticides', type: 'Pesticides', image: '/images/categories/organic-bio.jpg', description: 'Neem-based and microbial demo products for low-chemical farming.' },
   { name: 'Farming Tools and Safety Equipment', type: 'Farming Essentials', image: '/images/categories/farming-tools.jpg', description: 'Hand tools, sprayers and personal protective equipment.' },
 ];
 
@@ -42,7 +42,18 @@ const DEMO_LABEL = {
   disposal: 'Demo listing. Do not reuse the container. Dispose of empty packaging and leftover product according to local municipal and agricultural-authority guidelines.',
 };
 
-const P = (doc) => ({ isDemoData: true, active: true, reviewCount: 40 + Math.floor(Math.random() * 160), ...doc });
+const P = (doc) => ({
+  isDemoData: true,
+  active: true,
+  // explicit defaults so re-seeding always resets demo state
+  mrp: null,
+  images: [],
+  manualOutOfStock: false,
+  isNewRelease: false,
+  releaseDate: null,
+  reviewCount: 40 + Math.floor(Math.random() * 160),
+  ...doc,
+});
 
 const PRODUCTS = [
   // ---------------- Vegetable Seeds ----------------
@@ -305,11 +316,11 @@ const PRODUCTS = [
     batch: { batchNumber: 'SG-DEMO-021', expiryDate: null },
   }),
 
-  // ---------------- Organic and Biological Crop Protection ----------------
+  // ---------------- Bio-pesticides ----------------
   P({
     name: 'BioAgro Cold-Pressed Neem Oil (Demo)',
     description: 'Cold-pressed neem oil demo listing for organic farming demonstrations. Label details below are placeholder demo text.',
-    category: 'Organic and Biological Crop Protection', type: 'Pesticides', brand: 'BioAgro (Demo)', price: 350, packSize: '500 ml',
+    category: 'Bio-pesticides', type: 'Pesticides', brand: 'BioAgro (Demo)', price: 350, packSize: '500 ml',
     image: '/images/products/neem-oil.svg', stockQuantity: 102, bestseller: true, featured: true, rating: 4.5,
     crops: ['Vegetables', 'Fruits', 'Ornamentals'],
     labelInfo: { ...DEMO_LABEL, composition: 'DEMO DATA — cold-pressed neem oil listing; percentage and registration not verified.' },
@@ -318,7 +329,7 @@ const PRODUCTS = [
   P({
     name: 'BioAgro Trichoderma Bio-Fungicide (Demo)',
     description: 'Microbial bio-fungicide demo listing for seed and soil application demonstrations on this site.',
-    category: 'Organic and Biological Crop Protection', type: 'Pesticides', brand: 'BioAgro (Demo)', price: 280, packSize: '250 g',
+    category: 'Bio-pesticides', type: 'Pesticides', brand: 'BioAgro (Demo)', price: 280, packSize: '250 g',
     image: '/images/products/trichoderma.svg', stockQuantity: 84, rating: 4.4,
     crops: ['Vegetables', 'Field Crops'],
     labelInfo: { ...DEMO_LABEL, composition: 'DEMO DATA — microbial formulation listing; viable count and registration not verified.' },
@@ -327,7 +338,7 @@ const PRODUCTS = [
   P({
     name: 'BioAgro Botanical Guard Spray (Demo)',
     description: 'Plant-extract based botanical spray demo listing for integrated pest management demonstrations.',
-    category: 'Organic and Biological Crop Protection', type: 'Pesticides', brand: 'BioAgro (Demo)', price: 320, packSize: '500 ml',
+    category: 'Bio-pesticides', type: 'Pesticides', brand: 'BioAgro (Demo)', price: 320, packSize: '500 ml',
     image: '/images/products/botanical-guard.svg', stockQuantity: 71, rating: 4.2,
     crops: ['Vegetables'],
     labelInfo: { ...DEMO_LABEL },
@@ -401,6 +412,48 @@ const PRODUCTS = [
   }),
 ];
 
+/* ---------------------------------------------------------------------------
+ * Merchandising pass (clearly-labelled DEMO data)
+ * - A few listings are flagged as "newly released" with staggered release
+ *   dates so the home page New Releases section has real database content.
+ * - A few listings carry a genuine MRP above the selling price so the
+ *   discount badge logic has data to work with. Nothing is auto-discounted
+ *   silently: an MRP is only shown when it is genuinely higher than the price.
+ * ------------------------------------------------------------------------- */
+const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
+
+const NEW_RELEASES = [
+  'AgroShield Weed Cutter with Wooden Handle',
+  'AgroShield Bypass Pruning Shears',
+  'AgroShield Respirator Safety Mask',
+  'BioAgro Botanical Guard Spray (Demo)',
+  'AgroShield Micronutrient Mix - Zinc',
+  'Watermelon Seed - Chandan (Demo)',
+];
+
+const DISCOUNTED = [
+  'Tomato Hybrid Seed - Pushpa F1 (Demo)',
+  'Cotton Seed - Kapaat F1 (Demo)',
+  'FarmGuard Crop Shield Insecticide (Demo)',
+  'AgroShield NPK 19:19:19 Granules (Demo)',
+  'BioAgro Cold-Pressed Neem Oil (Demo)',
+  'AgroShield 16 L Knapsack Sprayer',
+  'Paddy (Rice) Seed - Sugandha (Demo)',
+  'WeedOut Field Herbicide (Demo)',
+];
+
+for (const p of PRODUCTS) {
+  const releaseIdx = NEW_RELEASES.indexOf(p.name);
+  if (releaseIdx !== -1) {
+    p.isNewRelease = true;
+    p.releaseDate = daysAgo(releaseIdx * 2 + 1);
+  }
+  if (DISCOUNTED.includes(p.name)) {
+    // Round the MRP up to the nearest ₹5 for a clean demo discount.
+    p.mrp = Math.ceil((p.price * 1.2) / 5) * 5;
+  }
+}
+
 async function seed() {
   await connectDB();
 
@@ -411,9 +464,20 @@ async function seed() {
   }
 
   let productCount = 0;
+  const usedSlugs = new Set();
   for (const product of PRODUCTS) {
     const { name, ...rest } = product;
-    await Product.updateOne({ name }, { $set: { ...rest, name } }, { upsert: true });
+    // URL slug derived from the name (deduplicated inside this batch).
+    let slug =
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 80) || 'product';
+    let candidate = slug;
+    for (let i = 2; usedSlugs.has(candidate); i += 1) candidate = `${slug}-${i}`;
+    usedSlugs.add(candidate);
+    await Product.updateOne({ name }, { $set: { ...rest, name, slug: candidate } }, { upsert: true });
     productCount += 1;
   }
 

@@ -75,7 +75,72 @@
     const box = $('checkout-error');
     box.textContent = message;
     box.classList.add('show');
+    delete box.dataset.blocked; // a server flash is not the blocked-state markup
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* ---------------- live availability pre-check ----------------
+   * Before the order is placed, every cart line is verified against the
+   * database (product still active, not manually blocked, stock sufficient).
+   * The server performs the same checks again during the POST — this is only
+   * a friendly early warning so the customer is never surprised at submit.
+   * ------------------------------------------------------------- */
+  const liveIssues = [];
+
+  function applyPlaceOrderState() {
+    const btn = $('place-order');
+    const box = $('checkout-error');
+    if (!btn) return;
+    if (liveIssues.length) {
+      btn.disabled = true;
+      btn.classList.add('is-disabled');
+      box.innerHTML = `<strong>Checkout blocked</strong><br>${liveIssues
+        .map((i) => UI.esc(i))
+        .join('<br>')}<br><a href="/pages/cart.html">Return to your cart</a>`;
+      box.classList.add('show');
+      box.dataset.blocked = '1';
+    } else {
+      btn.disabled = false;
+      btn.classList.remove('is-disabled');
+      if (box.dataset.blocked) {
+        box.classList.remove('show');
+        box.textContent = '';
+        delete box.dataset.blocked;
+      }
+    }
+  }
+
+  async function verifyCart() {
+    liveIssues.length = 0;
+    const items = cart.items();
+    await Promise.all(
+      items.map(async (item) => {
+        try {
+          const data = await api.get(`/products/${item.id}`);
+          const p = data.product;
+          if (p.available === false) {
+            liveIssues.push(
+              p.stockStatus === 'unavailable'
+                ? `"${p.name}" is no longer available.`
+                : `"${p.name}" is out of stock.`
+            );
+          } else if (item.qty > p.stockQuantity) {
+            liveIssues.push(`Only ${p.stockQuantity} unit(s) of "${p.name}" are in stock.`);
+          }
+          // keep the local summary in sync with current database prices
+          const patch = {};
+          if (Number.isFinite(p.price) && p.price !== item.price) patch.price = p.price;
+          if (typeof p.stockQuantity === 'number' && p.stockQuantity !== item.stock)
+            patch.stock = p.stockQuantity;
+          if (Object.keys(patch).length) cart.patch(item.id, patch);
+        } catch (err) {
+          liveIssues.push(`A product in your cart is no longer available. Please return to your cart.`);
+        }
+      })
+    );
+    renderSummary();
+    applyPlaceOrderState();
+    return liveIssues.length === 0;
   }
 
   /* ---------------- prefill ---------------- */
@@ -104,6 +169,18 @@
       return;
     }
 
+    // Final availability re-check (the server enforces the same rules).
+    const btn = $('place-order');
+    btn.disabled = true;
+    $('placing').classList.remove('hidden');
+    const ok = await verifyCart();
+    if (!ok) {
+      $('placing').classList.add('hidden');
+      btn.disabled = true; // stays blocked until the cart is fixed
+      toast('Some items in your cart are unavailable. Please review your cart.', 'error');
+      return;
+    }
+
     const payload = {
       items: cart.toPayload(),
       paymentMethod: document.querySelector('input[name="payment"]:checked').value,
@@ -117,10 +194,6 @@
         pincode: $('c-pincode').value.trim(),
       },
     };
-
-    const btn = $('place-order');
-    btn.disabled = true;
-    $('placing').classList.remove('hidden');
 
     try {
       const data = await api.post('/orders', payload);
@@ -147,8 +220,11 @@
       }
       flashError(err.message);
       toast(err.message, 'error');
+      if (err.status === 409) verifyCart(); // refresh the blocked state
     } finally {
-      btn.disabled = false;
+      // stay blocked (greyed out) while known issues remain in the cart
+      btn.disabled = liveIssues.length > 0;
+      btn.classList.toggle('is-disabled', liveIssues.length > 0);
       $('placing').classList.add('hidden');
     }
   }
@@ -174,6 +250,8 @@
     }
     prefill();
     UI.refreshBadges();
+
+    verifyCart(); // async — blocks the submit button if anything is unavailable
 
     Object.keys(validators).forEach((field) => {
       const input = document.querySelector(`[name="${field}"]`);

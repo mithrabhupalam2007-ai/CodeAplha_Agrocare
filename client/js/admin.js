@@ -40,6 +40,8 @@
 
     if (name === 'dashboard') loadDashboard();
     if (name === 'products') loadProducts();
+    if (name === 'editprices') loadPriceList();
+    if (name === 'newreleases') loadNewReleases();
     if (name === 'inventory') loadInventory('inventory');
     if (name === 'outofstock') loadInventory('outofstock');
     if (name === 'orders') loadOrders();
@@ -57,14 +59,15 @@
       $('s-rev-sub').textContent = `avg order ${UI.inr(s.averageOrderValue)}`;
       $('s-orders').textContent = s.totalOrders.toLocaleString('en-IN');
       $('s-orders-sub').textContent = `${s.paidOrders} fulfilled / in progress`;
-      $('s-customers').textContent = s.totalCustomers.toLocaleString('en-IN');
+      $('s-active').textContent = (s.activeProducts ?? 0).toLocaleString('en-IN');
+      $('s-newreleases').textContent = (s.newReleases ?? 0).toLocaleString('en-IN');
       $('s-products').textContent = s.totalProducts.toLocaleString('en-IN');
       $('s-products-sub').textContent = `${s.activeProducts} active · ${s.inactiveProducts} inactive`;
       $('s-instock').textContent = (s.inStockProducts ?? 0).toLocaleString('en-IN');
       $('s-oos').textContent = (s.outOfStockProducts ?? 0).toLocaleString('en-IN');
       $('oos-card').classList.toggle('alerted', (s.outOfStockProducts || 0) > 0);
-      $('s-users').textContent = (s.totalUsers ?? s.totalCustomers).toLocaleString('en-IN');
-      $('s-users-sub').textContent = `${s.totalCustomers} customer(s)`;
+      $('s-users').textContent = (s.totalCustomers ?? 0).toLocaleString('en-IN');
+      $('s-users-sub').textContent = `${s.totalUsers ?? 0} account(s) incl. admin`;
       $('s-lowstock').textContent = s.lowStockCount;
       $('s-lowstock-sub').textContent = `threshold: ≤ ${s.lowStockThreshold} units`;
       $('lowstock-card').classList.toggle('alerted', s.lowStockCount > 0);
@@ -154,9 +157,9 @@
               (p) => `
         <tr>
           <td><img src="${UI.esc(p.image)}" alt="" /></td>
-          <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.esc(p.packSize)}</span>${p.isDemoData ? ' <span class="badge badge--amber">demo</span>' : ''}</td>
+          <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.esc(p.packSize)}</span>${p.isDemoData ? ' <span class="badge badge--amber">demo</span>' : ''}${p.isNewRelease ? ' <span class="badge badge--green">new</span>' : ''}${p.manualOutOfStock ? ' <span class="badge badge--red">blocked</span>' : ''}</td>
           <td>${UI.esc(p.category)}</td>
-          <td><b>${UI.inr(p.price)}</b></td>
+          <td><b>${UI.inr(p.price)}</b>${p.discountPercent > 0 ? `<br/><span class="text-muted" style="font-size:.75rem;">MRP ${UI.inr(p.mrp)}</span>` : ''}</td>
           <td><span class="badge ${p.stockQuantity === 0 ? 'badge--red' : p.stockQuantity <= 5 ? 'badge--amber' : 'badge--green'}">${p.stockQuantity}</span></td>
           <td><span class="badge ${p.active ? 'badge--green' : 'badge--grey'}">${p.active ? 'Active' : 'Inactive'}</span></td>
           <td>
@@ -222,7 +225,8 @@
     if (id) {
       $('pm-title').textContent = 'Edit product';
       api
-        .get(`/products/${id}`)
+        // admin endpoint — also works for inactive products
+        .get(`/admin/products/${id}`)
         .then(({ product }) => {
           form.id.value = product._id;
           form.name.value = product.name;
@@ -232,22 +236,84 @@
           form.brand.value = product.brand;
           form.packSize.value = product.packSize;
           form.price.value = product.price;
+          form.mrp.value = product.mrp ?? '';
           form.stockQuantity.value = product.stockQuantity;
           form.image.value = product.image;
+          form.images.value = (product.images || []).join('\n');
           form.crops.value = (product.crops || []).join(', ');
+          form.specifications.value = (product.specifications || [])
+            .map((s) => `${s.label}: ${s.value}`)
+            .join('\n');
+          const l = product.labelInfo || {};
+          form.labelInfo.value = Object.entries({
+            Composition: l.composition,
+            'Registration details': l.registrationNo,
+            'Label instructions': l.labelInstructions,
+            'Safety precautions': l.safetyPrecautions,
+            Storage: l.storage,
+            'Disposal guidance': l.disposal,
+          })
+            .filter(([, v]) => v)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join('\n');
+          form.batchNumber.value = (product.batch && product.batch.batchNumber) || '';
+          form.expiryDate.value =
+            product.batch && product.batch.expiryDate ? String(product.batch.expiryDate).slice(0, 10) : '';
+          form.releaseDate.value = product.releaseDate ? String(product.releaseDate).slice(0, 10) : '';
           form.featured.checked = !!product.featured;
           form.bestseller.checked = !!product.bestseller;
           form.seasonal.checked = !!product.seasonal;
           form.active.checked = !!product.active;
+          form.isNewRelease.checked = !!product.isNewRelease;
+          form.manualOutOfStock.checked = !!product.manualOutOfStock;
         })
         .catch((err) => toast(err.message, 'error'));
     }
     $('product-modal').classList.add('open');
   }
 
+  /** Parse "Label: Value" lines into [{label, value}]. */
+  function parseKeyValues(text) {
+    return String(text || '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const i = line.indexOf(':');
+        if (i === -1) return { label: line, value: '' };
+        return { label: line.slice(0, i).trim(), value: line.slice(i + 1).trim() };
+      })
+      .filter((kv) => kv.label);
+  }
+
+  /** Known label-info keys (display name -> schema key). */
+  const LABEL_KEYS = {
+    composition: 'composition',
+    'registration details': 'registrationNo',
+    'label instructions': 'labelInstructions',
+    'safety precautions': 'safetyPrecautions',
+    storage: 'storage',
+    'disposal guidance': 'disposal',
+  };
+
   async function saveProduct(e) {
     e.preventDefault();
     const f = e.target;
+
+    // Split the combined "label & safety" textarea into the schema's
+    // labelInfo object; anything unrecognised becomes a specification entry.
+    const labelInfo = {};
+    const extraSpecs = [];
+    parseKeyValues(f.labelInfo.value).forEach((kv) => {
+      const key = LABEL_KEYS[kv.label.toLowerCase()];
+      if (key && kv.value) labelInfo[key] = kv.value;
+      else if (kv.value) extraSpecs.push(kv);
+    });
+
+    const batch = {};
+    if (f.batchNumber.value.trim()) batch.batchNumber = f.batchNumber.value.trim();
+    if (f.expiryDate.value) batch.expiryDate = f.expiryDate.value;
+
     const payload = {
       name: f.name.value.trim(),
       description: f.description.value.trim(),
@@ -256,9 +322,17 @@
       brand: f.brand.value.trim(),
       packSize: f.packSize.value.trim(),
       price: Number(f.price.value),
+      mrp: f.mrp.value === '' ? null : Number(f.mrp.value),
       stockQuantity: Number(f.stockQuantity.value),
       image: f.image.value.trim(),
+      images: f.images.value.split('\n').map((s) => s.trim()).filter(Boolean),
       crops: f.crops.value.split(',').map((c) => c.trim()).filter(Boolean),
+      specifications: [...parseKeyValues(f.specifications.value), ...extraSpecs],
+      labelInfo,
+      batch,
+      isNewRelease: f.isNewRelease.checked,
+      releaseDate: f.releaseDate.value || null,
+      manualOutOfStock: f.manualOutOfStock.checked,
       featured: f.featured.checked,
       bestseller: f.bestseller.checked,
       seasonal: f.seasonal.checked,
@@ -272,8 +346,8 @@
       toast(data.message);
       $('product-modal').classList.remove('open');
       const activeTab = document.querySelector('.side-nav button.active');
-      if (activeTab && activeTab.dataset.tab === 'add-product') switchTab('products');
-      else loadProducts();
+      const tab = activeTab ? activeTab.dataset.tab : 'products';
+      switchTab(tab === 'add-product' ? 'products' : tab);
     } catch (err) {
       toast(err.message, 'error');
     }
@@ -285,27 +359,52 @@
     outofstock: { page: 1, search: '' },
   };
 
-  function stockBadge(qty) {
-    if (qty <= 0) return '<span class="badge badge--red">Out of stock</span>';
-    if (qty <= 5) return `<span class="badge badge--amber">${qty} left</span>`;
-    return `<span class="badge badge--green">${qty} in stock</span>`;
+  function stockBadge(p) {
+    if (!p) return '';
+    if (!p.available) {
+      return p.stockStatus === 'unavailable'
+        ? '<span class="badge badge--grey">Unavailable</span>'
+        : '<span class="badge badge--red">Out of stock</span>';
+    }
+    if (p.stockStatus === 'low') return `<span class="badge badge--amber">${p.stockQuantity} left</span>`;
+    return `<span class="badge badge--green">${p.stockQuantity} in stock</span>`;
+  }
+
+  const reasonCell = (p) =>
+    p.manualOutOfStock
+      ? '<span class="badge badge--red">Manual block</span>'
+      : '<span class="badge badge--amber">Quantity 0</span>';
+
+  /** Toggle the manual out-of-stock override (availability endpoint). */
+  async function toggleManualBlock(id, name, value, view) {
+    try {
+      const data = await api.patch(`/admin/products/${id}/availability`, { manualOutOfStock: value });
+      toast(data.message);
+      loadInventory(view);
+      if (view === 'outofstock') loadDashboardIfVisible();
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+
+  function loadDashboardIfVisible() {
+    const panel = document.querySelector('[data-panel="dashboard"]');
+    if (panel && !panel.classList.contains('hidden')) loadDashboard();
   }
 
   async function loadInventory(view) {
     const isOOS = view === 'outofstock';
     const st = listState[view];
     const tbody = $(isOOS ? 'oos-table' : 'inv-table');
-    tbody.innerHTML = `<tr><td colspan="${isOOS ? 6 : 7}"><div class="spinner"></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${isOOS ? 7 : 7}"><div class="spinner"></div></td></tr>`;
 
     try {
       const data = await api.get(
-        '/admin/products' +
-          api.qs({
-            status: isOOS ? 'outofstock' : '',
-            search: st.search,
-            page: st.page,
-            limit: 12,
-          })
+        isOOS
+          ? '/admin/products/out-of-stock' +
+              api.qs({ search: st.search, reason: st.reason || '', page: st.page, limit: 12 })
+          : '/admin/products' +
+              api.qs({ search: st.search, page: st.page, limit: 12, status: '' })
       );
 
       tbody.innerHTML = data.products.length
@@ -318,27 +417,39 @@
                 <td>
                   <div class="cell-actions">
                     <input type="number" min="0" step="1" value="${p.stockQuantity}" data-stock-input="${p._id}" style="width:84px;padding:6px 8px;border:1.5px solid var(--line-strong);border-radius:6px;font-size:.85rem;" aria-label="Stock quantity for ${UI.esc(p.name)}" />
-                    <button class="btn btn--primary btn--sm" data-stock-save="${p._id}" data-name="${UI.esc(p.name)}">Update</button>
+                    <button class="btn btn--primary btn--sm" data-stock-save="${p._id}" data-name="${UI.esc(p.name)}" data-manual="${p.manualOutOfStock ? '1' : ''}">Update</button>
                   </div>
                 </td>`;
               const editBtn = `<button class="btn btn--ghost btn--sm" data-edit="${p._id}">Edit</button>`;
 
               if (isOOS) {
+                const clearBtn = p.manualOutOfStock
+                  ? `<button class="btn btn--accent btn--sm" data-manual-toggle="${p._id}" data-value="false" data-name="${UI.esc(p.name)}">Clear block</button>`
+                  : '';
                 return `<tr>
                   ${img}${name}<td>${UI.esc(p.category)}</td>${price}
+                  <td>${reasonCell(p)}</td>
                   ${stockInput}
-                  <td><div class="cell-actions">${editBtn}</div></td>
+                  <td><div class="cell-actions">${editBtn}${clearBtn}</div></td>
                 </tr>`;
               }
+
+              // inventory view: manual-block toggle + visibility
+              const manualCell = p.manualOutOfStock
+                ? `<span class="badge badge--red">Blocked</span> <button class="btn btn--ghost btn--sm" data-manual-toggle="${p._id}" data-value="false" data-name="${UI.esc(p.name)}">Clear block</button>`
+                : `<span class="badge badge--green">Selling</span> <button class="btn btn--ghost btn--sm" data-manual-toggle="${p._id}" data-value="true" data-name="${UI.esc(p.name)}">Mark out of stock</button>`;
               return `<tr>
                 ${img}${name}${price}${stockInput}
-                <td>${stockBadge(p.stockQuantity)}</td>
-                <td><span class="badge ${p.active ? 'badge--green' : 'badge--grey'}">${p.active ? 'Active' : 'Inactive'}</span></td>
+                <td>${stockBadge(p)}</td>
+                <td>
+                  <span class="badge ${p.active ? 'badge--green' : 'badge--grey'}">${p.active ? 'Active' : 'Inactive'}</span>
+                  <div style="margin-top:6px;">${manualCell}</div>
+                </td>
                 <td><div class="cell-actions">${editBtn}</div></td>
               </tr>`;
             })
             .join('')
-        : `<tr><td colspan="${isOOS ? 6 : 7}" class="text-center text-muted" style="padding:30px;">${
+        : `<tr><td colspan="${isOOS ? 7 : 7}" class="text-center text-muted" style="padding:30px;">${
             isOOS ? 'Nice — no products are out of stock right now.' : 'No products match your search.'
           }</td></tr>`;
 
@@ -348,17 +459,22 @@
       });
 
       tbody.querySelectorAll('[data-stock-save]').forEach((b) =>
-        b.addEventListener('click', () => updateStock(b.dataset.stockSave, b.dataset.name, view))
+        b.addEventListener('click', () => updateStock(b.dataset.stockSave, b.dataset.name, view, b.dataset.manual === '1'))
+      );
+      tbody.querySelectorAll('[data-manual-toggle]').forEach((b) =>
+        b.addEventListener('click', () =>
+          toggleManualBlock(b.dataset.manualToggle, b.dataset.name, b.dataset.value === 'true', view)
+        )
       );
       tbody.querySelectorAll('[data-edit]').forEach((b) =>
         b.addEventListener('click', () => openProductModal(b.dataset.edit))
       );
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="${isOOS ? 6 : 7}"><div class="alert show alert--error">${UI.esc(err.message)}</div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${isOOS ? 7 : 7}"><div class="alert show alert--error">${UI.esc(err.message)}</div></td></tr>`;
     }
   }
 
-  async function updateStock(id, name, view) {
+  async function updateStock(id, name, view, wasManual) {
     const input = document.querySelector(`[data-stock-input="${id}"]`);
     const qty = Number(input ? input.value : NaN);
     if (!Number.isInteger(qty) || qty < 0) {
@@ -366,10 +482,147 @@
       return;
     }
     try {
-      const data = await api.patch(`/products/${id}`, { stockQuantity: qty });
-      toast(`${name}: stock set to ${qty}`);
+      // Restocking also clears a manual block so availability is restored
+      // as soon as the product is active and quantity > 0.
+      const data = await api.patch(`/admin/products/${id}/stock`, {
+        stockQuantity: qty,
+        clearManualOutOfStock: qty > 0 && wasManual,
+      });
+      toast(data.message);
+      if (wasManual && qty > 0) toast(`${name} restocked and its manual block was cleared ✓`);
       loadInventory(view);
-      if (view === 'outofstock' && qty > 0) toast(`${name} is back in stock ✓`);
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+
+  /* ================= edit prices & new releases ================= */
+  const priceState = { page: 1, search: '' };
+  const newState = { page: 1, search: '', filter: '' };
+
+  async function loadPriceList() {
+    const tbody = $('price-table');
+    tbody.innerHTML = '<tr><td colspan="8"><div class="spinner"></div></td></tr>';
+    try {
+      const data = await api.get(
+        '/admin/products' + api.qs({ search: priceState.search, page: priceState.page, limit: 12 })
+      );
+
+      tbody.innerHTML = data.products.length
+        ? data.products
+            .map((p) => {
+              const disc =
+                p.discountPercent > 0 ? `<span class="badge badge--red">${p.discountPercent}% off</span>` : '—';
+              return `
+        <tr>
+          <td><img src="${UI.esc(p.image)}" alt="" /></td>
+          <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)}</span></td>
+          <td>${UI.esc(p.category)}</td>
+          <td>${p.mrp ? UI.inr(p.mrp) : '<span class="text-muted">—</span>'}</td>
+          <td><b>${UI.inr(p.price)}</b></td>
+          <td>${disc}</td>
+          <td>
+            <div class="cell-actions">
+              <input type="number" min="0" step="0.01" value="${p.price}" data-price-input="${p._id}" style="width:92px;padding:6px 8px;border:1.5px solid var(--line-strong);border-radius:6px;font-size:.85rem;" aria-label="New price for ${UI.esc(p.name)}" />
+              <button class="btn btn--primary btn--sm" data-price-save="${p._id}" data-name="${UI.esc(p.name)}">Update</button>
+            </div>
+          </td>
+          <td><button class="btn btn--ghost btn--sm" data-edit="${p._id}">Full edit</button></td>
+        </tr>`;
+            })
+            .join('')
+        : '<tr><td colspan="8" class="text-center text-muted" style="padding:30px;">No products match your search.</td></tr>';
+
+      renderPager($('price-pager'), data.pagination, (p) => {
+        priceState.page = p;
+        loadPriceList();
+      });
+
+      tbody.querySelectorAll('[data-price-save]').forEach((b) =>
+        b.addEventListener('click', () => updatePrice(b.dataset.priceSave, b.dataset.name))
+      );
+      tbody.querySelectorAll('[data-edit]').forEach((b) =>
+        b.addEventListener('click', () => openProductModal(b.dataset.edit))
+      );
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="alert show alert--error">${UI.esc(err.message)}</div></td></tr>`;
+    }
+  }
+
+  async function updatePrice(id, name) {
+    const input = document.querySelector(`[data-price-input="${id}"]`);
+    const price = Number(input ? input.value : NaN);
+    if (Number.isNaN(price) || price < 0) {
+      toast('Enter a valid non-negative price.', 'error');
+      return;
+    }
+    try {
+      const data = await api.patch(`/admin/products/${id}/price`, { price });
+      toast(data.message);
+      loadPriceList();
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+
+  async function loadNewReleases() {
+    const tbody = $('new-table');
+    tbody.innerHTML = '<tr><td colspan="6"><div class="spinner"></div></td></tr>';
+    try {
+      const data = await api.get(
+        '/admin/products' +
+          api.qs({
+            search: newState.search,
+            status: newState.filter === 'newrelease' ? 'newrelease' : '',
+            page: newState.page,
+            limit: 12,
+          })
+      );
+
+      tbody.innerHTML = data.products.length
+        ? data.products
+            .map((p) => `
+        <tr>
+          <td><img src="${UI.esc(p.image)}" alt="" /></td>
+          <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.inr(p.price)}</span></td>
+          <td>${UI.esc(p.category)}</td>
+          <td>${p.releaseDate ? UI.formatDate(p.releaseDate) : '<span class="text-muted">—</span>'}</td>
+          <td><span class="badge ${p.isNewRelease ? 'badge--green' : 'badge--grey'}">${p.isNewRelease ? 'New release' : 'Not flagged'}</span></td>
+          <td>
+            <div class="cell-actions">
+              <button class="btn btn--${p.isNewRelease ? 'danger' : 'accent'} btn--sm" data-new-toggle="${p._id}" data-value="${!p.isNewRelease}" data-name="${UI.esc(p.name)}">
+                ${p.isNewRelease ? 'Remove from New Releases' : 'Mark as New Release'}
+              </button>
+              <button class="btn btn--ghost btn--sm" data-edit="${p._id}">Edit date</button>
+            </div>
+          </td>
+        </tr>`)
+            .join('')
+        : '<tr><td colspan="6" class="text-center text-muted" style="padding:30px;">No products match your search.</td></tr>';
+
+      renderPager($('new-pager'), data.pagination, (p) => {
+        newState.page = p;
+        loadNewReleases();
+      });
+
+      tbody.querySelectorAll('[data-new-toggle]').forEach((b) =>
+        b.addEventListener('click', () =>
+          toggleNewRelease(b.dataset.newToggle, b.dataset.name, b.dataset.value === 'true')
+        )
+      );
+      tbody.querySelectorAll('[data-edit]').forEach((b) =>
+        b.addEventListener('click', () => openProductModal(b.dataset.edit))
+      );
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="alert show alert--error">${UI.esc(err.message)}</div></td></tr>`;
+    }
+  }
+
+  async function toggleNewRelease(id, name, value) {
+    try {
+      const data = await api.patch(`/admin/products/${id}/availability`, { isNewRelease: value });
+      toast(data.message);
+      loadNewReleases();
     } catch (err) {
       toast(err.message, 'error');
     }
@@ -650,6 +903,36 @@
         listState.outofstock.page = 1;
         loadInventory('outofstock');
       }, 350);
+    });
+    $('oos-reason').addEventListener('change', (e) => {
+      listState.outofstock.reason = e.target.value;
+      listState.outofstock.page = 1;
+      loadInventory('outofstock');
+    });
+
+    let priceTimer;
+    $('price-search').addEventListener('input', (e) => {
+      clearTimeout(priceTimer);
+      priceTimer = setTimeout(() => {
+        priceState.search = e.target.value.trim();
+        priceState.page = 1;
+        loadPriceList();
+      }, 350);
+    });
+
+    let newTimer;
+    $('new-search').addEventListener('input', (e) => {
+      clearTimeout(newTimer);
+      newTimer = setTimeout(() => {
+        newState.search = e.target.value.trim();
+        newState.page = 1;
+        loadNewReleases();
+      }, 350);
+    });
+    $('new-filter').addEventListener('change', (e) => {
+      newState.filter = e.target.value;
+      newState.page = 1;
+      loadNewReleases();
     });
 
     loadDashboard();

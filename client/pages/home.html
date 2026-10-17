@@ -27,11 +27,11 @@
       <img class="hero__bg" src="/images/hero-field.jpg" alt="Farmer walking through a lush green crop field" />
       <div class="container hero__content">
         <span class="hero__chip">🌱 Trusted by farmers across India</span>
-        <h1>Grow Better.<br />Harvest More.</h1>
-        <p class="hero__sub">Quality seeds, crop protection products and farming essentials in one place.</p>
+        <h1>Protect Your Crops.<br />Grow Your Future.</h1>
+        <p class="hero__sub">Discover agricultural products, crop-protection solutions and quality seeds in one place.</p>
         <div class="hero__cta">
-          <a class="btn btn--light btn--lg" href="/pages/products.html?type=Seeds">Shop Seeds</a>
-          <a class="btn btn--primary btn--lg" href="/pages/products.html?type=Pesticides">Explore Crop Protection</a>
+          <a class="btn btn--light btn--lg" href="/pages/products.html">Explore Products</a>
+          <a class="btn btn--primary btn--lg" href="#new-releases">Shop Newly Released Products</a>
         </div>
         <div class="hero__points">
           <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 100% genuine products</span>
@@ -69,8 +69,23 @@
       </div>
     </section>
 
+    <!-- ======================= NEWLY RELEASED PRODUCTS ======================= -->
+    <section class="section section--beige" id="new-releases">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Just landed</span>
+            <h2>Newly Released Products</h2>
+            <p>The newest additions to the AgroShield catalogue, straight from the store database.</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href="/pages/products.html?sort=newest">View All →</a>
+        </div>
+        <div class="product-grid" id="new-releases-grid"></div>
+      </div>
+    </section>
+
     <!-- ======================= FEATURED PRODUCTS ======================= -->
-    <section class="section section--beige" id="featured">
+    <section class="section" id="featured">
       <div class="container">
         <div class="section-head">
           <div>
@@ -84,13 +99,13 @@
       </div>
     </section>
 
-    <!-- ======================= BESTSELLING SEEDS ======================= -->
-    <section class="section" id="bestsellers">
+    <!-- ======================= FEATURED SEEDS ======================= -->
+    <section class="section section--beige" id="bestsellers">
       <div class="container">
         <div class="section-head">
           <div>
             <span class="eyebrow">Grower favourites</span>
-            <h2>Bestselling seeds</h2>
+            <h2>Featured Seeds</h2>
             <p>Seeds farmers keep coming back for, season after season.</p>
           </div>
           <a class="btn btn--ghost btn--sm" href="/pages/products.html?type=Seeds">All seeds →</a>
@@ -99,18 +114,48 @@
       </div>
     </section>
 
-    <!-- ======================= SEASONAL ======================= -->
-    <section class="section section--beige" id="seasonal">
+    <!-- ======================= CROP PROTECTION ======================= -->
+    <section class="section" id="crop-protection">
       <div class="container">
         <div class="section-head">
           <div>
-            <span class="eyebrow">This season</span>
-            <h2>Seasonal farming essentials</h2>
-            <p>Supplies matched to the current sowing season.</p>
+            <span class="eyebrow">Crop care</span>
+            <h2>Crop Protection Products</h2>
+            <p>Demo insecticide, fungicide and herbicide listings with clear safety information.</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href="/pages/products.html?type=Pesticides">All crop protection →</a>
+        </div>
+        <div class="product-grid" id="crop-grid"></div>
+      </div>
+    </section>
+
+    <!-- ======================= RECENTLY ADDED ======================= -->
+    <section class="section section--beige" id="recently-added">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Fresh stock</span>
+            <h2>Recently Added Products</h2>
+            <p>The latest products saved to the catalogue by our team.</p>
           </div>
           <a class="btn btn--ghost btn--sm" href="/pages/products.html?sort=newest">New arrivals →</a>
         </div>
-        <div class="product-grid" id="seasonal-grid"></div>
+        <div class="product-grid" id="recent-grid"></div>
+      </div>
+    </section>
+
+    <!-- ======================= FARMING ESSENTIALS ======================= -->
+    <section class="section" id="essentials">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Everyday gear</span>
+            <h2>Farming Tools &amp; Essentials</h2>
+            <p>Sprayers, hand tools and protective equipment for daily farm work.</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href="/pages/products.html?type=Farming%20Essentials">All essentials →</a>
+        </div>
+        <div class="product-grid" id="essentials-grid"></div>
       </div>
     </section>
 

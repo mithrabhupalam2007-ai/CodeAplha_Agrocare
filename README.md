@@ -14,26 +14,39 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 
 ### Customer
 - **User login / registration** — email + password login, full registration (name, email, phone, password, delivery address), back buttons to the selection page
-- **Home page** — hero banner, shop-by-category cards, featured/bestseller/seasonal product rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
+- **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), shop-by-category cards, **Newly Released Products** (live from the database, newest first, with an empty state), Featured, Featured Seeds, Crop Protection, Recently Added and Farming Essentials rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
 - **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options, Load More pagination, empty states
-- **Product details** — specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, related products, quantity picker, **Add to Cart / Buy Now / Wishlist**
-- **Out of stock handling** — “Out of Stock” badge, disabled Add to Cart & Buy Now buttons, and the backend rejects orders for unavailable products (with a clear message if stock runs out at checkout)
-- **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar
-- **Checkout** — address form with validation, Cash on Delivery + clearly-labelled demo payment, server-side price/stock verification
+- **Product cards** — image, name, category, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons
+- **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
+- **Out of stock handling** — highly visible “Out of Stock” panel with a “check back later” message, disabled Add to Cart & Buy Now, and the backend rejects orders for unavailable products (including products **manually blocked** by an administrator)
+- **Wishlist** — dedicated page with live availability, remove and one-click *Move to Cart* (out-of-stock items stay listed but cannot move)
+- **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar, **live re-check of every line against the database** (unavailable items are clearly labelled and **checkout is blocked** until the cart is purchasable)
+- **Checkout** — address form with validation, Cash on Delivery + clearly-labelled demo payment, pre-submit availability check, server-side price/stock verification
 - **Orders** — confirmation page, My Orders with status timeline, self-cancellation (Placed/Confirmed only) with automatic restock
-- **Account** — profile editing, saved address, wishlist, change password, logout
+- **Account** — profile editing, saved address, change password, logout; the navbar account menu links to Profile, Orders, Wishlist and Logout
+- **Policies page** — shipping information, privacy policy and terms (`/pages/legal.html`), linked from the footer
 - **Auth** — register/login with field validation, bcrypt hashing, JWT (httpOnly cookie + bearer fallback)
 
 ### Admin (`/pages/admin-login.html` → `/pages/admin.html`)
 - **Separate admin login** — email *or* username + password; only accounts with `role: admin` are accepted (verified on the backend)
-- **Dashboard Overview** — total products, products in stock, out-of-stock products, total orders, registered users, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
-- **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items
-- **Add New Product** — one-click entry in the sidebar that opens the product form
-- **Inventory Management** — quick per-product stock updates + visibility toggle
-- **Out-of-Stock Products** — focused list with inline restocking
+- **Dashboard Overview** — total products, active products, in-stock, out-of-stock, **newly released**, total orders, registered customers, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
+- **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items, with *new* and *manually blocked* badges
+- **Add New Product** — form with name, category, description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, crops, specifications, **label & safety information**, batch number & expiry
+- **Edit Products & Prices** — quick inline price editing (uses the dedicated price endpoint) plus full-edit modal
+- **Newly Released Products** — flag/unflag any product as a new release; flagged products automatically appear in the customer home page section, newest first
+- **Inventory Management** — quick per-product stock updates, visibility toggle and manual out-of-stock switch
+- **Out-of-Stock Products** — shows *why* each product is unavailable (**quantity is zero** vs **manual block**), restocking (which clears the manual block), “Clear block” action, reason filter and search
 - **Manage Orders** — status transitions + automatic restock on cancel
 - **Manage Customers** — order counts and lifetime spend
 - **Categories** — create / edit / delete, blocked while products use the category
+
+### Availability rule (single source of truth)
+
+```
+available  ⇔  active  AND  stockQuantity > 0  AND  manualOutOfStock = false
+```
+
+The database is authoritative: the same rule is applied by the backend for catalogue responses (`available` + `stockStatus` on every product), for the checkout validation and atomic stock decrement, and it drives every button/badge on the storefront.
 
 ### Security
 - bcrypt password hashing (cost 10) — plain-text passwords never stored
@@ -76,14 +89,15 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 │   ├── js/
 │   │   ├── api.js              # fetch wrapper + auth strategy
 │   │   ├── store.js            # cart (localStorage) + auth cache
-│   │   ├── ui.js               # icons, toasts, navbar/footer, guards
+│   │   ├── ui.js               # icons, toasts, navbar (account menu)/footer, guards
 │   │   ├── entry.js            # selection page (?next= support)
 │   │   ├── home.js  products.js  product-details.js
 │   │   ├── cart.js  checkout.js  order-confirmation.js
-│   │   └── auth.js  account.js   admin.js
+│   │   └── auth.js  account.js  wishlist.js  admin.js
 │   ├── images/                 # hero, categories, product images
 │   └── pages/                  # home, products, details, cart, checkout,
-│                               # login, register, admin-login, account, admin
+│                               # wishlist, order-confirmation, login, register,
+│                               # admin-login, account, admin, legal
 │
 ├── server/                     # backend
 │   ├── server.js               # app entry: security, login wall, static serving, routes
@@ -186,18 +200,26 @@ Base URL: `http://localhost:5050/api`
 ### Catalogue
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/products` | user | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, sort, page, limit` |
-| GET | `/products/:id` | user | Detail + related products |
-| POST | `/products` | admin | Create product |
+| GET | `/products` | user | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, newRelease, sort (incl. `release`), page, limit`; every item carries `available`, `stockStatus` and `discountPercent` |
+| GET | `/products/new-releases` | user | Products flagged as newly released, newest (`releaseDate`) first — powers the home page section |
+| GET | `/products/:id` | user | Detail (+ related products) — 404 for inactive products |
+| GET | `/products/:id/related` | user | “You May Also Like” carousel set (same category first, top-up from other actives, never includes itself) |
+| POST | `/products` | admin | Create product (name → auto slug, `mrp`, `images[]`, `isNewRelease`, `releaseDate`, `manualOutOfStock`, …) |
 | PATCH | `/products/:id` | admin | Update product |
 | DELETE | `/products/:id` | admin | Deactivate (`?permanent=true` to delete) |
 | GET | `/categories` | user | Categories with live product counts |
 | POST | `/newsletter` | — | Subscribe |
 
+### Wishlist
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/wishlist` | user | Saved products with live availability (`available`, `stockStatus`, `discountPercent`) — alias of `/users/wishlist` |
+| POST / DELETE | `/wishlist/:productId` | user | Add / remove (no duplicates) |
+
 ### Orders (customer)
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/orders` | user | Checkout — server verifies prices/stock, computes totals, decrements inventory atomically |
+| POST | `/orders` | user | Checkout — server verifies prices/stock/availability (incl. manual blocks), computes totals, decrements inventory atomically |
 | GET | `/orders/my` | user | Own orders only |
 | GET | `/orders/:id` | owner/admin | Readable order id (`AS-YYYYMMDD-XXXXXX`) |
 | PATCH | `/orders/:id/cancel` | owner | Cancel while Placed/Confirmed + restock |
@@ -212,8 +234,16 @@ Base URL: `http://localhost:5050/api`
 ### Admin (all require `role: admin`)
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/admin/dashboard` | Stats (products, in/out of stock, orders, users, revenue), sales chart, low stock, top products, recent orders |
-| GET | `/admin/products` | Product list **including inactive items** — `status=active|inactive|instock|outofstock`, `search`, `category`, `page`, `limit` |
+| GET | `/admin/dashboard` | Stats (total/active/in-stock/out-of-stock/newly-released products, orders, customers, revenue), sales chart, low stock, top products, recent orders |
+| GET | `/admin/products` | Product list **including inactive items** — `status=active|inactive|instock|outofstock|newrelease`, `search`, `category`, `page`, `limit` |
+| GET | `/admin/products/:id` | Full product record **including inactive items** (used by the edit form) |
+| GET | `/admin/products/out-of-stock` | Products that are unavailable — `reason=manual|quantity`, `search`, `page` |
+| POST | `/admin/products` | Create product (alias of `POST /products`) |
+| PATCH | `/admin/products/:id` | Update product (alias of `PATCH /products/:id`) |
+| PATCH | `/admin/products/:id/price` | Change selling price and/or MRP |
+| PATCH | `/admin/products/:id/stock` | Set stock; `clearManualOutOfStock: true` restores availability when active + qty > 0 |
+| PATCH | `/admin/products/:id/availability` | Toggle `active`, `manualOutOfStock` and/or `isNewRelease` (+ `releaseDate`) |
+| DELETE | `/admin/products/:id` | Deactivate / permanently delete |
 | GET | `/admin/orders` | All orders with search/status filter + pagination |
 | PATCH | `/admin/orders/:id` | Update order/payment status (restocks on cancel) |
 | GET | `/admin/customers` | Customers with order counts and spend |
@@ -228,7 +258,7 @@ Base URL: `http://localhost:5050/api`
 Verified against a running instance (see §15 of the project prompt):
 
 - [x] Registration: valid data, duplicate email (409), weak password, password mismatch, invalid phone/PIN
-- [x] Login: correct credentials, wrong password (generic 401), missing auth (401)
+- [x] Login: correct credentials, wrong password (generic 401), unknown email/username (generic 401 — never a 500), missing auth (401)
 - [x] Login selection page is the site entry; protected pages redirect to `/?next=…` when logged out
 - [x] Admin login: by email **and** by username; customer credentials rejected on the admin page (403); customers blocked from `/pages/admin.html` and all admin APIs
 - [x] Product/category APIs return 401 without a valid session
@@ -244,6 +274,19 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Empty states, loading spinners, API error messages on every page
 - [x] Responsive layouts at desktop / tablet / mobile breakpoints
 - [x] Password change (wrong current password rejected), profile update, wishlist sync
+- [x] Home page New Releases section shows the flagged database products (newest first) with an empty state when none are flagged
+- [x] Product cards/details show MRP + discount % only when a genuine discount (mrp > price) exists
+- [x] PDP gallery thumbnails + zoom lightbox; related carousel excludes the current product and shows ≥ 8 real database items
+- [x] Wishlist page: list, remove, move-to-cart (blocked for out-of-stock), availability always live
+- [x] Cart re-checks every line on load — unavailable items labelled, quantities capped, **Proceed to Checkout blocked** until the cart is purchasable
+- [x] Checkout pre-verifies availability and blocks the Place Order button while issues remain
+- [x] Admin: manually mark a product out of stock → customers immediately see *Out of Stock* (even with stock > 0), Add to Cart/Buy Now disabled, **API checkout rejected with a clear message**
+- [x] Admin: restock (clears the manual block) → product becomes purchasable again only when active + qty > 0
+- [x] Admin: price changes appear immediately on product cards, details, related carousel and cart summary (cart lines re-priced from the database)
+- [x] Admin: new-release flag toggles instantly feed the customer home page section
+- [x] Admin: inactive products stay hidden from customers but remain editable in the dashboard (admin detail endpoint)
+- [x] Out-of-stock management: reason filter (manual vs quantity), search, restock, clear-block actions
+- [x] Shipping / Privacy / Terms page public at `/pages/legal.html`, linked from the footer
 
 ---
 
@@ -251,7 +294,7 @@ Verified against a running instance (see §15 of the project prompt):
 
 **User** — name, email (unique), phone, password hash (bcrypt, `select:false`), role (`customer|admin`), saved address, wishlist, timestamps
 
-**Product** — name, description, category, type, brand, price, packSize, image(s), stockQuantity, crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured flags, timestamps + text index
+**Product** — name, slug, description, category, type, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured/bestseller/seasonal flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
 
 **Order** — unique readable `orderId`, user ref, item snapshots (name/price/packSize/image/quantity at purchase time), address snapshot, subtotal, delivery, total, payment method/status, order status (`Placed → Confirmed → Processing → Shipped → Delivered | Cancelled`), status history, timestamps + indexes
 

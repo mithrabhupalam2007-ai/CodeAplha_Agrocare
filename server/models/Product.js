@@ -20,7 +20,11 @@ const productSchema = new mongoose.Schema(
       index: true,
     },
     brand: { type: String, required: [true, 'Brand / manufacturer is required'], trim: true, maxlength: 100 },
+    /** URL/SEO friendly identifier generated from the name. */
+    slug: { type: String, trim: true, index: true },
     price: { type: Number, required: [true, 'Price is required'], min: [0, 'Price cannot be negative'] },
+    /** Optional original (MRP) price — a discount is only shown when mrp > price. */
+    mrp: { type: Number, min: [0, 'MRP cannot be negative'], default: null },
     packSize: { type: String, required: [true, 'Pack size is required'], trim: true, maxlength: 40 },
     image: { type: String, required: [true, 'Product image is required'], trim: true },
     images: [{ type: String, trim: true }],
@@ -70,6 +74,16 @@ const productSchema = new mongoose.Schema(
     isDemoData: { type: Boolean, default: true },
     /** Admin switch to hide a listing without deleting history. */
     active: { type: Boolean, default: true, index: true },
+    /**
+     * Manual availability override: when true the product is shown as
+     * "Out of Stock" for customers even if stockQuantity > 0.
+     * Rule: available = active AND stockQuantity > 0 AND !manualOutOfStock
+     */
+    manualOutOfStock: { type: Boolean, default: false, index: true },
+    /** Merchandising flag powering the "Newly Released Products" section. */
+    isNewRelease: { type: Boolean, default: false, index: true },
+    /** Release date used to sort the New Releases section (falls back to createdAt). */
+    releaseDate: { type: Date, default: null },
     /** Simple merchandising flags used by the home page. */
     featured: { type: Boolean, default: false },
     bestseller: { type: Boolean, default: false },
@@ -83,5 +97,15 @@ const productSchema = new mongoose.Schema(
 productSchema.index({ name: 'text', description: 'text', brand: 'text' });
 productSchema.index({ category: 1, price: 1 });
 productSchema.index({ active: 1, stockQuantity: 1 });
+productSchema.index({ active: 1, isNewRelease: 1, releaseDate: -1 });
+
+/**
+ * Central availability rule used everywhere (API responses + checkout):
+ * a product can only be bought when it is active, has stock and is not
+ * manually blocked by an administrator.
+ */
+productSchema.statics.isPurchasable = function (product) {
+  return Boolean(product.active && product.stockQuantity > 0 && !product.manualOutOfStock);
+};
 
 module.exports = mongoose.model('Product', productSchema);
