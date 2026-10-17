@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/admin.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><span class="current">Admin</span>
+        </nav>
+        <h1>Admin Dashboard</h1>
+        <p>Products, orders, customers and sales — all live from MongoDB.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="loading-row" id="loader"><div class="spinner"></div></div>
+
+        <div class="admin-layout hidden" id="admin-root">
+          <!-- ============ SIDE NAV ============ -->
+          <nav class="side-nav" aria-label="Admin sections">
+            <button class="active" data-tab="dashboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>
+              Dashboard
+            </button>
+            <button data-tab="products">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 8-9-5-9 5v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></svg>
+              Products
+            </button>
+            <button data-tab="orders">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17V5H2v12h2"/><path d="M14 9h4l4 4v4h-2"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></svg>
+              Orders
+            </button>
+            <button data-tab="customers">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Customers
+            </button>
+            <button data-tab="categories">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+              Categories
+            </button>
+            <button data-tab="logout" style="color:var(--danger);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+              Logout
+            </button>
+          </nav>
+
+          <div>
+            <!-- ============ DASHBOARD ============ -->
+            <div class="tab-panel" data-panel="dashboard">
+              <div class="stat-grid" id="stat-grid">
+                <div class="stat-card"><span class="lbl">Total revenue</span><span class="val" id="s-revenue">—</span><span class="sub" id="s-rev-sub"></span></div>
+                <div class="stat-card"><span class="lbl">Total orders</span><span class="val" id="s-orders">—</span><span class="sub" id="s-orders-sub"></span></div>
+                <div class="stat-card"><span class="lbl">Customers</span><span class="val" id="s-customers">—</span><span class="sub">registered accounts</span></div>
+                <div class="stat-card"><span class="lbl">Products</span><span class="val" id="s-products">—</span><span class="sub" id="s-products-sub"></span></div>
+                <div class="stat-card" id="lowstock-card"><span class="lbl">Low stock alerts</span><span class="val" id="s-lowstock">—</span><span class="sub" id="s-lowstock-sub"></span></div>
+              </div>
+
+              <div class="info-grid" style="grid-template-columns:1.4fr 1fr;">
+                <div class="panel">
+                  <h3>Monthly sales (last 6 months)</h3>
+                  <div class="bar-chart" id="sales-chart"></div>
+                </div>
+                <div class="panel">
+                  <h3>Order status split</h3>
+                  <table class="spec-table"><tbody id="status-table"></tbody></table>
+                </div>
+              </div>
+
+              <div class="info-grid" style="grid-template-columns:1fr 1fr;margin-top:20px;">
+                <div class="panel">
+                  <h3>Top selling products</h3>
+                  <table class="spec-table"><tbody id="top-products"></tbody></table>
+                </div>
+                <div class="panel">
+                  <h3>Low stock (≤ threshold)</h3>
+                  <div class="table-wrap">
+                    <table class="data-table">
+                      <thead><tr><th>Product</th><th>Stock</th></tr></thead>
+                      <tbody id="lowstock-table"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-top:20px;">
+                <h3>Recent orders</h3>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody id="recent-orders"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============ PRODUCTS ============ -->
+            <div class="tab-panel hidden" data-panel="products">
+              <div class="admin-bar">
+                <h2>Products</h2>
+                <div class="tools">
+                  <input type="search" id="prod-search" placeholder="Search products..." aria-label="Search products" />
+                  <select id="prod-cat" aria-label="Filter by category"><option value="">All categories</option></select>
+                  <button class="btn btn--primary btn--sm" id="btn-add-product">+ Add product</button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="prod-table"><tr><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager" id="prod-pager"></div>
+            </div>
+
+            <!-- ============ ORDERS ============ -->
+            <div class="tab-panel hidden" data-panel="orders">
+              <div class="admin-bar">
+                <h2>Orders</h2>
+                <div class="tools">
+                  <input type="search" id="ord-search" placeholder="Search order id / customer..." aria-label="Search orders" />
+                  <select id="ord-status" aria-label="Filter by status">
+                    <option value="">All statuses</option>
+                    <option>Placed</option><option>Confirmed</option><option>Processing</option>
+                    <option>Shipped</option><option>Delivered</option><option>Cancelled</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Update</th></tr></thead>
+                  <tbody id="ord-table"><tr><td colspan="8"><div class="spinner"></div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager" id="ord-pager"></div>
+            </div>
+
+            <!-- ============ CUSTOMERS ============ -->
+            <div class="tab-panel hidden" data-panel="customers">
+              <div class="admin-bar"><h2>Customers</h2></div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Orders</th><th>Total spent</th><th>Joined</th></tr></thead>
+                  <tbody id="cust-table"><tr><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager" id="cust-pager"></div>
+            </div>
+
+            <!-- ============ CATEGORIES ============ -->
+            <div class="tab-panel hidden" data-panel="categories">
+              <div class="admin-bar">
+                <h2>Categories</h2>
+                <div class="tools"><button class="btn btn--primary btn--sm" id="btn-add-cat">+ Add category</button></div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Name</th><th>Type</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
+                  <tbody id="cat-table"><tr><td colspan="5"><div class="spinner"></div></td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ PRODUCT MODAL ============ -->
+  <div class="modal-backdrop" id="product-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pm-title">
+      <div class="modal__head">
+        <h3 id="pm-title">Add product</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Close">✕</button>
+      </div>
+      <form id="product-form">
+        <div class="modal__body">
+          <input type="hidden" name="id" />
+          <div class="field">
+            <label>Product name</label>
+            <input class="input" name="name" required />
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <textarea class="input" name="description" rows="3" required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Category</label>
+              <select class="input" name="category" id="pm-category" required></select>
+            </div>
+            <div class="field">
+              <label>Type</label>
+              <select class="input" name="type" required>
+                <option>Seeds</option><option>Pesticides</option><option>Fertilizers</option><option>Farming Essentials</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Brand / manufacturer</label><input class="input" name="brand" required /></div>
+            <div class="field"><label>Pack size</label><input class="input" name="packSize" placeholder="e.g. 500 g" required /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Price (₹)</label><input class="input" name="price" type="number" min="0" step="0.01" required /></div>
+            <div class="field"><label>Stock quantity</label><input class="input" name="stockQuantity" type="number" min="0" step="1" required /></div>
+          </div>
+          <div class="field">
+            <label>Image path</label>
+            <input class="input" name="image" placeholder="/images/products/example.jpg" required />
+          </div>
+          <div class="field">
+            <label>Approved crops / intended use <span class="text-muted">(comma separated)</span></label>
+            <input class="input" name="crops" placeholder="Cotton, Paddy" />
+          </div>
+          <div class="form-row">
+            <label class="check"><input type="checkbox" name="featured" /> Featured</label>
+            <label class="check"><input type="checkbox" name="bestseller" /> Bestseller</label>
+          </div>
+          <div class="form-row" style="margin-top:10px;">
+            <label class="check"><input type="checkbox" name="seasonal" /> Seasonal</label>
+            <label class="check"><input type="checkbox" name="active" checked /> Active (visible in store)</label>
+          </div>
+          <div class="alert show alert--demo" style="margin-top:16px;">
+            Pesticide products added here should carry verified label information before real sale. This demo store marks new listings as demo data.
+          </div>
+        </div>
+        <div class="modal__foot">
+          <button class="btn btn--ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn--primary" type="submit" id="pm-save">Save product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ CATEGORY MODAL ============ -->
+  <div class="modal-backdrop" id="category-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cm-title">
+      <div class="modal__head">
+        <h3 id="cm-title">Add category</h3>
+        <button class="icon-btn" type="button" data-close aria-label="Close">✕</button>
+      </div>
+      <form id="category-form">
+        <div class="modal__body">
+          <input type="hidden" name="id" />
+          <div class="field"><label>Name</label><input class="input" name="name" required /></div>
+          <div class="field">
+            <label>Type</label>
+            <select class="input" name="type" required>
+              <option>Seeds</option><option>Pesticides</option><option>Fertilizers</option><option>Farming Essentials</option>
+            </select>
+          </div>
+          <div class="field"><label>Description</label><textarea class="input" name="description" rows="2"></textarea></div>
+          <div class="field"><label>Image path</label><input class="input" name="image" placeholder="/images/categories/xyz.jpg" /></div>
+        </div>
+        <div class="modal__foot">
+          <button class="btn btn--ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn--primary" type="submit">Save category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+</body>
+</html>

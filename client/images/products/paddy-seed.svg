@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/></defs>
+<rect width="800" height="520" fill="url(#bg)"/><rect x="300" y="170" width="200" height="270" rx="12" fill="hsl(10,55%,46%)"/><rect x="300" y="170" width="200" height="60" rx="12" fill="hsl(10,60%,34%)"/><rect x="320" y="255" width="160" height="120" rx="8" fill="#fdfbe8"/><circle cx="400" cy="315" r="34" fill="hsl(10,50%,55%)" opacity=".6"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Paddy Seed</text>
+</svg>

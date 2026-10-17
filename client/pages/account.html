@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/account.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><span class="current">My Account</span>
+        </nav>
+        <h1>My Account</h1>
+        <p id="welcome-line">Manage your profile, orders and wishlist.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="loading-row" id="loader"><div class="spinner"></div></div>
+
+        <div class="account-layout hidden" id="account-root">
+          <!-- ============ SIDE NAV ============ -->
+          <nav class="side-nav" aria-label="Account sections">
+            <button class="active" data-tab="profile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Personal info
+            </button>
+            <button data-tab="orders">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 8-9-5-9 5v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></svg>
+              My Orders
+            </button>
+            <button data-tab="wishlist">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+              Wishlist
+            </button>
+            <button data-tab="password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              Change password
+            </button>
+            <button data-tab="logout" style="color:var(--danger);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+              Logout
+            </button>
+          </nav>
+
+          <!-- ============ PANELS ============ -->
+          <div>
+            <!-- profile -->
+            <div class="tab-panel" data-panel="profile">
+              <div class="panel">
+                <h3>Personal information</h3>
+                <div class="alert" id="profile-alert"></div>
+                <form id="profile-form" novalidate>
+                  <div class="form-row">
+                    <div class="field">
+                      <label for="p-name">Full name</label>
+                      <input class="input" id="p-name" name="name" required />
+                    </div>
+                    <div class="field">
+                      <label for="p-phone">Phone number</label>
+                      <input class="input" id="p-phone" name="phone" maxlength="10" required />
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="p-email">Email address <span class="text-muted">(cannot be changed)</span></label>
+                    <input class="input" id="p-email" disabled />
+                  </div>
+                  <div class="field">
+                    <label for="p-line1">Saved delivery address</label>
+                    <input class="input" id="p-line1" name="line1" required />
+                  </div>
+                  <div class="form-row">
+                    <div class="field">
+                      <label for="p-city">City</label>
+                      <input class="input" id="p-city" name="city" required />
+                    </div>
+                    <div class="field">
+                      <label for="p-state">State</label>
+                      <input class="input" id="p-state" name="state" required />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="field">
+                      <label for="p-pincode">PIN code</label>
+                      <input class="input" id="p-pincode" name="pincode" maxlength="6" required />
+                    </div>
+                    <div class="field"></div>
+                  </div>
+                  <button class="btn btn--primary" type="submit">Save changes</button>
+                </form>
+              </div>
+
+              <div class="panel">
+                <h3>Account overview</h3>
+                <table class="spec-table">
+                  <tbody>
+                    <tr><td>Member since</td><td id="ov-joined">—</td></tr>
+                    <tr><td>Account type</td><td id="ov-role">—</td></tr>
+                    <tr><td>Saved wishlist items</td><td id="ov-wish">0</td></tr>
+                    <tr><td>Total orders</td><td id="ov-orders">0</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- orders -->
+            <div class="tab-panel hidden" data-panel="orders">
+              <div class="admin-bar">
+                <h2>My Orders</h2>
+                <div class="tools">
+                  <select id="order-filter" aria-label="Filter orders">
+                    <option value="">All statuses</option>
+                    <option>Placed</option>
+                    <option>Confirmed</option>
+                    <option>Processing</option>
+                    <option>Shipped</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                  </select>
+                </div>
+              </div>
+              <div id="orders-list"><div class="spinner"></div></div>
+            </div>
+
+            <!-- wishlist -->
+            <div class="tab-panel hidden" data-panel="wishlist">
+              <div class="admin-bar"><h2>My Wishlist</h2></div>
+              <div class="product-grid" id="wishlist-grid"></div>
+              <div class="empty hidden" id="wishlist-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+                <h3>Your wishlist is empty</h3>
+                <p>Tap the heart on any product to save it here for later.</p>
+                <a class="btn btn--primary" href="/pages/products.html">Browse products</a>
+              </div>
+            </div>
+
+            <!-- password -->
+            <div class="tab-panel hidden" data-panel="password">
+              <div class="panel" style="max-width:560px;">
+                <h3>Change password</h3>
+                <div class="alert" id="pw-alert"></div>
+                <form id="pw-form" novalidate>
+                  <div class="field">
+                    <label for="cur-pw">Current password</label>
+                    <div class="pw-wrap">
+                      <input class="input" id="cur-pw" name="currentPassword" type="password" autocomplete="current-password" required />
+                      <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="new-pw">New password</label>
+                    <div class="pw-wrap">
+                      <input class="input" id="new-pw" name="newPassword" type="password" autocomplete="new-password" placeholder="Min 8 chars, letters + numbers" required />
+                      <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="conf-pw">Confirm new password</label>
+                    <div class="pw-wrap">
+                      <input class="input" id="conf-pw" name="confirmPassword" type="password" autocomplete="new-password" required />
+                      <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
+                    </div>
+                  </div>
+                  <button class="btn btn--primary" type="submit">Update password</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>

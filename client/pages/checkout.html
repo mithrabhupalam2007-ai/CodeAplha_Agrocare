@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/checkout.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><a href="/pages/cart.html">Cart</a><span>/</span><span class="current">Checkout</span>
+        </nav>
+        <h1>Checkout</h1>
+        <p>Delivery details and order review. Prices and stock are verified on the server.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="empty hidden" id="checkout-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.6"/><circle cx="19" cy="21" r="1.6"/><path d="M2 3h2.2l2.4 12.4a2 2 0 0 0 2 1.6h9.1a2 2 0 0 0 2-1.6L22 7H5.3"/></svg>
+          <h3>Your cart is empty</h3>
+          <p>Add some products before checking out.</p>
+          <a class="btn btn--primary" href="/pages/products.html">Continue Shopping</a>
+        </div>
+
+        <form class="checkout-layout hidden" id="checkout-form" novalidate>
+          <!-- ============ LEFT ============ -->
+          <div>
+            <div class="alert" id="checkout-error" role="alert"></div>
+
+            <div class="panel">
+              <h3><span class="step">1</span> Delivery information</h3>
+              <div class="form-row">
+                <div class="field">
+                  <label for="c-name">Full name</label>
+                  <input class="input" id="c-name" name="name" autocomplete="name" required />
+                  <span class="field-error" data-err="name"></span>
+                </div>
+                <div class="field">
+                  <label for="c-phone">Phone number</label>
+                  <input class="input" id="c-phone" name="phone" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile" required />
+                  <span class="field-error" data-err="phone"></span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="c-line1">Address line</label>
+                <input class="input" id="c-line1" name="line1" autocomplete="address-line1" placeholder="House no., street, area" required />
+                <span class="field-error" data-err="line1"></span>
+              </div>
+              <div class="field">
+                <label for="c-line2">Landmark / address line 2 <span class="text-muted">(optional)</span></label>
+                <input class="input" id="c-line2" name="line2" autocomplete="address-line2" />
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="c-city">City</label>
+                  <input class="input" id="c-city" name="city" autocomplete="address-level2" required />
+                  <span class="field-error" data-err="city"></span>
+                </div>
+                <div class="field">
+                  <label for="c-state">State</label>
+                  <input class="input" id="c-state" name="state" autocomplete="address-level1" required />
+                  <span class="field-error" data-err="state"></span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label for="c-pincode">PIN code</label>
+                  <input class="input" id="c-pincode" name="pincode" inputmode="numeric" autocomplete="postal-code" maxlength="6" required />
+                  <span class="field-error" data-err="pincode"></span>
+                </div>
+                <div class="field"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3><span class="step">2</span> Payment method</h3>
+              <div class="pay-options">
+                <label class="pay-option selected" data-pay>
+                  <input type="radio" name="payment" value="cod" checked />
+                  <span>
+                    <b>💵 Cash on Delivery</b>
+                    <span>Pay in cash when your order arrives at your doorstep.</span>
+                  </span>
+                </label>
+                <label class="pay-option" data-pay>
+                  <input type="radio" name="payment" value="demo" />
+                  <span>
+                    <b>🧪 Demo Checkout (no real payment)</b>
+                    <span>Simulation for presentations only — no card details are collected and no real money moves.</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ RIGHT ============ -->
+          <aside class="summary-card">
+            <h3>Order summary</h3>
+            <div class="mini-items" id="summary-items"></div>
+            <div class="summary-row"><span>Subtotal</span><b id="c-subtotal">₹0</b></div>
+            <div class="summary-row"><span>Delivery charges</span><b id="c-delivery">₹0</b></div>
+            <div class="summary-row summary-row--total"><span>Total amount</span><b id="c-total">₹0</b></div>
+            <div class="summary-note" id="c-note">Final amounts are recalculated from live database prices when you confirm.</div>
+            <button class="btn btn--primary btn--block btn--lg" id="place-order" type="submit">Confirm Order</button>
+            <div class="loading-row hidden" id="placing"><div class="spinner"></div></div>
+            <p class="text-muted text-center" style="font-size:.78rem;margin:12px 0 0;">
+              By confirming you agree to the store's demo terms. No real payment information is ever requested.
+            </p>
+          </aside>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>

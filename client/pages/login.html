@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/auth.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main" class="auth-wrap">
+    <aside class="auth-art">
+      <img src="/images/hero-field.jpg" alt="Green crop field at sunrise" />
+      <div class="auth-art__content">
+        <h2>Welcome back to AgroShield</h2>
+        <p>Log in to track orders, manage your wishlist and reorder your favourite farming essentials.</p>
+      </div>
+    </aside>
+
+    <section class="auth-form-side">
+      <div class="auth-card">
+        <span class="eyebrow">Sign in</span>
+        <h1>Login to your account</h1>
+        <p class="sub">Enter your registered email and password.</p>
+
+        <div class="alert" id="auth-alert" role="alert"></div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+            <span class="field-error" data-err="email"></span>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="pw-wrap">
+              <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required />
+              <button class="pw-toggle" type="button" data-pw-toggle>Show</button>
+            </div>
+            <span class="field-error" data-err="password"></span>
+          </div>
+
+          <button class="btn btn--primary btn--block btn--lg" id="submit-btn" type="submit">Login</button>
+        </form>
+
+        <p class="switch">New to AgroShield? <a href="/pages/register.html"><b>Create an account</b></a></p>
+        <p class="text-center link-quiet" style="font-size:.82rem;">
+          Demo admin: use the credentials in the README to explore the admin dashboard.
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details — AgroShield</title>
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/product-details.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb" id="crumb">
+          <a href="/">Home</a><span>/</span><a href="/pages/products.html">Products</a><span>/</span><span class="current">Details</span>
+        </nav>
+        <h1 id="head-title">Loading product…</h1>
+        <p id="head-sub"></p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="loading-row" id="loader"><div class="spinner"></div></div>
+
+        <div id="pdp-root" class="hidden">
+          <div class="pdp">
+            <!-- ============ GALLERY ============ -->
+            <div>
+              <div class="pdp__gallery">
+                <img id="pdp-image" src="" alt="" />
+              </div>
+              <div class="demo-note hidden" id="pdp-demo" style="margin-top:14px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span>Demo product data — this listing exists for demonstration only. Verify actual label, registration and licensing information before any real transaction.</span>
+              </div>
+            </div>
+
+            <!-- ============ INFO ============ -->
+            <div>
+              <span class="pdp__cat" id="pdp-cat"></span>
+              <h1 id="pdp-name"></h1>
+              <div class="pdp__rating">
+                <span class="stars" id="pdp-stars"></span>
+                <span id="pdp-reviews"></span>
+                <span class="badge badge--grey" id="pdp-brand"></span>
+              </div>
+
+              <p id="pdp-desc" class="text-muted"></p>
+
+              <div class="pdp__price-box">
+                <div>
+                  <span class="price price--lg" id="pdp-price"></span>
+                  <span class="pack" id="pdp-pack"></span>
+                </div>
+                <div class="pdp__stock" id="pdp-stock"></div>
+              </div>
+
+              <div class="pdp__actions">
+                <div class="qty" role="group" aria-label="Quantity">
+                  <button type="button" id="qty-minus" aria-label="Decrease quantity">−</button>
+                  <input type="number" id="qty-input" value="1" min="1" aria-label="Quantity" />
+                  <button type="button" id="qty-plus" aria-label="Increase quantity">+</button>
+                </div>
+                <button class="btn btn--primary btn--lg" id="add-cart" type="button">Add to Cart</button>
+                <button class="btn btn--outline btn--lg" id="add-wish" type="button">♡ Wishlist</button>
+              </div>
+
+              <div class="pdp__perks">
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17V5H2v12h2"/><path d="M14 9h4l4 4v4h-2"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></svg> Free delivery on orders above ₹499</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg> Secure checkout with Cash on Delivery</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg> Easy cancellation before dispatch</div>
+              </div>
+
+              <!-- specifications -->
+              <div class="panel" id="spec-panel">
+                <h3>Product specifications</h3>
+                <table class="spec-table"><tbody id="spec-body"></tbody></table>
+              </div>
+
+              <!-- seed info -->
+              <div class="panel hidden" id="seed-panel">
+                <h3>Seed information &amp; sowing</h3>
+                <table class="spec-table"><tbody id="seed-body"></tbody></table>
+              </div>
+
+              <!-- pesticide label info -->
+              <div class="panel hidden" id="label-panel">
+                <div class="label-block">
+                  <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Label &amp; safety information</h3>
+                  <div id="label-rows"></div>
+                </div>
+              </div>
+
+              <!-- batch/expiry -->
+              <div class="panel hidden" id="batch-panel">
+                <h3>Batch &amp; expiry</h3>
+                <table class="spec-table"><tbody id="batch-body"></tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ RELATED ============ -->
+          <section class="section section--tight" id="related-section">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">You may also like</span>
+                <h2>Related products</h2>
+              </div>
+            </div>
+            <div class="product-grid" id="related-grid"></div>
+          </section>
+        </div>
+
+        <div class="empty hidden" id="not-found">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <h3>Product not found</h3>
+          <p>It may have been removed or the link is incorrect.</p>
+          <a class="btn btn--primary" href="/pages/products.html">Back to all products</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>

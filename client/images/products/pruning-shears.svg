@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/></defs>
+<rect width="800" height="520" fill="url(#bg)"/><rect x="290" y="380" width="220" height="26" rx="13" fill="hsl(30,45%,45%)"/><rect x="385" y="180" width="30" height="210" rx="10" fill="hsl(158,30%,55%)"/><path d="M330 170 h140 a20 20 0 0 1 0 40 h-140 a20 20 0 0 1 0-40Z" fill="hsl(158,55%,40%)"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Pruning Shears</text>
+</svg>

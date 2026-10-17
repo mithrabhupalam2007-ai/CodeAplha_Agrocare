@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Products — AgroShield</title>
+  <meta name="description" content="Browse seeds, pesticides, fertilizers and farming tools on AgroShield. Search, filter by category and price, sort and shop." />
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <script defer src="/js/api.js"></script>
+  <script defer src="/js/store.js"></script>
+  <script defer src="/js/ui.js"></script>
+  <script defer src="/js/products.js"></script>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span>/</span><span class="current">All Products</span>
+        </nav>
+        <h1 id="page-title">All Products</h1>
+        <p id="page-sub">Fresh from the store database — search, filter and find what your crop needs.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <div class="chip-row" id="type-chips">
+          <button class="chip active" data-type="">All</button>
+          <button class="chip" data-type="Seeds">Seeds</button>
+          <button class="chip" data-type="Pesticides">Pesticides</button>
+          <button class="chip" data-type="Fertilizers">Fertilizers</button>
+          <button class="chip" data-type="Farming Essentials">Farming Essentials</button>
+        </div>
+
+        <div class="catalog">
+          <!-- ================= FILTERS ================= -->
+          <aside class="filters" id="filters" aria-label="Product filters">
+            <h3>Filters</h3>
+
+            <div class="field">
+              <label for="f-search">Search by name</label>
+              <input class="input" id="f-search" type="search" placeholder="e.g. tomato, sprayer..." />
+            </div>
+
+            <div class="field">
+              <label for="f-category">Category</label>
+              <select class="input" id="f-category">
+                <option value="">All categories</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="f-crop">Crop / intended use</label>
+              <select class="input" id="f-crop">
+                <option value="">Any crop</option>
+              </select>
+            </div>
+
+            <div class="filters__group">
+              <b>Price range (₹)</b>
+              <div class="price-inputs">
+                <input class="input" id="f-min" type="number" min="0" placeholder="Min" aria-label="Minimum price" />
+                <input class="input" id="f-max" type="number" min="0" placeholder="Max" aria-label="Maximum price" />
+              </div>
+            </div>
+
+            <div class="filters__group">
+              <b>Availability</b>
+              <label class="check"><input type="checkbox" id="f-stock" /> In stock only</label>
+            </div>
+
+            <div class="filters__actions">
+              <button class="btn btn--primary btn--block" id="apply-filters" type="button">Apply Filters</button>
+              <button class="btn btn--ghost btn--block" id="clear-filters" type="button">Clear Filters</button>
+            </div>
+          </aside>
+
+          <!-- ================= RESULTS ================= -->
+          <div>
+            <div class="catalog__bar">
+              <div>
+                <button class="btn btn--ghost btn--sm filter-toggle" id="filter-toggle" type="button">☰ Filters</button>
+                <span class="catalog__count" id="result-count"></span>
+              </div>
+              <label class="catalog__sort">
+                Sort by
+                <select id="f-sort">
+                  <option value="featured">Popularity</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="name_asc">Name: A → Z</option>
+                  <option value="name_desc">Name: Z → A</option>
+                  <option value="rating">Customer rating</option>
+                  <option value="newest">Newest first</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="product-grid" id="product-grid" aria-live="polite"></div>
+
+            <div class="empty hidden" id="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <h3>No products match your filters</h3>
+              <p>Try a different search term, widen the price range, or clear all filters.</p>
+              <button class="btn btn--primary" id="empty-clear" type="button">Clear all filters</button>
+            </div>
+
+            <div class="load-more-wrap">
+              <button class="btn btn--outline hidden" id="load-more" type="button">Load more products</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>
