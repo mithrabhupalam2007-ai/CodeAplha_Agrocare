@@ -4,6 +4,7 @@ const Category = require('../models/Category');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const v = require('../utils/validators');
+const taxonomy = require('../utils/taxonomy');
 
 /** Escape user input before embedding it in a RegExp. */
 function escapeRegex(str) {
@@ -77,6 +78,22 @@ const listProducts = asyncHandler(async (req, res) => {
   const q = req.query;
   const filter = { active: true };
 
+  /* Taxonomy guard: a {type, category} pair that cannot exist in the store
+     (e.g. a seed subcategory under Pesticides) is a client error — report
+     it instead of silently returning an empty page. `category` alone keeps
+     its historic cross-type filter meaning, so it is only validated when
+     paired with a type. */
+  if (q.type && String(q.type).trim()) {
+    const type = String(q.type).trim();
+    if (!taxonomy.MAIN_CATEGORIES.includes(type)) {
+      throw new ApiError(400, `Category must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}.`);
+    }
+    if (q.category !== undefined && String(q.category).trim()) {
+      const pair = taxonomy.validatePair({ type, category: q.category });
+      if (pair.error) throw new ApiError(400, pair.error);
+    }
+  }
+
   if (q.search && String(q.search).trim()) {
     const rx = new RegExp(escapeRegex(String(q.search).trim()), 'i');
     filter.$or = [{ name: rx }, { brand: rx }, { category: rx }];
@@ -109,8 +126,25 @@ const listProducts = asyncHandler(async (req, res) => {
   }
   if (q.featured === 'true') filter.featured = true;
   if (q.bestseller === 'true') filter.bestseller = true;
-  if (q.seasonal === 'true') filter.seasonal = true;
+  if (q.seasonal === 'true') filter.isSeasonal = true;
   if (q.newRelease === 'true') filter.isNewRelease = true;
+
+  /* Randomized category selections: shuffle=true returns a fresh random
+     sample (no duplicates) of up to `limit` matching products. The client
+     pages then show them in small batches ("Load More") without re-querying,
+     so a single selection never repeats a product. */
+  if (q.shuffle === 'true') {
+    const size = Math.min(60, Math.max(1, parseInt(q.limit, 10) || 12));
+    const [items, total] = await Promise.all([
+      Product.aggregate([{ $match: filter }, { $sample: { size } }]),
+      Product.countDocuments(filter),
+    ]);
+    return res.json({
+      success: true,
+      products: decorateAll(items),
+      pagination: { page: 1, limit: size, total, totalPages: 1, hasNext: false, hasPrev: false },
+    });
+  }
 
   const sort = SORT_OPTIONS[q.sort] || SORT_OPTIONS.featured;
 
@@ -215,8 +249,34 @@ const newReleases = asyncHandler(async (req, res) => {
   res.json({ success: true, products: decorateAll(items) });
 });
 
+/**
+ * GET /api/products/seasonal
+ * Products an administrator marked as seasonal (isSeasonal + seasonalNote),
+ * most recently released first. When nothing has been configured yet the
+ * response flags `demoFallback` so the home page can show a friendly note
+ * alongside clearly-labelled popular picks — no invented seasonality.
+ */
+const seasonalProducts = asyncHandler(async (req, res) => {
+  const limit = Math.min(24, Math.max(1, parseInt(req.query.limit, 10) || 8));
+
+  let items = await Product.find({ active: true, isSeasonal: true })
+    .sort({ releaseDate: -1, createdAt: -1, rating: -1 })
+    .limit(limit)
+    .lean();
+
+  const demoFallback = items.length === 0;
+  if (demoFallback) {
+    items = await Product.find({ active: true, $or: [{ featured: true }, { bestseller: true }] })
+      .sort({ rating: -1, reviewCount: -1 })
+      .limit(limit)
+      .lean();
+  }
+
+  res.json({ success: true, products: decorateAll(items), demoFallback });
+});
+
 /** Validate + normalize a product payload shared by create/update. */
-function parseProductBody(body, { partial = false } = {}) {
+function parseProductBody(body, { partial = false, existing = {} } = {}) {
   const out = {};
   const errors = {};
 
@@ -231,23 +291,46 @@ function parseProductBody(body, { partial = false } = {}) {
   };
 
   strField('name', 'Product name', { min: 3, max: 140 });
-  strField('category', 'Category', { min: 2, max: 80 });
   strField('brand', 'Brand / manufacturer', { min: 2, max: 100 });
   strField('packSize', 'Pack size', { min: 1, max: 40 });
   strField('image', 'Product image', { min: 3, max: 300 });
+
+  /* --- main category + subcategory, validated against the store taxonomy ---
+     A pesticide can never be saved under a seed subcategory: the pair is
+     checked in server/utils/taxonomy.js. `existing` supports partial updates
+     that change only one half of the pair. */
+  if (body.type !== undefined) {
+    const type = String(body.type).trim();
+    if (!taxonomy.MAIN_CATEGORIES.includes(type)) {
+      errors.type = `Category must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}`;
+    } else {
+      out.type = type;
+    }
+  } else if (!partial) {
+    errors.type = 'Product category (type) is required';
+  }
+
+  const touchesCategory = !partial || body.category !== undefined || body.type !== undefined;
+  if (touchesCategory && !errors.type) {
+    const pair = taxonomy.validatePair({
+      type: body.type !== undefined ? String(body.type).trim() : undefined,
+      category: body.category !== undefined ? String(body.category).trim() : undefined,
+      existing,
+    });
+    if (pair.error) {
+      errors.category = pair.error;
+    } else {
+      out.category = pair.category;
+      if (pair.type) out.type = pair.type;
+    }
+  } else if (partial && body.category !== undefined && !String(body.category).trim()) {
+    errors.category = 'Subcategory cannot be empty — pick one from the list.';
+  }
 
   if (body.description !== undefined) {
     const err = v.requiredString(body.description, 'Description', { min: 10, max: 4000 });
     if (err) errors.description = err;
     else out.description = String(body.description).trim();
-  }
-
-  if (body.type !== undefined) {
-    const allowed = ['Seeds', 'Pesticides', 'Fertilizers', 'Farming Essentials'];
-    if (!allowed.includes(body.type)) errors.type = `Type must be one of: ${allowed.join(', ')}`;
-    else out.type = body.type;
-  } else if (!partial) {
-    errors.type = 'Product type is required';
   }
 
   if (body.price !== undefined) {
@@ -353,7 +436,13 @@ function parseProductBody(body, { partial = false } = {}) {
     if (Object.keys(batch).length) out.batch = batch;
   }
 
-  for (const flag of ['featured', 'bestseller', 'seasonal', 'active', 'isDemoData', 'isNewRelease', 'manualOutOfStock']) {
+  if (body.seasonalNote !== undefined && body.seasonalNote !== null) {
+    const note = String(body.seasonalNote).trim();
+    if (note.length > 140) errors.seasonalNote = 'Seasonal note is too long (max 140 characters)';
+    else out.seasonalNote = note;
+  }
+
+  for (const flag of ['featured', 'bestseller', 'isSeasonal', 'active', 'isDemoData', 'isNewRelease', 'manualOutOfStock']) {
     if (body[flag] !== undefined) out[flag] = Boolean(body[flag]);
   }
 
@@ -375,15 +464,17 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id)) throw new ApiError(400, 'Invalid product id.');
 
-  const data = parseProductBody(req.body, { partial: true });
+  // The stored record validates half-updates (e.g. only the subcategory).
+  const existing = await Product.findById(id).lean();
+  if (!existing) throw new ApiError(404, 'Product not found.');
+
+  const data = parseProductBody(req.body, { partial: true, existing });
   if (Object.keys(data).length === 0) throw new ApiError(400, 'No valid fields supplied for update.');
 
   // Turning on the new-release flag without a date stamps it as "now".
   if (data.isNewRelease === true && !data.releaseDate) data.releaseDate = new Date();
 
   const product = await Product.findByIdAndUpdate(id, { $set: data }, { new: true, runValidators: true });
-  if (!product) throw new ApiError(404, 'Product not found.');
-
   res.json({ success: true, message: 'Product updated.', product: decorate(product) });
 });
 
@@ -413,6 +504,7 @@ module.exports = {
   getProduct,
   getRelated,
   newReleases,
+  seasonalProducts,
   createProduct,
   updateProduct,
   deleteProduct,

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient></defs>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/>
+<rect width="800" height="520" fill="url(#bg)"/>
+<rect x="270" y="150" width="260" height="290" rx="20" fill="hsl(345,45%,48%)"/>
+<rect x="270" y="150" width="260" height="46" rx="20" fill="hsl(345,50%,36%)"/>
+<rect x="300" y="240" width="200" height="120" rx="10" fill="#fdfbe8"/>
+<circle cx="400" cy="300" r="36" fill="hsl(345,50%,58%)" opacity=".55"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Muriate of Potash</text>
+</svg>

@@ -14,9 +14,10 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 
 ### Customer
 - **User login / registration** — **email-only login** (no password field), registration collects name, email, phone and delivery address, back buttons to the selection page
-- **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), shop-by-category cards, **Newly Released Products** (live from the database, newest first, with an empty state), Featured, Featured Seeds, Crop Protection, Recently Added and Farming Essentials rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
-- **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options, Load More pagination, empty states
-- **Product cards** — image, name, category, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons
+- **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), a horizontal **main-category slider** (Seeds / Pesticides / Fertilizers / Farming Essentials — arrows + swipe, whole-card links, selected category highlighted), a **Seasonal Products** section fed by the admin-configurable seasonal flags (with per-product display notes, a clearly-labelled fallback when none are configured, and a friendly empty state), plus New Releases, Featured, Crop Protection, Recently Added and Farming Essentials rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
+- **Category pages** (`/pages/category.html?type=…`) — a horizontal **subcategory slider** in the exact taxonomy order (Seeds 8 · Pesticides 10 · Fertilizers 10), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; subcategory views (`&sub=…`) filter + count + in-section search + price sorting; **Farming Essentials lists directly** (no subcategory slider)
+- **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options (+ “Recommended” which preserves the shuffled order), Load More pagination, empty states
+- **Product cards** — image, name, **subcategory**, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons — one shared card component (`UI.productCard`) renders identically on every listing page
 - **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
 - **Out of stock handling** — highly visible “Out of Stock” panel with a “check back later” message, disabled Add to Cart & Buy Now, and the backend rejects orders for unavailable products (including products **manually blocked** by an administrator)
 - **Wishlist** — dedicated page with live availability, remove and one-click *Move to Cart* (out-of-stock items stay listed but cannot move)
@@ -31,7 +32,7 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 - **Separate admin login** — email only; only accounts with `role: admin` are accepted (verified on the backend against the database record)
 - **Dashboard Overview** — total products, active products, in-stock, out-of-stock, **newly released**, total orders, registered customers, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
 - **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items, with *new* and *manually blocked* badges
-- **Add New Product** — form with name, category, description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, crops, specifications, **label & safety information**, batch number & expiry
+- **Add New Product** — form with name, **main category + category-aware subcategory select** (the subcategory list follows the chosen main category and disappears for Farming Essentials), description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, **seasonal flag + seasonal display note** (drives the home-page Seasonal Products section), crops, specifications, **label & safety information**, batch number & expiry
 - **Edit Products & Prices** — quick inline price editing (uses the dedicated price endpoint) plus full-edit modal
 - **Newly Released Products** — flag/unflag any product as a new release; flagged products automatically appear in the customer home page section, newest first
 - **Inventory Management** — quick per-product stock updates, visibility toggle and manual out-of-stock switch
@@ -101,13 +102,14 @@ Other protections in place:
 │   ├── js/
 │   │   ├── api.js              # fetch wrapper + auth strategy
 │   │   ├── store.js            # cart (localStorage) + auth cache
-│   │   ├── ui.js               # icons, toasts, navbar (account menu)/footer, guards
+│   │   ├── taxonomy.js         # client mirror of the store taxonomy (subcategories per main category)
+│   │   ├── ui.js               # icons, toasts, navbar/footer, guards, shared product card + carousel helper
 │   │   ├── entry.js            # selection page (?next= support)
-│   │   ├── home.js  products.js  product-details.js
+│   │   ├── home.js  products.js  product-details.js  category.js
 │   │   ├── cart.js  checkout.js  order-confirmation.js
 │   │   └── auth.js  account.js  wishlist.js  admin.js
-│   ├── images/                 # hero, categories, product images
-│   └── pages/                  # home, products, details, cart, checkout,
+│   ├── images/                 # hero, categories, product + subcategory-tile images
+│   └── pages/                  # home, category, products, details, cart, checkout,
 │                               # wishlist, order-confirmation, login, register,
 │                               # admin-login, account, admin, legal
 │
@@ -118,9 +120,13 @@ Other protections in place:
 │   ├── controllers/            # auth, product, order, user, admin, category
 │   ├── routes/                 # modular Express routers
 │   ├── middleware/             # auth (JWT), rate limits, cookies, errors
-│   ├── utils/                  # ApiError, validators, token, delivery, orderId
+│   ├── utils/                  # ApiError, validators, token, delivery, orderId,
+│   │                           # taxonomy.js (single source of truth: main categories +
+│   │                           # subcategories, pair validation & canonicalization)
 │   ├── scripts/
-│   │   ├── seedProducts.js     # 34 demo products + 9 categories (idempotent)
+│   │   ├── seedProducts.js     # 53 demo products + 29 categories (idempotent, taxonomy-validated)
+│   │   ├── checkTaxonomyParity.js  # fails if client/server taxonomies drift or art is missing
+│   │   ├── generateDemoArt.js  # regenerates the SVG pack-shots + subcategory tiles
 │   │   ├── createAdmin.js      # bootstrap admin from .env
 │   │   ├── fetchPhotos.js      # one-off: hero/category photos
 │   │   └── fetchProductPhotos.js
@@ -169,7 +175,7 @@ Then edit `server/.env`:
 ### 3. Seed the database
 
 ```bash
-npm run seed          # 34 demo products + 9 categories (safe to re-run)
+npm run seed          # 53 demo products + 29 categories (safe to re-run, taxonomy-validated)
 npm run create-admin  # creates the administrator from .env
 ```
 
@@ -212,12 +218,13 @@ Base URL: `http://localhost:5050/api`
 ### Catalogue
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/products` | user | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, newRelease, sort (incl. `release`), page, limit`; every item carries `available`, `stockStatus` and `discountPercent` |
+| GET | `/products` | user | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, newRelease, shuffle, sort (incl. `release`), page, limit`; every item carries `available`, `stockStatus` and `discountPercent`. A `{type, category}` pair is validated against the store taxonomy (impossible combinations → 400). `shuffle=true` returns a fresh random sample (no duplicates) for the “Explore” sections |
+| GET | `/products/seasonal` | user | Products flagged `isSeasonal` with their display notes; when none are configured it falls back to popular picks and sets `demoFallback: true` so the UI can label them clearly |
 | GET | `/products/new-releases` | user | Products flagged as newly released, newest (`releaseDate`) first — powers the home page section |
 | GET | `/products/:id` | user | Detail (+ related products) — 404 for inactive products |
-| GET | `/products/:id/related` | user | “You May Also Like” carousel set (same category first, top-up from other actives, never includes itself) |
-| POST | `/products` | admin | Create product (name → auto slug, `mrp`, `images[]`, `isNewRelease`, `releaseDate`, `manualOutOfStock`, …) |
-| PATCH | `/products/:id` | admin | Update product |
+| GET | `/products/:id/related` | user | “Related Products” carousel set (same subcategory first, top-up from other actives of the same main category, never includes itself) |
+| POST | `/products` | admin | Create product (name → auto slug, `category` **must be a valid subcategory of `type`**, `mrp`, `images[]`, `isNewRelease`, `releaseDate`, `manualOutOfStock`, `isSeasonal`, `seasonalNote`, …) |
+| PATCH | `/products/:id` | admin | Update product (partial updates re-validate the stored type/category pair) |
 | DELETE | `/products/:id` | admin | Deactivate (`?permanent=true` to delete) |
 | GET | `/categories` | user | Categories with live product counts |
 | POST | `/newsletter` | — | Subscribe |
@@ -274,7 +281,7 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Admin login: by email; customer email rejected on the admin page (403); admin email rejected on the user login page (403); customers blocked from `/pages/admin.html` and all admin APIs
 - [x] Sessions expire (JWT `exp`) — an expired token gets 401; logout clears the cookie so the session is invalid immediately
 - [x] Product/category APIs return 401 without a valid session
-- [x] Product data loaded from MongoDB (34 products, 9 categories)
+- [x] Product data loaded from MongoDB (53 products, 29 categories)
 - [x] Search / category / price / stock / crop filters, all 7 sort orders, empty state, pagination
 - [x] Out-of-stock: badge + disabled Add to Cart/Buy Now in the UI, backend rejects checkout for unavailable stock with a clear message
 - [x] Cart quantity updates, stock caps, subtotal/delivery/total math
@@ -299,6 +306,14 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Admin: inactive products stay hidden from customers but remain editable in the dashboard (admin detail endpoint)
 - [x] Out-of-stock management: reason filter (manual vs quantity), search, restock, clear-block actions
 - [x] Shipping / Privacy / Terms page public at `/pages/legal.html`, linked from the footer
+- [x] Home page main-category slider: 4 cards, arrows + swipe, whole-card links, selected category highlighted
+- [x] Home page Seasonal Products section: live seasonal products with display notes; fallback clearly labelled when none configured; empty state; out-of-stock seasonal items not purchasable
+- [x] Category pages: subcategory sliders in the exact taxonomy order (Seeds 8, Pesticides 10, Fertilizers 10); Farming Essentials lists directly
+- [x] “Explore {Type}” sections shuffled per visit, 12 initially, Load More without duplicates, active-only and type-pure
+- [x] Subcategory views: filter + count + in-section search + price sorting
+- [x] Backend rejects impossible category/subcategory combinations (create, partial update and listing all return 400); lowercase spellings canonicalized; Farming Essentials defaults its category to the type name
+- [x] Admin product form: subcategory select follows the main category; seasonal flag + display note editable and pre-filled on edit
+- [x] Full 19-point browser acceptance suite (headless Chrome + CDP): 76/76 checks across home, the four category pages, subcategory views, PDP, admin and a 375px mobile pass
 
 ---
 
@@ -306,7 +321,7 @@ Verified against a running instance (see §15 of the project prompt):
 
 **User** — name, email (unique), phone, optional password hash (bcrypt, `select:false` — kept for legacy accounts / a future return to password auth; unused by email-only demo login), role (`customer|admin`), saved address, wishlist, timestamps
 
-**Product** — name, slug, description, category, type, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured/bestseller/seasonal flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
+**Product** — name, slug, description, **type (main category: Seeds | Pesticides | Fertilizers | Farming Essentials)**, **category (subcategory of that type — validated against `server/utils/taxonomy.js`)**, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, **isSeasonal** + **seasonalNote** (home-page Seasonal Products section), crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured/bestseller flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
 
 **Order** — unique readable `orderId`, user ref, item snapshots (name/price/packSize/image/quantity at purchase time), address snapshot, subtotal, delivery, total, payment method/status, order status (`Placed → Confirmed → Processing → Shipped → Delivered | Cancelled`), status history, timestamps + indexes
 

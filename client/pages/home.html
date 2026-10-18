@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/css/components.css" />
   <script defer src="/js/api.js"></script>
   <script defer src="/js/store.js"></script>
+  <script defer src="/js/taxonomy.js"></script>
   <script defer src="/js/ui.js"></script>
   <script defer src="/js/home.js"></script>
 </head>
@@ -52,25 +53,60 @@
       </div>
     </div>
 
-    <!-- ======================= CATEGORIES ======================= -->
+    <!-- ======================= MAIN CATEGORIES (SLIDING) ======================= -->
     <section class="section" id="categories">
       <div class="container">
         <div class="section-head">
           <div>
             <span class="eyebrow">Shop by category</span>
             <h2>Everything your farm needs</h2>
-            <p>Nine carefully organised categories — from vegetable seeds to safety gear.</p>
+            <p>Four main categories — swipe or use the arrows to browse, then tap a card to open its category page.</p>
           </div>
-          <a class="btn btn--outline btn--sm" href="/pages/products.html">View all products</a>
+          <div class="carousel__nav">
+            <button class="carousel__btn" type="button" data-prev aria-label="Scroll categories left">‹</button>
+            <button class="carousel__btn" type="button" data-next aria-label="Scroll categories right">›</button>
+          </div>
         </div>
-        <div class="cat-grid" id="category-grid">
-          <!-- filled by home.js -->
+        <div class="carousel" data-carousel id="main-cat-carousel">
+          <div class="carousel__track mcat-track" id="main-cat-track">
+            <!-- filled by home.js from the store taxonomy -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= SEASONAL PRODUCTS ======================= -->
+    <section class="section section--beige" id="seasonal">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">This season</span>
+            <h2>Seasonal Products</h2>
+            <p>Products our administrators marked as seasonal — pick of the current sowing season.</p>
+          </div>
+          <div class="carousel__nav">
+            <button class="carousel__btn" type="button" data-prev aria-label="Scroll seasonal products left">‹</button>
+            <button class="carousel__btn" type="button" data-next aria-label="Scroll seasonal products right">›</button>
+          </div>
+        </div>
+        <div class="demo-note hidden" id="seasonal-note" style="margin-bottom:18px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span></span>
+        </div>
+        <div class="carousel" data-carousel id="seasonal-carousel">
+          <div class="carousel__track" id="seasonal-track">
+            <!-- filled by home.js from /api/products/seasonal -->
+          </div>
+        </div>
+        <div class="empty-state hidden" id="seasonal-empty">
+          <p>No seasonal products have been configured yet. Check back soon!</p>
+          <a class="btn btn--primary btn--sm" href="/pages/products.html">Browse all products</a>
         </div>
       </div>
     </section>
 
     <!-- ======================= NEWLY RELEASED PRODUCTS ======================= -->
-    <section class="section section--beige" id="new-releases">
+    <section class="section" id="new-releases">
       <div class="container">
         <div class="section-head">
           <div>
@@ -85,7 +121,7 @@
     </section>
 
     <!-- ======================= FEATURED PRODUCTS ======================= -->
-    <section class="section" id="featured">
+    <section class="section section--beige" id="featured">
       <div class="container">
         <div class="section-head">
           <div>
@@ -100,7 +136,7 @@
     </section>
 
     <!-- ======================= FEATURED SEEDS ======================= -->
-    <section class="section section--beige" id="bestsellers">
+    <section class="section" id="bestsellers">
       <div class="container">
         <div class="section-head">
           <div>
@@ -108,14 +144,14 @@
             <h2>Featured Seeds</h2>
             <p>Seeds farmers keep coming back for, season after season.</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href="/pages/products.html?type=Seeds">All seeds →</a>
+          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Seeds">All seeds →</a>
         </div>
         <div class="product-grid" id="seed-grid"></div>
       </div>
     </section>
 
     <!-- ======================= CROP PROTECTION ======================= -->
-    <section class="section" id="crop-protection">
+    <section class="section section--beige" id="crop-protection">
       <div class="container">
         <div class="section-head">
           <div>
@@ -123,14 +159,14 @@
             <h2>Crop Protection Products</h2>
             <p>Demo insecticide, fungicide and herbicide listings with clear safety information.</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href="/pages/products.html?type=Pesticides">All crop protection →</a>
+          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Pesticides">All crop protection →</a>
         </div>
         <div class="product-grid" id="crop-grid"></div>
       </div>
     </section>
 
     <!-- ======================= RECENTLY ADDED ======================= -->
-    <section class="section section--beige" id="recently-added">
+    <section class="section" id="recently-added">
       <div class="container">
         <div class="section-head">
           <div>
@@ -145,7 +181,7 @@
     </section>
 
     <!-- ======================= FARMING ESSENTIALS ======================= -->
-    <section class="section" id="essentials">
+    <section class="section section--beige" id="essentials">
       <div class="container">
         <div class="section-head">
           <div>
@@ -153,7 +189,7 @@
             <h2>Farming Tools &amp; Essentials</h2>
             <p>Sprayers, hand tools and protective equipment for daily farm work.</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href="/pages/products.html?type=Farming%20Essentials">All essentials →</a>
+          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Farming%20Essentials">All essentials →</a>
         </div>
         <div class="product-grid" id="essentials-grid"></div>
       </div>

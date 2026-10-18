@@ -295,9 +295,21 @@
 
   function wireCarousel() {
     const track = $('related-grid');
-    const step = () => Math.max(240, Math.round(track.clientWidth * 0.8));
-    $('rel-prev').addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
-    $('rel-next').addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    // The scrollable element is the wrapping .carousel, not the flex track
+    // inside it — arrows must scroll the former.
+    const scroller = track.closest('.carousel') || track;
+    const step = () => Math.max(240, Math.round(scroller.clientWidth * 0.8));
+    $('rel-prev').addEventListener('click', () => scroller.scrollBy({ left: -step(), behavior: 'smooth' }));
+    $('rel-next').addEventListener('click', () => scroller.scrollBy({ left: step(), behavior: 'smooth' }));
+    const sync = () => {
+      // Disable the arrows when there is nothing to scroll in that direction.
+      $('rel-prev').disabled = scroller.scrollLeft <= 4;
+      $('rel-next').disabled = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 4;
+    };
+    scroller.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    requestAnimationFrame(sync);
+    setTimeout(sync, 400);
   }
 
   async function load() {
@@ -358,6 +370,9 @@
     const relItems = related.filter((p) => p._id !== product._id);
     if (relItems.length) {
       relItems.forEach((p) => relGrid.appendChild(relatedCard(p)));
+      // The carousel arrows are wired at init (grid still empty) — re-sync
+      // their enabled/disabled state now that the cards have been laid out.
+      window.dispatchEvent(new Event('resize'));
     } else {
       $('related-section').classList.add('hidden');
     }

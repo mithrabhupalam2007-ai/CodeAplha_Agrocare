@@ -89,84 +89,11 @@
   }
 
   /* ---------------- rendering ---------------- */
+  // One shared card implementation (subcategory label, seasonal badge,
+  // wishlist + add-to-cart wiring) lives in ui.js — every listing page
+  // renders identically.
   function card(p) {
-    const d = document.createElement('article');
-    d.className = 'p-card';
-    // Backend is the source of truth for availability:
-    // available = active AND stock > 0 AND manualOutOfStock === false
-    const available = p.available !== false;
-    const stockCls = !available ? 'out' : p.stockStatus === 'low' ? 'low' : 'in';
-    const stockTxt = !available
-      ? p.stockStatus === 'unavailable'
-        ? 'Unavailable'
-        : 'Out of Stock'
-      : p.stockStatus === 'low'
-        ? `Low Stock · ${p.stockQuantity} left`
-        : 'In Stock';
-    const wished = ((authStore.user && authStore.user.wishlist) || []).includes(p._id);
-
-    d.innerHTML = `
-      <div class="p-card__media">
-        <div class="p-card__flags">
-          ${p.isNewRelease ? '<span class="badge badge--green">New</span>' : ''}
-          ${p.bestseller ? '<span class="badge badge--amber">Bestseller</span>' : ''}
-          ${p.featured ? '<span class="badge badge--green">Featured</span>' : ''}
-          ${p.discountPercent > 0 ? `<span class="badge badge--red">${p.discountPercent}% off</span>` : ''}
-          ${!available ? '<span class="badge badge--red">Out of Stock</span>' : ''}
-        </div>
-        <button class="p-card__wish ${wished ? 'on' : ''}" type="button" aria-label="Toggle wishlist" data-wish>${I.heart}</button>
-        <a href="/pages/product-details.html?id=${p._id}"><img src="${UI.esc(p.image)}" alt="${UI.esc(p.name)}" loading="lazy" /></a>
-      </div>
-      <div class="p-card__body">
-        <span class="p-card__cat">${UI.esc(p.category)}</span>
-        <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${UI.esc(p.name)}</a></h3>
-        <div class="p-card__meta">
-          <span>${UI.esc(p.packSize)}</span>
-          <span class="p-card__stock ${stockCls}"><span class="dot"></span>${stockTxt}</span>
-        </div>
-        <div class="p-card__price-row">
-          <span class="price">${UI.inr(p.price)}</span>
-          ${p.discountPercent > 0 ? `<span class="price-old">${UI.inr(p.mrp)}</span>` : ''}
-        </div>
-      </div>
-      <div class="p-card__actions">
-        <button class="btn btn--primary" type="button" data-add ${available ? '' : 'disabled'}>
-          ${available ? 'Add to Cart' : 'Out of Stock'}
-        </button>
-        <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
-      </div>`;
-
-    d.querySelector('[data-add]').addEventListener('click', () => {
-      if (!available) return;
-      cart.add(UI.cartLine(p), 1);
-      UI.refreshBadges();
-      toast(`${p.name} added to cart`);
-    });
-
-    d.querySelector('[data-wish]').addEventListener('click', async (e) => {
-      if (!UI.requireLogin()) return;
-      const btn = e.currentTarget;
-      const on = btn.classList.contains('on');
-      try {
-        if (on) {
-          await api.del(`/users/wishlist/${p._id}`);
-          btn.classList.remove('on');
-          authStore.user.wishlist = (authStore.user.wishlist || []).filter((id) => id !== p._id);
-          toast('Removed from wishlist', 'info');
-        } else {
-          await api.post(`/users/wishlist/${p._id}`);
-          btn.classList.add('on');
-          authStore.user.wishlist = [...new Set([...(authStore.user.wishlist || []), p._id])];
-          toast('Added to wishlist');
-        }
-        localStorage.setItem('agroshield_user', JSON.stringify(authStore.user));
-        UI.refreshBadges();
-      } catch (err) {
-        toast(err.message, 'error');
-      }
-    });
-
-    return d;
+    return UI.productCard(p);
   }
 
   /* ---------------- fetching ---------------- */

@@ -141,14 +141,11 @@
         api.get('/admin/categories'),
       ]);
 
-      // category dropdowns (filters + modal)
+      // category filter dropdown (the product-form subcategory select is
+      // driven by TAXONOMY instead — see fillSubcategories)
       const filterSel = $('prod-cat');
-      const modalSel = $('pm-category');
       if (filterSel.options.length === 1) {
-        cats.categories.forEach((c) => {
-          filterSel.add(new Option(c.name, c.name));
-          modalSel.add(new Option(c.name, c.name));
-        });
+        cats.categories.forEach((c) => filterSel.add(new Option(c.name, c.name)));
       }
 
       tbody.innerHTML = data.products.length
@@ -215,12 +212,38 @@
     }
   }
 
+  /**
+   * Populate the product-form subcategory select for a main category.
+   * Farming Essentials has no subcategories — the select is emptied and
+   * hidden; the backend then defaults the product's category to its type.
+   */
+  function fillSubcategories(type, selected) {
+    const sel = $('pm-category');
+    const field = sel.closest('.field');
+    sel.innerHTML = '';
+    const subs = TAXONOMY.subcategoriesOf(type);
+    if (!subs.length) {
+      sel.add(new Option('— none for this category —', ''));
+      field.classList.add('hidden');
+      $('pm-sub-hint').textContent = '(not needed for Farming Essentials)';
+      return;
+    }
+    field.classList.remove('hidden');
+    $('pm-sub-hint').textContent = `(${subs.length} options)`;
+    sel.add(new Option('Choose a subcategory…', ''));
+    subs.forEach((s) => sel.add(new Option(s, s)));
+    if (selected && subs.includes(selected)) sel.value = selected;
+  }
+
   function openProductModal(id) {
     const form = $('product-form');
     form.reset();
     form.id.value = '';
     $('pm-title').textContent = 'Add product';
     form.active.checked = true;
+    fillSubcategories(form.type.value); // reset select to match current type
+    form.isSeasonal.checked = false;
+    form.seasonalNote.value = '';
 
     if (id) {
       $('pm-title').textContent = 'Edit product';
@@ -231,8 +254,9 @@
           form.id.value = product._id;
           form.name.value = product.name;
           form.description.value = product.description;
-          form.category.value = product.category;
           form.type.value = product.type;
+          // repopulate the subcategory select for this type, then select it
+          fillSubcategories(product.type, product.category);
           form.brand.value = product.brand;
           form.packSize.value = product.packSize;
           form.price.value = product.price;
@@ -262,7 +286,8 @@
           form.releaseDate.value = product.releaseDate ? String(product.releaseDate).slice(0, 10) : '';
           form.featured.checked = !!product.featured;
           form.bestseller.checked = !!product.bestseller;
-          form.seasonal.checked = !!product.seasonal;
+          form.isSeasonal.checked = !!product.isSeasonal;
+          form.seasonalNote.value = product.seasonalNote || '';
           form.active.checked = !!product.active;
           form.isNewRelease.checked = !!product.isNewRelease;
           form.manualOutOfStock.checked = !!product.manualOutOfStock;
@@ -335,9 +360,18 @@
       manualOutOfStock: f.manualOutOfStock.checked,
       featured: f.featured.checked,
       bestseller: f.bestseller.checked,
-      seasonal: f.seasonal.checked,
+      isSeasonal: f.isSeasonal.checked,
+      seasonalNote: f.seasonalNote.value.trim(),
       active: f.active.checked,
     };
+
+    // Friendly pre-flight: every category except Farming Essentials needs a
+    // subcategory (the server enforces this too).
+    if (TAXONOMY.hasSubcategories(payload.type) && !payload.category) {
+      toast(`Please choose a subcategory for ${payload.type}.`, 'error');
+      $('pm-category').focus();
+      return;
+    }
 
     try {
       const data = f.id.value
@@ -836,6 +870,8 @@
     $('btn-add-product').addEventListener('click', () => openProductModal());
     $('btn-add-cat').addEventListener('click', () => openCategoryModal());
     $('product-form').addEventListener('submit', saveProduct);
+    // subcategory options depend on the chosen main category
+    $('pm-type').addEventListener('change', (e) => fillSubcategories(e.target.value));
     $('category-form').addEventListener('submit', saveCategory);
 
     const closeModal = (bd) => {

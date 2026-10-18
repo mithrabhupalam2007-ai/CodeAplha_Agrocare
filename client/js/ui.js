@@ -75,10 +75,10 @@ const UI = (() => {
   const NAV_LINKS = [
     { href: '/pages/home.html', label: 'Home', match: (p) => p.includes('home.html') },
     { href: '/pages/products.html', label: 'All Products', match: (p) => p.includes('products') && !location.search },
-    { href: '/pages/products.html?type=Seeds', label: 'Seeds', match: () => new URLSearchParams(location.search).get('type') === 'Seeds' },
-    { href: '/pages/products.html?type=Pesticides', label: 'Pesticides', match: () => new URLSearchParams(location.search).get('type') === 'Pesticides' },
-    { href: '/pages/products.html?type=Fertilizers', label: 'Fertilizers', match: () => new URLSearchParams(location.search).get('type') === 'Fertilizers' },
-    { href: '/pages/products.html?type=Farming%20Essentials', label: 'Farming Essentials', match: () => new URLSearchParams(location.search).get('type') === 'Farming Essentials' },
+    { href: '/pages/category.html?type=Seeds', label: 'Seeds', match: () => new URLSearchParams(location.search).get('type') === 'Seeds' },
+    { href: '/pages/category.html?type=Pesticides', label: 'Pesticides', match: () => new URLSearchParams(location.search).get('type') === 'Pesticides' },
+    { href: '/pages/category.html?type=Fertilizers', label: 'Fertilizers', match: () => new URLSearchParams(location.search).get('type') === 'Fertilizers' },
+    { href: '/pages/category.html?type=Farming%20Essentials', label: 'Farming Essentials', match: () => new URLSearchParams(location.search).get('type') === 'Farming Essentials' },
   ];
 
   function mountNav() {
@@ -121,7 +121,7 @@ const UI = (() => {
                     <button class="icon-btn" type="button" title="${esc(user.name)}" aria-label="Account menu" aria-haspopup="true" data-user-toggle>${I.user}</button>
                     <div class="user-menu__pop" data-user-pop>
                       <span class="user-menu__name">${esc(user.name)}<small>${esc(user.email)}</small></span>
-                      <a href="/pages/account.html">My Account</a>
+                      <a href="/pages/account.html">My Profile</a>
                       <a href="/pages/account.html#orders">My Orders</a>
                       <a href="/pages/wishlist.html">Wishlist</a>
                       ${user.role === 'admin' ? '<a href="/pages/admin.html">Admin Dashboard</a>' : ''}
@@ -207,10 +207,10 @@ const UI = (() => {
             <div>
               <h4>Shop</h4>
               <ul>
-                <li><a href="/pages/products.html?type=Seeds">Seeds</a></li>
-                <li><a href="/pages/products.html?type=Pesticides">Pesticides</a></li>
-                <li><a href="/pages/products.html?type=Fertilizers">Fertilizers</a></li>
-                <li><a href="/pages/products.html?type=Farming%20Essentials">Farming Essentials</a></li>
+                <li><a href="/pages/category.html?type=Seeds">Seeds</a></li>
+                <li><a href="/pages/category.html?type=Pesticides">Pesticides</a></li>
+                <li><a href="/pages/category.html?type=Fertilizers">Fertilizers</a></li>
+                <li><a href="/pages/category.html?type=Farming%20Essentials">Farming Essentials</a></li>
                 <li><a href="/pages/products.html">All Products</a></li>
               </ul>
             </div>
@@ -284,10 +284,143 @@ const UI = (() => {
     };
   }
 
+  /* ---------------- shared product card ---------------- */
+  /**
+   * The one product card used across home rails, the seasonal carousel,
+   * category/subcategory pages and the catalogue. Shows the subcategory
+   * (Farming Essentials products have no subcategory, so they show the
+   * main category instead), backend availability, wishlist toggle and a
+   * disabled purchase state for out-of-stock items.
+   */
+  function productCard(p) {
+    const d = document.createElement('article');
+    d.className = 'p-card';
+    // Availability comes from the backend (active AND stock > 0 AND not
+    // manually blocked) — never re-derived in the browser.
+    const available = p.available !== false;
+    const stockCls = !available ? 'out' : p.stockStatus === 'low' ? 'low' : 'in';
+    const stockTxt = !available
+      ? p.stockStatus === 'unavailable'
+        ? 'Unavailable'
+        : 'Out of Stock'
+      : p.stockStatus === 'low'
+        ? `Low Stock · ${p.stockQuantity} left`
+        : 'In Stock';
+    const wished = ((authStore.user && authStore.user.wishlist) || []).includes(p._id);
+    const subLabel = p.type === 'Farming Essentials' ? 'Farming Essentials' : p.category;
+
+    d.innerHTML = `
+      <div class="p-card__media">
+        <div class="p-card__flags">
+          ${p.isNewRelease ? '<span class="badge badge--green">New</span>' : ''}
+          ${p.bestseller ? '<span class="badge badge--amber">Bestseller</span>' : ''}
+          ${p.featured ? '<span class="badge badge--green">Featured</span>' : ''}
+          ${p.isSeasonal ? '<span class="badge badge--teal">Seasonal</span>' : ''}
+          ${p.discountPercent > 0 ? `<span class="badge badge--red">${p.discountPercent}% off</span>` : ''}
+          ${!available ? '<span class="badge badge--red">Out of Stock</span>' : ''}
+        </div>
+        <button class="p-card__wish ${wished ? 'on' : ''}" type="button" aria-label="Toggle wishlist" data-wish>${I.heart}</button>
+        <a href="/pages/product-details.html?id=${p._id}">
+          <img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" />
+        </a>
+      </div>
+      <div class="p-card__body">
+        <span class="p-card__cat">${esc(subLabel)}</span>
+        <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${esc(p.name)}</a></h3>
+        <div class="p-card__meta">
+          <span>${esc(p.packSize)}</span>
+          <span class="p-card__stock ${stockCls}"><span class="dot"></span>${stockTxt}</span>
+        </div>
+        <div class="p-card__price-row">
+          <span class="price">${inr(p.price)}</span>
+          ${p.discountPercent > 0 ? `<span class="price-old">${inr(p.mrp)}</span>` : ''}
+        </div>
+      </div>
+      <div class="p-card__actions">
+        <button class="btn btn--primary" type="button" data-add ${available ? '' : 'disabled'}>
+          ${available ? 'Add to Cart' : 'Out of Stock'}
+        </button>
+        <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
+      </div>`;
+
+    d.querySelector('[data-add]').addEventListener('click', () => {
+      if (!available) return;
+      cart.add(cartLine(p), 1);
+      refreshBadges();
+      toast(`${p.name} added to cart`);
+    });
+
+    d.querySelector('[data-wish]').addEventListener('click', (e) => toggleWishlist(p, e.currentTarget));
+    return d;
+  }
+
+  /** Wishlist toggle used by every shared card; keeps server + badge in sync. */
+  async function toggleWishlist(product, btn) {
+    if (!requireLogin()) return;
+    const isOn = btn.classList.contains('on');
+    try {
+      if (isOn) {
+        await api.del(`/users/wishlist/${product._id}`);
+        btn.classList.remove('on');
+        // authStore.user is a getter (fresh object on every read) — assign
+        // the whole object so the setter persists the change to storage.
+        authStore.user = {
+          ...authStore.user,
+          wishlist: (authStore.user.wishlist || []).filter((id) => id !== product._id),
+        };
+        toast('Removed from wishlist', 'info');
+      } else {
+        await api.post(`/users/wishlist/${product._id}`);
+        btn.classList.add('on');
+        authStore.user = {
+          ...authStore.user,
+          wishlist: [...new Set([...(authStore.user.wishlist || []), product._id])],
+        };
+        toast('Added to wishlist');
+      }
+      refreshBadges();
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  }
+
+  /* ---------------- horizontal carousel ---------------- */
+  /**
+   * Wire prev/next arrows for a horizontal track. The track itself is a
+   * scroll-snap flex row, so touch swiping already works natively on mobile.
+   * Accepts either the [data-carousel] track itself or a wrapper that
+   * contains it; the buttons live in a sibling .section-head, so we look for
+   * them in the track's parent scope. Idempotent — re-calling is a no-op.
+   */
+  function wireCarousel(root) {
+    if (!root) return;
+    const isTrack = !!root.matches && root.matches('[data-carousel]');
+    const track = isTrack ? root : root.querySelector('[data-carousel]');
+    if (!track || track.dataset.wired === '1') return;
+    const scope = isTrack ? root.parentElement || document : root;
+    const prev = scope.querySelector('[data-prev]');
+    const next = scope.querySelector('[data-next]');
+    track.dataset.wired = '1';
+    const step = () => Math.max(240, Math.round(track.clientWidth * 0.8));
+    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    if (next) next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    const sync = () => {
+      if (prev) prev.disabled = track.scrollLeft <= 4;
+      if (next) next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    };
+    track.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    // Arrows need a frame once images/cards have laid out.
+    requestAnimationFrame(sync);
+    setTimeout(sync, 300);
+    sync();
+  }
+
   return {
     I, inr, formatDate, stars, esc, toast,
     mountNav, mountFooter, refreshBadges,
     requireLogin, requireAdmin, cartLine,
+    productCard, toggleWishlist, wireCarousel,
   };
 })();
 

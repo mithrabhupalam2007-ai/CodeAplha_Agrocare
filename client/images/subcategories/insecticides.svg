@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Insecticides">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient>
+<linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="hsl(210,45%,93%)"/></linearGradient></defs>
+<rect width="320" height="200" rx="18" fill="url(#bg)"/>
+<path d="M0 168 Q160 138 320 168 V200 H0 Z" fill="hsl(210,40%,86%)" opacity=".6"/>
+<circle cx="64" cy="96" r="52" fill="url(#chip)" stroke="hsl(210,45%,55%)" stroke-width="2"/>
+
+  <g stroke="#234832" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M64 62 L84 70 V96 C84 110 74 120 64 124 C54 120 44 110 44 96 V70 Z"/>
+    <path d="M56 92 l6 6 12-12" stroke-width="5"/>
+  </g>
+<circle cx="252" cy="52" r="34" fill="#234832"/>
+<text x="252" y="63.333333333333336" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#f3ead6">IN</text>
+<circle cx="212" cy="140" r="8" fill="hsl(210,55%,52%)" opacity=".85"/>
+<circle cx="234" cy="156" r="5" fill="hsl(210,45%,45%)" opacity=".7"/>
+<circle cx="196" cy="162" r="4" fill="#234832" opacity=".4"/>
+</svg>

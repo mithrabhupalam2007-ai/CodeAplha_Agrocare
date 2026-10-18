@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/css/components.css" />
   <script defer src="/js/api.js"></script>
   <script defer src="/js/store.js"></script>
+  <script defer src="/js/taxonomy.js"></script>
   <script defer src="/js/ui.js"></script>
   <script defer src="/js/admin.js"></script>
 </head>
@@ -322,14 +323,14 @@
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Category</label>
-              <select class="input" name="category" id="pm-category" required></select>
-            </div>
-            <div class="field">
-              <label>Type</label>
-              <select class="input" name="type" required>
+              <label>Main category</label>
+              <select class="input" name="type" id="pm-type" required>
                 <option>Seeds</option><option>Pesticides</option><option>Fertilizers</option><option>Farming Essentials</option>
               </select>
+            </div>
+            <div class="field">
+              <label>Subcategory <span class="text-muted" id="pm-sub-hint">(not needed for Farming Essentials)</span></label>
+              <select class="input" name="category" id="pm-category"></select>
             </div>
           </div>
           <div class="form-row">
@@ -373,8 +374,12 @@
             <label class="check"><input type="checkbox" name="bestseller" /> Bestseller</label>
           </div>
           <div class="form-row" style="margin-top:10px;">
-            <label class="check"><input type="checkbox" name="seasonal" /> Seasonal</label>
+            <label class="check"><input type="checkbox" name="isSeasonal" /> Seasonal (home section)</label>
             <label class="check"><input type="checkbox" name="active" checked /> Active (visible in store)</label>
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label>Seasonal display note <span class="text-muted">(shown with seasonal products, optional)</span></label>
+            <input class="input" name="seasonalNote" maxlength="140" placeholder="e.g. Kharif sowing season (demo)" />
           </div>
           <div class="form-row" style="margin-top:10px;">
             <label class="check"><input type="checkbox" name="isNewRelease" /> Newly released (home page section)</label>

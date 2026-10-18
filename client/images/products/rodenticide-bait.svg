@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient></defs>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/>
+<rect width="800" height="520" fill="url(#bg)"/>
+<rect x="290" y="180" width="220" height="240" rx="10" fill="hsl(240,45%,50%)"/>
+<rect x="290" y="180" width="220" height="52" rx="10" fill="hsl(240,50%,38%)"/>
+<line x1="400" y1="180" x2="400" y2="420" stroke="hsl(240,45%,38%)" stroke-width="3"/>
+<rect x="316" y="262" width="168" height="100" rx="8" fill="#fdfbe8"/>
+<circle cx="400" cy="312" r="30" fill="hsl(240,50%,55%)" opacity=".55"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Rodenticide Bait</text>
+</svg>

@@ -4,6 +4,7 @@ const {
   getProduct,
   getRelated,
   newReleases,
+  seasonalProducts,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -14,6 +15,7 @@ const { protect, requireAdmin } = require('../middleware/auth');
 // selection page). Admin write access is enforced separately below.
 // NOTE: static sub-paths must be registered before the /:id catch-all.
 router.get('/new-releases', protect, newReleases);
+router.get('/seasonal', protect, seasonalProducts);
 router.get('/', protect, listProducts);
 router.get('/:id/related', protect, getRelated);
 router.get('/:id', protect, getProduct);

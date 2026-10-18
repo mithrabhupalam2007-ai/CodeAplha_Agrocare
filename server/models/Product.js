@@ -12,7 +12,13 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: [true, 'Product name is required'], trim: true, maxlength: 140 },
     description: { type: String, required: [true, 'Description is required'], trim: true, maxlength: 4000 },
-    category: { type: String, required: [true, 'Category is required'], trim: true, index: true },
+    /**
+     * SUBCATEGORY value from server/utils/taxonomy.js (e.g. 'Vegetable Seeds',
+     * 'Herbicides (Weed Killers)'). Required for Seeds/Pesticides/Fertilizers
+     * and defaulted to the type name for Farming Essentials — enforced in
+     * productController.parseProductBody against the taxonomy, not here.
+     */
+    category: { type: String, trim: true, index: true },
     type: {
       type: String,
       required: true,
@@ -87,7 +93,10 @@ const productSchema = new mongoose.Schema(
     /** Simple merchandising flags used by the home page. */
     featured: { type: Boolean, default: false },
     bestseller: { type: Boolean, default: false },
-    seasonal: { type: Boolean, default: false },
+    /** Merchandising flag powering the "Seasonal Products" home section. */
+    isSeasonal: { type: Boolean, default: false, index: true },
+    /** Optional seasonal display text set by the admin (shown on home). */
+    seasonalNote: { type: String, trim: true, maxlength: 140, default: '' },
     rating: { type: Number, min: 0, max: 5, default: 0 },
     reviewCount: { type: Number, min: 0, default: 0 },
   },

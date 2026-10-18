@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient></defs>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/>
+<rect width="800" height="520" fill="url(#bg)"/>
+<rect x="330" y="150" width="140" height="36" rx="8" fill="hsl(130,55%,38%)"/>
+<rect x="322" y="184" width="156" height="250" rx="18" fill="hsl(130,55%,47%)"/>
+<rect x="344" y="240" width="112" height="110" rx="8" fill="#fdfbe8"/>
+<circle cx="400" cy="295" r="27" fill="hsl(130,50%,55%)" opacity=".6"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Rhizobium</text>
+</svg>
