@@ -667,6 +667,37 @@ const PRODUCTS = [
       { label: 'Handle', value: 'Wooden, 110 cm' },
     ],
   }),
+  P({
+    name: 'AgroShield Anti-Fog Safety Goggles',
+    description: 'Wrap-around safety goggles with anti-fog polycarbonate lenses and a soft seal for spraying, handling seeds and dusty field work (demo listing).',
+    category: 'Farming Essentials', type: 'Farming Essentials', brand: 'AgroShield Safety', price: 279, packSize: '1 piece',
+    image: '/images/products/safety-goggles.svg', stockQuantity: 96, rating: 4.3,
+    specifications: [
+      { label: 'Lens', value: 'Polycarbonate, anti-fog' },
+      { label: 'Protection', value: 'UV + splash guard' },
+    ],
+  }),
+  P({
+    name: 'AgroShield Garden Watering Can 5 L',
+    description: 'Lightweight 5-litre watering can with an arched handle and rose sprinkler head for seedlings, terrace gardens and nursery beds (demo listing).',
+    category: 'Farming Essentials', type: 'Farming Essentials', brand: 'AgroShield Tools', price: 389, packSize: '1 unit (5 L)',
+    image: '/images/products/watering-can.svg', stockQuantity: 74, featured: true, rating: 4.4,
+    specifications: [
+      { label: 'Capacity', value: '5 litres' },
+      { label: 'Material', value: 'UV-stabilised HDPE' },
+      { label: 'Outlet', value: 'Removable rose head' },
+    ],
+  }),
+  P({
+    name: 'AgroShield Garden Measuring Set',
+    description: 'Handy measuring set with soil pH strips, moisture meter and a graduated measuring cup for accurate watering and fertigation dosing (demo listing).',
+    category: 'Farming Essentials', type: 'Farming Essentials', brand: 'AgroShield Tools', price: 499, packSize: '1 kit (3 pieces)',
+    image: '/images/products/measuring-set.svg', stockQuantity: 61, rating: 4.2,
+    specifications: [
+      { label: 'Includes', value: 'pH strips, moisture meter, cup' },
+      { label: 'Cup range', value: '50–1000 ml' },
+    ],
+  }),
 ];
 
 /* ---------------------------------------------------------------------------

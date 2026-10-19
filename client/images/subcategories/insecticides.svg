@@ -1,19 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Insecticides">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Insecticides demo illustration">
 <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient>
-<linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="hsl(210,45%,93%)"/></linearGradient></defs>
+<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient></defs>
 <rect width="320" height="200" rx="18" fill="url(#bg)"/>
-<path d="M0 168 Q160 138 320 168 V200 H0 Z" fill="hsl(210,40%,86%)" opacity=".6"/>
-<circle cx="64" cy="96" r="52" fill="url(#chip)" stroke="hsl(210,45%,55%)" stroke-width="2"/>
-
-  <g stroke="#234832" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 62 L84 70 V96 C84 110 74 120 64 124 C54 120 44 110 44 96 V70 Z"/>
-    <path d="M56 92 l6 6 12-12" stroke-width="5"/>
-  </g>
-<circle cx="252" cy="52" r="34" fill="#234832"/>
-<text x="252" y="63.333333333333336" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#f3ead6">IN</text>
-<circle cx="212" cy="140" r="8" fill="hsl(210,55%,52%)" opacity=".85"/>
-<circle cx="234" cy="156" r="5" fill="hsl(210,45%,45%)" opacity=".7"/>
-<circle cx="196" cy="162" r="4" fill="#234832" opacity=".4"/>
+<path d="M0 170 Q160 144 320 170 V200 H0 Z" fill="hsl(210,38%,86%)" opacity=".6"/>
+<g>
+<g transform="translate(96 160)"><path d="M0 0 V-44" stroke="#234832" stroke-width="4" stroke-linecap="round"/>
+<path d="M0 -22 C -20 -22 -27 -36 -23 -46 C -9 -44 -1 -32 0 -22 Z" fill="hsl(110,45%,42%)"/>
+<path d="M0 -32 C 20 -34 27 -48 23 -58 C 9 -56 1 -44 0 -32 Z" fill="hsl(110,52%,36%)"/>
+</g>
+<rect x="196" y="76" width="62" height="96" rx="10" fill="hsl(210,55%,54%)" stroke="#234832" stroke-width="3.5"/>
+<rect x="214" y="62" width="26" height="16" rx="3" fill="#234832"/>
+<rect x="208" y="44" width="36" height="16" rx="5" fill="#234832"/>
+<path d="M244 50 h16" stroke="#234832" stroke-width="5" stroke-linecap="round"/>
+<rect x="206" y="98" width="42" height="44" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+<path d="M227 106 l11 4 v9 c0 7 -5 13 -11 15 c-6 -2 -11 -8 -11 -15 v-9 z" fill="hsl(210,60%,50%)" stroke="#234832" stroke-width="2"/>
+<circle cx="176" cy="66" r="4" fill="hsl(210,75%,58%)" opacity=".9"/>
+<circle cx="158" cy="56" r="3.5" fill="hsl(210,75%,58%)" opacity=".85"/>
+<circle cx="142" cy="62" r="3" fill="hsl(210,75%,58%)" opacity=".8"/>
+<circle cx="166" cy="80" r="3" fill="hsl(210,75%,58%)" opacity=".8"/>
+<circle cx="150" cy="86" r="2.5" fill="hsl(210,75%,58%)" opacity=".75"/></g>
+<rect x="206" y="14" width="96" height="23" rx="11.5" fill="#234832" opacity=".92"/>
+<text x="254" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#f3ead6" letter-spacing=".4">Pesticides</text>
 </svg>

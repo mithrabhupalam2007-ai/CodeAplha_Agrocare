@@ -15,7 +15,7 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 ### Customer
 - **User login / registration** — **email-only login** (no password field), registration collects name, email, phone and delivery address, back buttons to the selection page
 - **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), a horizontal **main-category slider** (Seeds / Pesticides / Fertilizers / Farming Essentials — arrows + swipe, whole-card links, selected category highlighted), a **Seasonal Products** section fed by the admin-configurable seasonal flags (with per-product display notes, a clearly-labelled fallback when none are configured, and a friendly empty state), plus New Releases, Featured, Crop Protection, Recently Added and Farming Essentials rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
-- **Category pages** (`/pages/category.html?type=…`) — a horizontal **subcategory slider** in the exact taxonomy order (Seeds 8 · Pesticides 10 · Fertilizers 10), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; subcategory views (`&sub=…`) filter + count + in-section search + price sorting; **Farming Essentials lists directly** (no subcategory slider)
+- **Category pages** (`/pages/category.html?type=…`) — a horizontal **subcategory slider** in the exact taxonomy order (Seeds 8 · Pesticides 10 · Fertilizers 10) where **every tile carries its own distinct illustration** (sourced from the single `TAXONOMY.subImage` mapping, lazy-loaded, consistent 110 px height, rounded corners, card-lift + zoom hover), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; subcategory views (`&sub=…`) filter + count + in-section search + price sorting; **Farming Essentials lists directly** (no subcategory slider) with demo images on every card; **any broken image falls back to a shared placeholder** (`/images/categories/image-fallback.svg`)
 - **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options (+ “Recommended” which preserves the shuffled order), Load More pagination, empty states
 - **Product cards** — image, name, **subcategory**, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons — one shared card component (`UI.productCard`) renders identically on every listing page
 - **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
@@ -83,7 +83,7 @@ Other protections in place:
 | Database | MongoDB + Mongoose |
 | Auth | JSONwebtoken (JWT in httpOnly cookie, bearer fallback) — email-only demo login; bcryptjs retained for legacy password hashes |
 | Security | helmet, cors, express-rate-limit, mongo-sanitize |
-| Images | Wikimedia Commons photographs + generated SVG pack-shots |
+| Images | Wikimedia Commons photographs + generated SVG pack-shots (incl. 28 distinct subcategory tile illustrations from `server/scripts/generateDemoArt.js` and a shared broken-image fallback) |
 
 ---
 
@@ -314,6 +314,9 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Backend rejects impossible category/subcategory combinations (create, partial update and listing all return 400); lowercase spellings canonicalized; Farming Essentials defaults its category to the type name
 - [x] Admin product form: subcategory select follows the main category; seasonal flag + display note editable and pre-filled on edit
 - [x] Full 19-point browser acceptance suite (headless Chrome + CDP): 76/76 checks across home, the four category pages, subcategory views, PDP, admin and a 375px mobile pass
+- [x] Subcategory imagery: all 28 tiles have their own distinct, relevant illustration with alt text, lazy loading, consistent rounded sizing, hover effects and single-mapping sources; clicking every tile opens the correct sub view with the correct products (52/52 image acceptance checks)
+- [x] Farming Essentials demo images: sprayer, gloves, mask, hoe, shears, weed cutter + new safety goggles, watering can and measuring set — still a direct listing with no subcategory carousel
+- [x] Broken-image fallback: a global capture-phase handler swaps any failed `<img>` once for `/images/categories/image-fallback.svg`, preserving alt text and guarding against swap loops
 
 ---
 

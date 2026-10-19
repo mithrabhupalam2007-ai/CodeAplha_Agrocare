@@ -428,6 +428,22 @@ const UI = (() => {
    Registered once, outside mountNav, so it never stacks up. */
 document.addEventListener('auth:changed', () => UI.mountNav());
 
+/* Global broken-image fallback: any <img> on any page that fails to load is
+   swapped once for the shared demo placeholder (alt text is kept intact).
+   Capture phase is required — error events from images do not bubble.
+   The dataset guard stops a loop if the fallback itself ever fails. */
+const FALLBACK_IMG = '/images/categories/image-fallback.svg';
+window.addEventListener(
+  'error',
+  (e) => {
+    const el = e.target;
+    if (!el || el.tagName !== 'IMG' || el.dataset.fallbackApplied) return;
+    el.dataset.fallbackApplied = '1';
+    el.src = FALLBACK_IMG;
+  },
+  true
+);
+
 /* Re-export short names used by page scripts. */
 const toast = UI.toast;
 const I = UI.I;

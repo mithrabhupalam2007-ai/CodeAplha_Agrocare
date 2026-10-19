@@ -1,21 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Pulse and Legume Seeds">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Pulse and Legume Seeds demo illustration">
 <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient>
-<linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="hsl(25,45%,93%)"/></linearGradient></defs>
+<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient></defs>
 <rect width="320" height="200" rx="18" fill="url(#bg)"/>
-<path d="M0 168 Q160 138 320 168 V200 H0 Z" fill="hsl(25,40%,86%)" opacity=".6"/>
-<circle cx="64" cy="96" r="52" fill="url(#chip)" stroke="hsl(25,45%,55%)" stroke-width="2"/>
-
-  <g stroke="#234832" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 118 V88"/>
-    <path d="M64 96 C64 84 54 78 44 78 C44 90 52 96 64 96 Z" fill="#234832" stroke="none"/>
-    <path d="M64 90 C64 78 72 70 84 70 C84 82 76 90 64 90 Z" fill="#234832" stroke="none" opacity=".65"/>
-    <path d="M52 118 h24"/>
-  </g>
-<circle cx="252" cy="52" r="34" fill="#234832"/>
-<text x="252" y="63.333333333333336" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#f3ead6">PL</text>
-<circle cx="212" cy="140" r="8" fill="hsl(25,55%,52%)" opacity=".85"/>
-<circle cx="234" cy="156" r="5" fill="hsl(25,45%,45%)" opacity=".7"/>
-<circle cx="196" cy="162" r="4" fill="#234832" opacity=".4"/>
+<path d="M0 170 Q160 144 320 170 V200 H0 Z" fill="hsl(25,38%,86%)" opacity=".6"/>
+<g>
+<path d="M58 92 Q150 56 254 84 Q162 134 58 92 Z" fill="hsl(88,42%,62%)" stroke="#234832" stroke-width="3.5" stroke-linejoin="round"/>
+<circle cx="96" cy="93" r="12" fill="hsl(25,55%,62%)" stroke="#234832" stroke-width="2.5"/>
+<circle cx="132" cy="87" r="12" fill="hsl(25,55%,62%)" stroke="#234832" stroke-width="2.5"/>
+<circle cx="168" cy="85" r="12" fill="hsl(25,55%,62%)" stroke="#234832" stroke-width="2.5"/>
+<circle cx="204" cy="87" r="12" fill="hsl(25,55%,62%)" stroke="#234832" stroke-width="2.5"/>
+<path d="M64 146 c 12 -16 34 -12 36 4 c 2 16 -16 24 -30 14 c -9 -7 -11 -13 -6 -18 z" fill="hsl(28,55%,58%)" stroke="#234832" stroke-width="2.5"/>
+<path d="M150 154 c 12 -16 34 -12 36 4 c 2 16 -16 24 -30 14 c -9 -7 -11 -13 -6 -18 z" fill="hsl(30,55%,55%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="242" cy="146" rx="10" ry="7" fill="hsl(35,55%,55%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="266" cy="158" rx="10" ry="7" fill="hsl(35,55%,55%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="238" cy="166" rx="10" ry="7" fill="hsl(35,55%,55%)" stroke="#234832" stroke-width="2.5"/></g>
+<rect x="243" y="14" width="59" height="23" rx="11.5" fill="#234832" opacity=".92"/>
+<text x="272.5" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#f3ead6" letter-spacing=".4">Seeds</text>
 </svg>

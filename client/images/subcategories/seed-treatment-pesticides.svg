@@ -1,19 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Seed Treatment Pesticides">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Seed Treatment Pesticides demo illustration">
 <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient>
-<linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="hsl(175,45%,93%)"/></linearGradient></defs>
+<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient></defs>
 <rect width="320" height="200" rx="18" fill="url(#bg)"/>
-<path d="M0 168 Q160 138 320 168 V200 H0 Z" fill="hsl(175,40%,86%)" opacity=".6"/>
-<circle cx="64" cy="96" r="52" fill="url(#chip)" stroke="hsl(175,45%,55%)" stroke-width="2"/>
-
-  <g stroke="#234832" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 62 L84 70 V96 C84 110 74 120 64 124 C54 120 44 110 44 96 V70 Z"/>
-    <path d="M56 92 l6 6 12-12" stroke-width="5"/>
-  </g>
-<circle cx="252" cy="52" r="34" fill="#234832"/>
-<text x="252" y="63.333333333333336" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#f3ead6">ST</text>
-<circle cx="212" cy="140" r="8" fill="hsl(175,55%,52%)" opacity=".85"/>
-<circle cx="234" cy="156" r="5" fill="hsl(175,45%,45%)" opacity=".7"/>
-<circle cx="196" cy="162" r="4" fill="#234832" opacity=".4"/>
+<path d="M0 170 Q160 144 320 170 V200 H0 Z" fill="hsl(175,38%,86%)" opacity=".6"/>
+<g>
+<rect x="238" y="66" width="56" height="98" rx="7" fill="hsl(175,50%,55%)" stroke="#234832" stroke-width="3.5"/>
+<rect x="238" y="66" width="56" height="20" rx="7" fill="#234832" opacity=".85"/>
+<rect x="246" y="96" width="40" height="40" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+<circle cx="258" cy="110" r="4.5" fill="hsl(345,60%,62%)" stroke="#234832" stroke-width="1.5"/>
+<circle cx="272" cy="120" r="4.5" fill="hsl(345,60%,62%)" stroke="#234832" stroke-width="1.5"/>
+<path d="M76 122 a74 42 0 0 0 148 0 Z" fill="hsl(175,30%,62%)" stroke="#234832" stroke-width="3.5"/>
+<path d="M64 122 h172" stroke="#234832" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="112" cy="110" rx="13" ry="10" fill="hsl(345,62%,66%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="144" cy="100" rx="13" ry="10" fill="hsl(345,62%,66%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="176" cy="106" rx="13" ry="10" fill="hsl(345,62%,66%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="146" cy="116" rx="13" ry="10" fill="hsl(345,62%,66%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="208" cy="114" rx="12" ry="9" fill="hsl(45,50%,72%)" stroke="#234832" stroke-width="2.5"/>
+<ellipse cx="86" cy="116" rx="12" ry="9" fill="hsl(45,50%,72%)" stroke="#234832" stroke-width="2.5"/>
+<path d="M96 44 c 10 12 16 20 16 27 a16 16 0 0 1 -32 0 c0 -7 6 -15 16 -27 z" fill="hsl(345,62%,70%)" stroke="#234832" stroke-width="2.5"/></g>
+<rect x="206" y="14" width="96" height="23" rx="11.5" fill="#234832" opacity=".92"/>
+<text x="254" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#f3ead6" letter-spacing=".4">Pesticides</text>
 </svg>

@@ -1,21 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Hybrid Seeds">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Hybrid Seeds demo illustration">
 <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient>
-<linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="hsl(265,45%,93%)"/></linearGradient></defs>
+<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient></defs>
 <rect width="320" height="200" rx="18" fill="url(#bg)"/>
-<path d="M0 168 Q160 138 320 168 V200 H0 Z" fill="hsl(265,40%,86%)" opacity=".6"/>
-<circle cx="64" cy="96" r="52" fill="url(#chip)" stroke="hsl(265,45%,55%)" stroke-width="2"/>
-
-  <g stroke="#234832" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M64 118 V88"/>
-    <path d="M64 96 C64 84 54 78 44 78 C44 90 52 96 64 96 Z" fill="#234832" stroke="none"/>
-    <path d="M64 90 C64 78 72 70 84 70 C84 82 76 90 64 90 Z" fill="#234832" stroke="none" opacity=".65"/>
-    <path d="M52 118 h24"/>
-  </g>
-<circle cx="252" cy="52" r="34" fill="#234832"/>
-<text x="252" y="63.333333333333336" text-anchor="middle" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#f3ead6">HY</text>
-<circle cx="212" cy="140" r="8" fill="hsl(265,55%,52%)" opacity=".85"/>
-<circle cx="234" cy="156" r="5" fill="hsl(265,45%,45%)" opacity=".7"/>
-<circle cx="196" cy="162" r="4" fill="#234832" opacity=".4"/>
+<path d="M0 170 Q160 144 320 170 V200 H0 Z" fill="hsl(265,38%,86%)" opacity=".6"/>
+<g>
+<rect x="44" y="58" width="86" height="106" rx="8" fill="hsl(265,35%,90%)" stroke="#234832" stroke-width="3.5"/>
+<rect x="44" y="58" width="86" height="24" rx="8" fill="#234832" opacity=".85"/>
+<rect x="56" y="94" width="62" height="50" rx="6" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+<path d="M87 132 V112 M87 118 C 75 118 71 108 74 100 C 84 102 87 110 87 118 Z M87 112 C 99 112 103 102 100 94 C 90 96 87 104 87 112 Z" fill="hsl(265,55%,52%)" stroke="hsl(265,55%,52%)" stroke-width="3" stroke-linecap="round"/>
+<circle cx="176" cy="78" r="19" fill="#234832"/>
+<path d="M176 68 v20 M166 78 h20" stroke="#f3ead6" stroke-width="4.5" stroke-linecap="round"/>
+<g transform="translate(248 162)"><path d="M0 0 V-56" stroke="#234832" stroke-width="4" stroke-linecap="round"/>
+<path d="M0 -30 C -20 -30 -27 -44 -23 -54 C -9 -52 -1 -40 0 -30 Z" fill="hsl(110,45%,42%)"/>
+<path d="M0 -38 C 20 -40 27 -54 23 -64 C 9 -62 1 -50 0 -38 Z" fill="hsl(110,52%,36%)"/>
+<path d="M0 -56 C -14 -60 -16 -72 -10 -78 C -2 -72 0 -64 0 -56 Z" fill="hsl(110,45%,42%)"/>
+</g>
+<path d="M212 52 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 z" fill="hsl(265,65%,60%)"/>
+<path d="M276 74 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5 z" fill="hsl(265,65%,60%)"/></g>
+<rect x="243" y="14" width="59" height="23" rx="11.5" fill="#234832" opacity=".92"/>
+<text x="272.5" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#f3ead6" letter-spacing=".4">Seeds</text>
 </svg>

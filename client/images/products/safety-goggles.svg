@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient></defs>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/>
+<rect width="800" height="520" fill="url(#bg)"/>
+<rect x="188" y="272" width="70" height="34" rx="10" fill="hsl(205,50%,38%)"/>
+<rect x="542" y="272" width="70" height="34" rx="10" fill="hsl(205,50%,38%)"/>
+<rect x="236" y="216" width="328" height="176" rx="76" fill="hsl(205,55%,47%)"/>
+<rect x="262" y="244" width="276" height="120" rx="52" fill="hsl(205,60%,86%)" opacity=".85"/>
+<path d="M300 350 L360 262 M346 358 L406 262" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity=".7"/>
+<path d="M400 392 q 14 22 30 0" fill="hsl(205,55%,47%)" stroke="none"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Safety Goggles</text>
+</svg>

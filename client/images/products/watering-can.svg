@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(90,30%,93%)"/><stop offset="1" stop-color="hsl(90,25%,86%)"/></linearGradient></defs>
+<ellipse cx="400" cy="462" rx="180" ry="22" fill="rgba(0,0,0,.12)"/>
+<rect width="800" height="520" fill="url(#bg)"/>
+<path d="M334 232 C 344 168 456 168 466 232" fill="none" stroke="hsl(115,50%,36%)" stroke-width="16" stroke-linecap="round"/>
+<path d="M310 238 H490 L474 418 H326 Z" fill="hsl(115,55%,47%)" stroke="hsl(115,55%,38%)" stroke-width="5" stroke-linejoin="round"/>
+<ellipse cx="400" cy="238" rx="92" ry="17" fill="hsl(115,60%,38%)"/>
+<path d="M314 306 L318 348 L198 292 L208 254 Z" fill="hsl(115,55%,47%)" stroke="hsl(115,55%,38%)" stroke-width="5" stroke-linejoin="round"/>
+<ellipse cx="196" cy="272" rx="28" ry="20" transform="rotate(-26 196 272)" fill="hsl(115,60%,38%)"/>
+<circle cx="168" cy="308" r="7" fill="hsl(115,65%,58%)" opacity=".85"/>
+<circle cx="150" cy="332" r="6" fill="hsl(115,65%,58%)" opacity=".8"/>
+<circle cx="176" cy="344" r="5" fill="hsl(115,65%,58%)" opacity=".75"/>
+<text x="400" y="495" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#2f4a26">Watering Can 5 L</text>
+</svg>
