@@ -50,9 +50,9 @@ const SUB_DESCRIPTIONS = {
   Cotton: 'Cotton hybrid and deshi seed listings (demo catalogue).',
   Polyhouse: 'Seeds suited to polyhouse and protected cultivation (demo catalogue).',
   Exotics: 'Exotic vegetable seed listings for specialty markets (demo catalogue).',
-  Forestory: 'Forest-tree seed and seedling listings (demo catalogue).',
+
   'Urban Garden': 'Terrace and kitchen-garden seed packs (demo catalogue).',
-  Saplings: 'Grafted and open-pollinated fruit sapling listings (demo catalogue).',
+
   // Crop Protection — chemical
   Insecticides: 'Demo insecticide listings — always follow the original product label.',
   Fungicides: 'Demo fungicide listings for fungal disease management.',
@@ -809,28 +809,12 @@ const PRODUCTS = [
     seedInfo: { variety: 'Calabrese (demo variety)', cropType: 'Broccoli', germinationPercent: 82, daysToGerminate: '4-7 days', sowingInstructions: 'Demo guidance: raise nursery seedlings, transplant at 45 x 45 cm in cool conditions.' },
   }),
   P({
-    name: 'Teak Seed - Forest Grade (Demo)',
-    description: 'Teak tree seed listing for forestry block plantings and bund raisedings (demo listing).',
-    category: 'Forestory', type: 'Seeds', brand: 'VanVista (Demo)', price: 180, packSize: '100 g',
-    image: '/images/products/forestry-seeds.svg', stockQuantity: 45, rating: 4.0,
-    crops: ['Teak', 'Forestry'],
-    seedInfo: { variety: 'Forest grade (demo)', cropType: 'Teak', germinationPercent: 65, daysToGerminate: '10-15 days', sowingInstructions: 'Demo guidance: raise in poly-bag nursery; transplant 4-6 month seedlings at 2 x 2 m spacing.' },
-  }),
-  P({
     name: 'Urban Terrace Garden Seed Pack (Demo)',
     description: 'Mixed terrace-garden pack of five small packs (tomato, chilli, coriander, spinach, marigold) for balcony and rooftop gardens (demo listing).',
     category: 'Urban Garden', type: 'Seeds', brand: 'CitySprout (Demo)', price: 199, packSize: '5 varieties / 50 g',
     image: '/images/products/urban-garden-seeds.svg', stockQuantity: 110, rating: 4.6, featured: true,
     crops: ['Tomato', 'Chilli', 'Coriander', 'Spinach', 'Marigold'],
     seedInfo: { variety: 'Mixed pack (demo)', cropType: 'Mixed vegetables', germinationPercent: 75, daysToGerminate: '4-10 days', sowingInstructions: 'Demo guidance: sow in 8-12 inch grow bags on a sunny terrace; harvest little and often.' },
-  }),
-  P({
-    name: 'Mango Sapling - Grafted (Demo)',
-    description: 'Grafted mango sapling listing for orchard and large-garden planting (demo listing; one plant).',
-    category: 'Saplings', type: 'Seeds', brand: 'VanVista (Demo)', price: 340, packSize: '1 plant (demo)',
-    image: '/images/products/saplings.svg', stockQuantity: 35, rating: 4.3,
-    crops: ['Mango'],
-    seedInfo: { variety: 'Grafted demo entry', cropType: 'Mango', germinationPercent: null, daysToGerminate: 'N/A (sapling)', sowingInstructions: 'Demo guidance: plant at 8 x 8 m spacing in well-drained soil; support the graft union until established.' },
   }),
   // ---------------- New Crop Protection subcategory demos ----------------
   P({

@@ -734,9 +734,7 @@ const SUB_TILES = {
   Cotton: { hue: 120, scene: `${bushPlant(140, 168, 1, 120)}<circle cx="124" cy="104" r="9" fill="#fffbe9" stroke="${K}" stroke-width="2.4"/><circle cx="152" cy="120" r="8" fill="#fffbe9" stroke="${K}" stroke-width="2.4"/><circle cx="139" cy="88" r="7.5" fill="#fffbe9" stroke="${K}" stroke-width="2.4"/>${packet(246, 168, 0.75, 115, seedGlyph)}` },
   Polyhouse: { hue: 150, scene: `${tunnel(166, 168, 1.15, 150)}${packet(62, 168, 0.75, 140, seedGlyph)}` },
   Exotics: { hue: 175, scene: `${fruit(128, 168, 1, 120, 'broccoli')}${fruit(212, 168, 0.85, 175, 'capsicum')}${packet(272, 168, 0.65, 175, seedGlyph)}` },
-  Forestory: { hue: 115, scene: `${tree(128, 168, 1.05, 115)}${tree(222, 168, 0.8, 120)}${polybag(272, 168, 0.7, 105)}` },
   'Urban Garden': { hue: 285, scene: `<path d="M60 156 h200 M72 156 v-30 M112 156 v-30 M152 156 v-30 M192 156 v-30 M232 156 v-30" stroke="${K}" stroke-width="2.6" opacity=".45"/>${polybag(112, 168, 1, 110)}${polybag(172, 168, 0.85, 285)}${flower(234, 168, 0.9, 335)}` },
-  Saplings: { hue: 30, scene: `${polybag(128, 168, 1.1, 30)}${tree(214, 168, 0.75, 105)}${fruit(272, 168, 0.6, 45)}` },
 
   /* ---- Crop Protection (chemical) -------------------------------------- */
   Insecticides: { hue: 200, scene: `${bottle(118, 168, 1, 200)}${bug(206, 152, 0.9, 5, 'beetle')}${bug(252, 163, 0.8, 5, 'fly')}` },
@@ -941,9 +939,7 @@ const PRODUCT_ART = [
   { file: 'jowar-seeds.svg', caption: 'Jowar (Sorghum) Seeds', shape: 'pouch', hue: 35 },
   { file: 'polyhouse-seeds.svg', caption: 'Polyhouse Capsicum Seeds', shape: 'pouch', hue: 150 },
   { file: 'exotic-seeds.svg', caption: 'Exotic Broccoli Seeds', shape: 'pouch', hue: 175 },
-  { file: 'forestry-seeds.svg', caption: 'Teak Forest Seeds', shape: 'pouch', hue: 115 },
   { file: 'urban-garden-seeds.svg', caption: 'Urban Garden Seed Pack', shape: 'pouch', hue: 285 },
-  { file: 'saplings.svg', caption: 'Grafted Mango Sapling', shape: 'bag', hue: 30 },
   // Crop Protection
   { file: 'bio-viricide.svg', caption: 'Bio Viricide', shape: 'bottle', hue: 265 },
   { file: 'bio-nematicide.svg', caption: 'Bio Nematicide', shape: 'bottle', hue: 150 },

@@ -20,7 +20,7 @@ const TAXONOMY = (() => {
     Seeds: [
       { heading: 'Horticulture Crops', subcategories: ['Vegetable Seeds', 'Fruit Seeds', 'Flower Seeds'] },
       { heading: 'Field Crops', subcategories: ['Forages', 'Maize/Corn', 'Paddy', 'Mustard', 'Jowar', 'Cotton'] },
-      { heading: 'Special Category', subcategories: ['Polyhouse', 'Exotics', 'Forestory', 'Urban Garden', 'Saplings'] },
+      { heading: 'Special Category', subcategories: ['Polyhouse', 'Exotics', 'Urban Garden'] },
     ],
     'Crop Protection': [
       { heading: 'Chemical Pesticides', subcategories: ['Insecticides', 'Fungicides', 'Herbicides', 'Bactericides', 'Miticides/Acaricides'] },

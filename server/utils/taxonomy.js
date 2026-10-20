@@ -35,13 +35,12 @@ const MAIN_CATEGORIES = [
 
 /** Ordered heading sections per main category. `heading: null` = show the
     subcategories directly (Tapas). Display spellings are authoritative:
-    'Tarpaulin', 'Growth Promoters', 'Bio Stimulants', 'Yield Boosters',
-    'Forestory' (sic, preserved as specified). */
+    'Tarpaulin', 'Growth Promoters', 'Bio Stimulants', 'Yield Boosters'. */
 const CATEGORY_STRUCTURE = {
   Seeds: [
     { heading: 'Horticulture Crops', subcategories: ['Vegetable Seeds', 'Fruit Seeds', 'Flower Seeds'] },
     { heading: 'Field Crops', subcategories: ['Forages', 'Maize/Corn', 'Paddy', 'Mustard', 'Jowar', 'Cotton'] },
-    { heading: 'Special Category', subcategories: ['Polyhouse', 'Exotics', 'Forestory', 'Urban Garden', 'Saplings'] },
+    { heading: 'Special Category', subcategories: ['Polyhouse', 'Exotics', 'Urban Garden'] },
   ],
   'Crop Protection': [
     { heading: 'Chemical Pesticides', subcategories: ['Insecticides', 'Fungicides', 'Herbicides', 'Bactericides', 'Miticides/Acaricides'] },

@@ -1,6 +1,6 @@
 # 🌱 AgroShield — Farm & Garden E-Commerce Platform
 
-A complete, responsive **full-stack agricultural e-commerce website** built with the **MERN-style stack** (Express + MongoDB + vanilla HTML/CSS/JS). AgroShield is an online marketplace for farmers, gardeners and agricultural customers, organised into **seven main categories** — Seeds, Crop Protection, Crop Nutrition, Equipments, Animal Husbandry, Organic and Tapas — with **85 subcategories** in a validated three-level taxonomy (main category → heading → subcategory).
+A complete, responsive **full-stack agricultural e-commerce website** built with the **MERN-style stack** (Express + MongoDB + vanilla HTML/CSS/JS). AgroShield is an online marketplace for farmers, gardeners and agricultural customers, organised into **seven main categories** — Seeds, Crop Protection, Crop Nutrition, Equipments, Animal Husbandry, Organic and Tapas — with **83 subcategories** in a validated three-level taxonomy (main category → heading → subcategory).
 
 > **Internship demo project.** All brands, prices and crop-protection label data are clearly labelled demonstration data. See [Demo data & legal notice](#-demo-data--legal-notice) before any real-world use.
 
@@ -15,7 +15,7 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 ### Customer
 - **User login / registration** — **email-only login** (no password field), registration collects name, email, phone and delivery address, back buttons to the selection page
 - **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), then **directly below the navbar** a horizontal **seven-category carousel** in the exact taxonomy order (Seeds / Crop Protection / Crop Nutrition / Equipments / Animal Husbandry / Organic / Tapas — arrows + mobile swipe, whole-card links, selected category highlighted), a **Seasonal Products** section fed by the admin-configurable seasonal flags (with per-product display notes, a clearly-labelled fallback when none are configured, and a friendly empty state), plus New Releases, Featured, Featured Seeds, Crop Protection, Recently Added and Farm Equipment rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
-- **Category pages** (`/pages/category.html?type=…`) — one **heading section per taxonomy heading**, each with its own horizontal **subcategory carousel** in the exact order (Seeds 3 headings · 14 subcategories, Crop Protection 3 · 14, Crop Nutrition 3 · 11, Equipments 4 · 25, Animal Husbandry 2 · 7, Organic 2 · 7 — while **Tapas lists its 7 subcategories directly, with no heading sections**), where **every tile carries its own distinct illustration** (sourced from the single subcategory-tile mapping in `TAXONOMY`, lazy-loaded, consistent 110 px height, rounded corners, card-lift + zoom hover), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; clicking a tile filters the section **to that subcategory only** (`&sub=…`) with count + in-section search + price sorting; **any broken image falls back to a shared placeholder** (`/images/categories/image-fallback.svg`)
+- **Category pages** (`/pages/category.html?type=…`) — one **heading section per taxonomy heading**, each with its own horizontal **subcategory carousel** in the exact order (Seeds 3 headings · 12 subcategories, Crop Protection 3 · 14, Crop Nutrition 3 · 11, Equipments 4 · 25, Animal Husbandry 2 · 7, Organic 2 · 7 — while **Tapas lists its 7 subcategories directly, with no heading sections**), where **every tile carries its own distinct illustration** (sourced from the single subcategory-tile mapping in `TAXONOMY`, lazy-loaded, consistent 110 px height, rounded corners, card-lift + zoom hover), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; clicking a tile filters the section **to that subcategory only** (`&sub=…`) with count + in-section search + price sorting; **any broken image falls back to a shared placeholder** (`/images/categories/image-fallback.svg`)
 - **Product catalogue** — live search, main-category chips + subcategory dropdown, crop/price/availability filters, 7 sort options (+ “Recommended” which preserves the shuffled order), Load More pagination, empty states
 - **Product cards** — image, name, **taxonomy chip (subcategory, heading or main category)**, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons — one shared card component (`UI.productCard`) renders identically on every listing page
 - **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, **breadcrumb Home / Products / main category / subcategory / name**, specs with **Main category + Category** rows, seed variety & sowing info, crop-protection label/safety blocks (clearly-marked demo data), batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
@@ -39,7 +39,7 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 - **Out-of-Stock Products** — shows *why* each product is unavailable (**quantity is zero** vs **manual block**), restocking (which clears the manual block), “Clear block” action, reason filter and search
 - **Manage Orders** — status transitions + automatic restock on cancel
 - **Manage Customers** — order counts and lifetime spend
-- **Categories** — create / edit / delete, blocked while products use the category; stored **per main category** (unique on the `{name, type}` pair, 85 seeded subcategory documents with live per-pair product counts)
+- **Categories** — create / edit / delete, blocked while products use the category; stored **per main category** (unique on the `{name, type}` pair, 83 seeded subcategory documents with live per-pair product counts)
 
 ### Availability rule (single source of truth)
 
@@ -83,7 +83,7 @@ Other protections in place:
 | Database | MongoDB + Mongoose |
 | Auth | JSONwebtoken (JWT in httpOnly cookie, bearer fallback) — email-only demo login; bcryptjs retained for legacy password hashes |
 | Security | helmet, cors, express-rate-limit, mongo-sanitize |
-| Images | Wikimedia Commons photographs + generated SVG art (77 distinct subcategory-tile illustrations covering all 85 subcategory entries, 5 photo + 2 SVG main-category carousel cards, 58 product pack-shots from `server/scripts/generateDemoArt.js`, plus a shared broken-image fallback) |
+| Images | Wikimedia Commons photographs + generated SVG art (75 distinct subcategory-tile illustrations covering all 83 subcategory entries, 5 photo + 2 SVG main-category carousel cards, 56 product pack-shots from `server/scripts/generateDemoArt.js`, plus a shared broken-image fallback) |
 
 ---
 
@@ -124,7 +124,7 @@ Other protections in place:
 │   │                           # taxonomy.js (single source of truth: 7 main categories,
 │   │                           # headings, subcategories, pair validation & canonicalization)
 │   ├── scripts/
-│   │   ├── seedProducts.js     # 114 demo products + 85 categories (idempotent, taxonomy-validated)
+│   │   ├── seedProducts.js     # 112 demo products + 83 categories (idempotent, taxonomy-validated)
 │   │   ├── migrateTaxonomy.js  # one-off: legacy type/category → primaryCategory/heading/subcategory
 │   │   ├── checkTaxonomyParity.js  # fails if client/server taxonomies drift or art is missing
 │   │   ├── generateDemoArt.js  # regenerates the pack-shots, subcategory tiles + main-category cards
@@ -176,7 +176,7 @@ Then edit `server/.env`:
 ### 3. Seed the database
 
 ```bash
-npm run seed          # 114 demo products + 85 categories (safe to re-run, taxonomy-validated)
+npm run seed          # 112 demo products + 83 categories (safe to re-run, taxonomy-validated)
 npm run create-admin  # creates the administrator from .env
 ```
 
@@ -282,7 +282,7 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Admin login: by email; customer email rejected on the admin page (403); admin email rejected on the user login page (403); customers blocked from `/pages/admin.html` and all admin APIs
 - [x] Sessions expire (JWT `exp`) — an expired token gets 401; logout clears the cookie so the session is invalid immediately
 - [x] Product/category APIs return 401 without a valid session
-- [x] Product data loaded from MongoDB (114 active demo products, 85 subcategory documents)
+- [x] Product data loaded from MongoDB (112 active demo products, 83 subcategory documents)
 - [x] Search / main-category chip / subcategory / price / stock / crop filters, all 7 sort orders, empty state, pagination
 - [x] Out-of-stock: badge + disabled Add to Cart/Buy Now in the UI, backend rejects checkout for unavailable stock with a clear message
 - [x] Cart quantity updates, stock caps, subtotal/delivery/total math
@@ -309,14 +309,14 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Shipping / Privacy / Terms page public at `/pages/legal.html`, linked from the footer
 - [x] Home page main-category carousel: **7 cards in the exact taxonomy order**, sitting directly below the navbar, arrows + swipe, whole-card links
 - [x] Home page Seasonal Products section: live seasonal products with display notes; fallback clearly labelled when none configured; empty state; out-of-stock seasonal items not purchasable
-- [x] Category pages: **heading sections with subcategory carousels in the exact taxonomy order** — Seeds 3/14, Crop Protection 3/14, Crop Nutrition 3/11, Equipments 4/25, Animal Husbandry 2/7, Organic 2/7; **Tapas lists its 7 subcategories directly (no headings)**
+- [x] Category pages: **heading sections with subcategory carousels in the exact taxonomy order** — Seeds 3/12, Crop Protection 3/14, Crop Nutrition 3/11, Equipments 4/25, Animal Husbandry 2/7, Organic 2/7; **Tapas lists its 7 subcategories directly (no headings)**
 - [x] “Explore {Type}” sections shuffled per visit (12 initially, Load More without duplicates), active-only and main-category-pure
 - [x] Subcategory views: **filter to that subcategory only** + count + in-section search + price sorting; Organic aliases (“Bio Miticides” ⇄ Crop Protection “Bio Miticides/Acaricides”) and cross-listed products resolve to the same canonical records
 - [x] Backend rejects impossible main-category/heading/subcategory combinations (create, partial update and listing all return 400)
 - [x] Admin product form: **three-level cascade (main category → heading → subcategory)**; Tapas offers its own 7 subcategories directly; seasonal flag + display note editable and pre-filled on edit; admin product/inventory search and filters work against the new taxonomy
 - [x] Navbar + footer Shop column list exactly the seven main categories; no retired category label (“Pesticides”, “Farming Essentials”, standalone “Fertilizers”) rendered as a category label or deep link
 - [x] Full **13-point** browser acceptance suite (headless Chrome + CDP): **91/91 checks** across the carousel, nav/footer, the exact heading/subcategory structure of all seven category pages, art loading, sub filtering + the Organic alias view, catalogue search/sort/filters, card chips, the admin cascade + save round-trip, the out-of-stock flow, PDP breadcrumbs/specs/related/label panel, a 375px mobile pass and page/API count parity
-- [x] Subcategory imagery: all 85 subcategory entries render their own tile illustration (77 distinct files — shared only where the same subcategory name legitimately exists under two main categories) with alt text and lazy loading; clicking every tile opens the correct sub view with the correct products
+- [x] Subcategory imagery: all 83 subcategory entries render their own tile illustration (75 distinct files — shared only where the same subcategory name legitimately exists under two main categories) with alt text and lazy loading; clicking every tile opens the correct sub view with the correct products
 - [x] Every main-category card and subcategory tile has relevant demo art with a descriptive filename; the home carousel works at desktop and mobile widths (mobile: burger nav, swipeable track, no horizontal page overflow)
 - [x] Broken-image fallback: a global capture-phase handler swaps any failed `<img>` once for `/images/categories/image-fallback.svg`, preserving alt text and guarding against swap loops
 
@@ -330,7 +330,7 @@ Verified against a running instance (see §15 of the project prompt):
 
 **Order** — unique readable `orderId`, user ref, item snapshots (name/price/packSize/image/quantity at purchase time), address snapshot, subtotal, delivery, total, payment method/status, order status (`Placed → Confirmed → Processing → Shipped → Delivered | Cancelled`), status history, timestamps + indexes
 
-**Category** — name + type as a **compound unique key (`{name, type}`)** — the same subcategory name may exist under two main categories (85 documents), image, description, active
+**Category** — name + type as a **compound unique key (`{name, type}`)** — the same subcategory name may exist under two main categories (83 documents), image, description, active
 
 **Newsletter** — email (unique), timestamps
 
