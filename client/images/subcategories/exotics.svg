@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Exotics demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(175,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(175,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(128 168) scale(1)">
+<ellipse cx="0" cy="2" rx="26" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-16 -12 q16 -12 32 0" fill="hsl(110,42%,55%)" stroke="#234832" stroke-width="2.6"/>
+<path d="M0 -14 v-16" stroke="#234832" stroke-width="3.4"/>
+<circle cx="-18" cy="-46" r="13" fill="hsl(120,48%,52%)" stroke="#234832" stroke-width="2.4"/><circle cx="0" cy="-58" r="13" fill="hsl(120,48%,52%)" stroke="#234832" stroke-width="2.4"/><circle cx="18" cy="-46" r="13" fill="hsl(120,48%,52%)" stroke="#234832" stroke-width="2.4"/><circle cx="-8" cy="-36" r="13" fill="hsl(120,48%,52%)" stroke="#234832" stroke-width="2.4"/><circle cx="10" cy="-36" r="13" fill="hsl(120,48%,52%)" stroke="#234832" stroke-width="2.4"/></g><g transform="translate(212 168) scale(0.85)">
+<ellipse cx="0" cy="2" rx="24" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-24 -34 q0 -34 24 -34 q24 0 24 34 q0 30 -24 30 q-24 0 -24 -30 z" fill="hsl(175,62%,54%)" stroke="#234832" stroke-width="3"/>
+<path d="M-10 -62 q4 26 -2 50 M10 -62 q-4 26 2 50" fill="none" stroke="#234832" stroke-width="2.4" opacity=".55"/>
+<path d="M0 -68 v-10 M0 -78 q-12 -2 -16 -10 q12 -2 16 6" fill="hsl(110,45%,50%)" stroke="#234832" stroke-width="2.6" stroke-linejoin="round"/></g><g transform="translate(272 168) scale(0.65)">
+<ellipse cx="0" cy="2" rx="30" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-32" y="-86" width="64" height="86" rx="7" fill="hsl(175,54%,60%)" stroke="#234832" stroke-width="3"/>
+<path d="M-32 -86 h64 l-7 -13 h-50 z" fill="hsl(175,58%,42%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<rect x="-22" y="-62" width="44" height="36" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+
+<circle cx="-9" cy="-50" r="4" fill="hsl(38,62%,55%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="7" cy="-46" r="4" fill="hsl(28,66%,50%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="-2" cy="-36" r="3.5" fill="hsl(50,60%,52%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="0" cy="-14" r="8" fill="hsl(175,64%,44%)" stroke="#234832" stroke-width="2.5"/></g>
+<g>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Seeds</text>
+</g>
+</svg>

@@ -29,6 +29,7 @@ const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
  * - `available`     — the single source of truth for "can this be bought?"
  * - `stockStatus`   — 'in' | 'low' | 'out' (manual blocks included)
  * - `discountPercent` — only set when a genuine discount (mrp > price) exists
+ * - `stock`         — alias of stockQuantity for API consumers
  *
  * Rule: available = active AND stockQuantity > 0 AND manualOutOfStock === false
  */
@@ -37,6 +38,7 @@ function decorate(p) {
   const src = p && typeof p.toObject === 'function' ? p.toObject() : p;
   const out = { ...src };
   out.available = Boolean(src.active && src.stockQuantity > 0 && !src.manualOutOfStock);
+  out.stock = src.stockQuantity;
   if (!src.active) out.stockStatus = 'unavailable';
   else if (src.manualOutOfStock || src.stockQuantity <= 0) out.stockStatus = 'out';
   else if (src.stockQuantity <= LOW_STOCK_THRESHOLD) out.stockStatus = 'low';
@@ -78,32 +80,52 @@ const listProducts = asyncHandler(async (req, res) => {
   const q = req.query;
   const filter = { active: true };
 
-  /* Taxonomy guard: a {type, category} pair that cannot exist in the store
-     (e.g. a seed subcategory under Pesticides) is a client error — report
-     it instead of silently returning an empty page. `category` alone keeps
-     its historic cross-type filter meaning, so it is only validated when
-     paired with a type. */
-  if (q.type && String(q.type).trim()) {
-    const type = String(q.type).trim();
-    if (!taxonomy.MAIN_CATEGORIES.includes(type)) {
-      throw new ApiError(400, `Category must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}.`);
-    }
-    if (q.category !== undefined && String(q.category).trim()) {
-      const pair = taxonomy.validatePair({ type, category: q.category });
-      if (pair.error) throw new ApiError(400, pair.error);
-    }
+  /* Resolve the browse pair. Historic query aliases (`type` / `category`)
+     are still accepted alongside the canonical names
+     (`primaryCategory` / `subcategory`). */
+  const rawMain = q.primaryCategory !== undefined ? q.primaryCategory : q.type;
+  const rawSub = q.subcategory !== undefined ? q.subcategory : q.category;
+  const main = rawMain !== undefined && String(rawMain).trim() !== '' ? String(rawMain).trim() : '';
+  const sub = rawSub !== undefined && String(rawSub).trim() !== '' ? String(rawSub).trim() : '';
+
+  /* Taxonomy guard: a {main, sub} pair that cannot exist in the store
+     (e.g. 'Vegetable Seeds' under Crop Protection) is a client error —
+     report it instead of silently returning an empty page. `subcategory`
+     alone keeps its historic cross-type filter meaning, so it is only
+     validated when paired with a main category. */
+  if (main && !taxonomy.isMainCategory(main)) {
+    throw new ApiError(400, `Category must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}.`);
+  }
+  let canonicalSub = sub;
+  if (main && sub) {
+    const pair = taxonomy.validatePair({ primaryCategory: main, subcategory: sub });
+    if (pair.error) throw new ApiError(400, pair.error);
+    canonicalSub = pair.subcategory;
   }
 
   if (q.search && String(q.search).trim()) {
     const rx = new RegExp(escapeRegex(String(q.search).trim()), 'i');
-    filter.$or = [{ name: rx }, { brand: rx }, { category: rx }];
+    filter.$or = [{ name: rx }, { brand: rx }, { subcategory: rx }];
   }
-  if (q.category && String(q.category).trim()) {
-    filter.category = new RegExp(`^${escapeRegex(String(q.category).trim())}$`, 'i');
+
+  /* Membership clauses go into $and so they never collide with the
+     search/inStock $or filters above.
+     - main + sub: products of that subcategory that are browsable in the
+       main category (primary ownership OR an explicit additionalCategories
+       entry) — this is how the same canonical record shows in Organic
+       without being duplicated.
+     - main only: everything browsable in that main category.
+     - sub only: historic cross-type exact subcategory match. */
+  const andClauses = [];
+  if (main && canonicalSub) {
+    andClauses.push({ subcategory: { $in: taxonomy.subsFor(main, canonicalSub) } });
+    andClauses.push({ $or: [{ primaryCategory: main }, { additionalCategories: main }] });
+  } else if (main) {
+    andClauses.push({ $or: [{ primaryCategory: main }, { additionalCategories: main }] });
+  } else if (sub) {
+    filter.subcategory = new RegExp(`^${escapeRegex(sub)}$`, 'i');
   }
-  if (q.type && String(q.type).trim()) {
-    filter.type = new RegExp(`^${escapeRegex(String(q.type).trim())}$`, 'i');
-  }
+  if (andClauses.length) filter.$and = andClauses;
   if (q.crop && String(q.crop).trim()) {
     filter.crops = new RegExp(escapeRegex(String(q.crop).trim()), 'i');
   }
@@ -186,16 +208,18 @@ const getProduct = asyncHandler(async (req, res) => {
   res.json({ success: true, product: decorate(product), related: decorateAll(related) });
 });
 
-/** Shared query for related products: same category first, then popular actives. */
+/** Shared query for related products: same subcategory first, then popular actives. */
 async function relatedQuery(product, limit) {
-  const sameCategory = await Product.find({
-    active: true,
-    category: product.category,
-    _id: { $ne: product._id },
-  })
-    .sort({ rating: -1 })
-    .limit(limit)
-    .lean();
+  const sameCategory = product.subcategory
+    ? await Product.find({
+        active: true,
+        subcategory: product.subcategory,
+        _id: { $ne: product._id },
+      })
+        .sort({ rating: -1 })
+        .limit(limit)
+        .lean()
+    : [];
 
   if (sameCategory.length >= Math.min(3, limit)) return sameCategory;
 
@@ -295,36 +319,63 @@ function parseProductBody(body, { partial = false, existing = {} } = {}) {
   strField('packSize', 'Pack size', { min: 1, max: 40 });
   strField('image', 'Product image', { min: 3, max: 300 });
 
-  /* --- main category + subcategory, validated against the store taxonomy ---
-     A pesticide can never be saved under a seed subcategory: the pair is
-     checked in server/utils/taxonomy.js. `existing` supports partial updates
-     that change only one half of the pair. */
-  if (body.type !== undefined) {
-    const type = String(body.type).trim();
-    if (!taxonomy.MAIN_CATEGORIES.includes(type)) {
-      errors.type = `Category must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}`;
+  /* --- primary category + heading + subcategory, validated against the
+     store taxonomy (server/utils/taxonomy.js). A pesticide can never be
+     saved under a seed subcategory: heading is derived from the taxonomy,
+     never free-form, and the subcategory must be listed under the chosen
+     main category. Historic input aliases `type`/`category` are still
+     accepted from older clients. `existing` supports partial updates that
+     change only one half of the classification. */
+  const mainIn = body.primaryCategory !== undefined ? body.primaryCategory : body.type;
+  const subIn = body.subcategory !== undefined ? body.subcategory : body.category;
+  const mainProvided = mainIn !== undefined;
+  const subProvided = subIn !== undefined;
+
+  if (mainProvided) {
+    const val = mainIn === null || mainIn === undefined ? '' : String(mainIn).trim();
+    if (!val) errors.primaryCategory = 'Product primary category is required';
+    else if (!taxonomy.isMainCategory(val)) {
+      errors.primaryCategory = `Category must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}`;
     } else {
-      out.type = type;
+      out.primaryCategory = val;
     }
   } else if (!partial) {
-    errors.type = 'Product category (type) is required';
+    errors.primaryCategory = 'Product primary category is required';
   }
 
-  const touchesCategory = !partial || body.category !== undefined || body.type !== undefined;
-  if (touchesCategory && !errors.type) {
-    const pair = taxonomy.validatePair({
-      type: body.type !== undefined ? String(body.type).trim() : undefined,
-      category: body.category !== undefined ? String(body.category).trim() : undefined,
-      existing,
-    });
-    if (pair.error) {
-      errors.category = pair.error;
-    } else {
-      out.category = pair.category;
-      if (pair.type) out.type = pair.type;
+  /* Explicitly emptying a subcategory is only allowed for legacy records
+     that never had one (they stay visible in the main-category grid but
+     belong to no subcategory until an admin picks one). */
+  if (subProvided && subIn !== null && subIn !== undefined && !String(subIn).trim()) {
+    if (String(existing.subcategory || '').trim()) {
+      errors.subcategory = 'Subcategory cannot be empty — pick one from the list.';
     }
-  } else if (partial && body.category !== undefined && !String(body.category).trim()) {
-    errors.category = 'Subcategory cannot be empty — pick one from the list.';
+  }
+
+  const touchesClass =
+    !partial || subProvided || mainProvided || body.heading !== undefined || body.additionalCategories !== undefined;
+
+  if (touchesClass && !errors.primaryCategory && !errors.subcategory) {
+    let pair;
+    try {
+      pair = taxonomy.validatePair({
+        primaryCategory: mainProvided ? mainIn : undefined,
+        subcategory: subProvided ? subIn : undefined,
+        heading: body.heading,
+        additionalCategories: body.additionalCategories,
+        existing,
+      });
+    } catch (err) {
+      errors.additionalCategories = err.message;
+    }
+    if (pair && pair.error) {
+      errors.subcategory = pair.error;
+    } else if (pair) {
+      out.primaryCategory = pair.primaryCategory;
+      out.subcategory = pair.subcategory;
+      out.heading = pair.heading;
+      out.additionalCategories = pair.additionalCategories;
+    }
   }
 
   if (body.description !== undefined) {

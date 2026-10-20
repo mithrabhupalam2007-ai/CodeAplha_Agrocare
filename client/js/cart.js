@@ -22,6 +22,13 @@
     return Number.isFinite(item.stock) ? item.stock : 999;
   };
 
+  /* Cart lines persist to localStorage, so ones written by the old
+     pre-restructure UI can still carry a retired category label. Never
+     render those names again. */
+  const RETIRED_LABELS = ['Pesticides', 'Fertilizers', 'Farming Essentials'];
+  const cartLineLabel = (item) =>
+    RETIRED_LABELS.includes(item.category) ? '' : item.category || '';
+
   /** Returns a list of human-readable blockers that must be fixed first. */
   function blockers() {
     const list = [];
@@ -102,7 +109,7 @@
         </a>
         <div>
           <div class="cart-item__name"><a href="/pages/product-details.html?id=${item.id}">${UI.esc(item.name)}</a></div>
-          <div class="cart-item__meta">${UI.esc(item.category || '')} · ${UI.esc(item.packSize)} · ${UI.inr(item.price)} each</div>
+          <div class="cart-item__meta">${[UI.esc(cartLineLabel(item)), UI.esc(item.packSize), UI.inr(item.price) + ' each'].filter(Boolean).join(' · ')}</div>
           ${stateNote}
           <button class="cart-item__remove" type="button" data-remove>Remove</button>
         </div>

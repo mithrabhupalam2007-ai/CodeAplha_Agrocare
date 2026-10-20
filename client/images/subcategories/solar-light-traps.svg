@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Solar Light Traps demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(215,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(215,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(158 168) scale(1.15)">
+<ellipse cx="0" cy="2" rx="24" ry="6" fill="#234832" opacity=".12"/>
+<path d="M0 -8 v-72" stroke="#234832" stroke-width="4" stroke-linecap="round"/>
+<rect x="-36" y="-118" width="72" height="26" rx="5" fill="hsl(215,58%,58%)" stroke="#234832" stroke-width="3" transform="rotate(-14 0 -105)"/>
+<path d="M-24 -108 l6 -14 M-6 -114 l6 -14 M12 -118 l6 -14" stroke="#234832" stroke-width="2" opacity=".6" transform="rotate(-14 0 -105)"/>
+<rect x="-16" y="-72" width="32" height="26" rx="6" fill="hsl(48,90%,70%)" stroke="#234832" stroke-width="3"/>
+<path d="M-10 -46 q10 10 20 0" fill="none" stroke="#234832" stroke-width="2.6"/>
+<path d="M28 -84 l14 -8 M30 -66 h16 M28 -50 l14 6" stroke="hsl(215,80%,55%)" stroke-width="3" stroke-linecap="round"/></g><g transform="translate(258 136) scale(0.7)">
+<ellipse cx="0" cy="0" rx="10" ry="8" fill="hsl(40,45%,45%)" stroke="#234832" stroke-width="2.4"/>
+<ellipse cx="-10" cy="-8" rx="11" ry="6" fill="#ffffff" fill-opacity=".75" stroke="#234832" stroke-width="2" transform="rotate(-24 -10 -8)"/>
+<ellipse cx="10" cy="-8" rx="11" ry="6" fill="#ffffff" fill-opacity=".75" stroke="#234832" stroke-width="2" transform="rotate(24 10 -8)"/>
+<circle cx="0" cy="-6" r="4" fill="hsl(40,50%,38%)" stroke="#234832" stroke-width="2"/>
+<path d="M-8 8 l-6 8 M8 8 l6 8" stroke="#234832" stroke-width="2.2" stroke-linecap="round"/></g><g transform="translate(64 152) scale(0.7)">
+<ellipse cx="0" cy="0" rx="13" ry="16" fill="hsl(30,58%,52%)" stroke="#234832" stroke-width="2.6"/>
+<path d="M0 -16 v30" stroke="#234832" stroke-width="2.2"/>
+<circle cx="0" cy="-18" r="7" fill="hsl(30,62%,42%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-6 -24 l-6 -8 M6 -24 l6 -8 M-13 -6 l-12 -4 M13 -6 l12 -4 M-13 6 l-12 4 M13 6 l12 4" stroke="#234832" stroke-width="2.4" stroke-linecap="round"/></g>
+<g>
+<rect x="166" y="14" width="138" height="24" rx="12" fill="#234832"/>
+<text x="235" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Protection</text>
+</g>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Plant Enhancers demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(165,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(165,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(128 168) scale(1)">
+<ellipse cx="0" cy="2" rx="22" ry="5" fill="#234832" opacity=".12"/>
+<rect x="-16" y="-84" width="32" height="84" rx="9" fill="hsl(165,56%,60%)" stroke="#234832" stroke-width="3"/>
+<rect x="-7" y="-96" width="14" height="12" rx="3" fill="hsl(165,60%,46%)" stroke="#234832" stroke-width="3"/>
+<rect x="-16" y="-58" width="32" height="24" rx="4" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+<path d="M-7 -46 h14 M0 -53 v14" stroke="#234832" stroke-width="2.4" stroke-linecap="round"/>
+<circle cx="24" cy="-84" r="3.4" fill="hsl(165,70%,55%)" stroke="#234832" stroke-width="1.6"/>
+<circle cx="32" cy="-90" r="2.6" fill="hsl(165,70%,55%)" stroke="#234832" stroke-width="1.6"/>
+<circle cx="30" cy="-76" r="2.2" fill="hsl(165,70%,55%)" stroke="#234832" stroke-width="1.6"/></g><g transform="translate(224 168) scale(0.85)">
+<ellipse cx="0" cy="2" rx="26" ry="6" fill="#234832" opacity=".12"/>
+<path d="M0 -8 v-24" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<circle cx="0" cy="-56" r="30" fill="hsl(110,50%,56%)" stroke="#234832" stroke-width="3"/>
+<path d="M-18 -60 q10 -12 22 -6 M0 -70 q10 -8 18 -2" fill="none" stroke="#234832" stroke-width="2.2" opacity=".55"/>
+<path d="M-12 -14 q-12 -6 -16 -16 M12 -14 q12 -6 16 -16" fill="none" stroke="#234832" stroke-width="2.6" stroke-linecap="round"/></g><path d="M266 78 v-14 M266 114 v14 M246 96 h-14 M286 96 h14" stroke="hsl(48,85%,55%)" stroke-width="3" stroke-linecap="round"/>
+<g>
+<rect x="173.60000000000002" y="14" width="130.39999999999998" height="24" rx="12" fill="#234832"/>
+<text x="238.8" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Nutrition</text>
+</g>
+</svg>

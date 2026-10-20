@@ -92,10 +92,14 @@
 
   /* ---------------- info panels ---------------- */
   function renderSpecs() {
+    const mainCat = product.primaryCategory || '';
+    const subLabel = TAXONOMY.labelFor(product);
     const rows = [
       ['Brand / manufacturer', product.brand],
-      ['Category', product.category],
-      ['Product type', product.type],
+      ['Main category', mainCat],
+      // Heading/subcategory row — omitted when it would duplicate the main
+      // (legacy heading-only records show their heading here).
+      ...(subLabel && subLabel !== mainCat ? [['Category', subLabel]] : []),
       ['Pack size', product.packSize],
       ['Price', `${UI.inr(product.price)} per ${product.packSize}`],
       ['Availability', isAvailable() ? `${product.stockQuantity} units available` : 'Currently out of stock'],
@@ -115,7 +119,7 @@
   function renderSeedInfo() {
     const s = product.seedInfo || {};
     const has =
-      product.type === 'Seeds' &&
+      product.primaryCategory === 'Seeds' &&
       (s.variety || s.cropType || s.germinationPercent || s.sowingInstructions || s.daysToGerminate);
     if (!has) return;
     $('seed-panel').classList.remove('hidden');
@@ -133,7 +137,8 @@
   }
 
   function renderLabelInfo() {
-    if (product.type !== 'Pesticides') return;
+    // Label/registration demo panel belongs to crop-protection listings.
+    if (product.primaryCategory !== 'Crop Protection') return;
     $('label-panel').classList.remove('hidden');
 
     const l = product.labelInfo || {};
@@ -237,7 +242,7 @@
         <a href="/pages/product-details.html?id=${p._id}"><img src="${UI.esc(p.image)}" alt="${UI.esc(p.name)}" loading="lazy" /></a>
       </div>
       <div class="p-card__body">
-        <span class="p-card__cat">${UI.esc(p.category)}</span>
+        <span class="p-card__cat">${UI.esc(TAXONOMY.labelFor(p))}</span>
         <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${UI.esc(p.name)}</a></h3>
         <div class="p-card__meta">
           <span>${UI.esc(p.packSize)}</span>
@@ -342,10 +347,17 @@
 
     document.title = `${product.name} — AgroShield`;
     $('head-title').textContent = product.name;
-    $('head-sub').textContent = `${product.brand} · ${product.category} · ${product.packSize}`;
-    $('crumb').innerHTML = `<a href="/pages/home.html">Home</a><span>/</span><a href="/pages/products.html">Products</a><span>/</span><a href="/pages/products.html?category=${encodeURIComponent(product.category)}">${UI.esc(product.category)}</a><span>/</span><span class="current">${UI.esc(product.name)}</span>`;
+    $('head-sub').textContent = `${product.brand} · ${TAXONOMY.labelFor(product)} · ${product.packSize}`;
+    // Breadcrumb: Home / Products / main category / subcategory / product
+    const crumbMain = product.primaryCategory || '';
+    const crumbSub = product.subcategory || '';
+    $('crumb').innerHTML =
+      `<a href="/pages/home.html">Home</a><span>/</span><a href="/pages/products.html">Products</a>` +
+      (crumbMain ? `<span>/</span><a href="${TAXONOMY.categoryUrl(crumbMain)}">${UI.esc(crumbMain)}</a>` : '') +
+      (crumbSub ? `<span>/</span><a href="${TAXONOMY.subcategoryUrl(crumbMain, crumbSub)}">${UI.esc(crumbSub)}</a>` : '') +
+      `<span>/</span><span class="current">${UI.esc(product.name)}</span>`;
 
-    $('pdp-cat').textContent = product.category;
+    $('pdp-cat').textContent = TAXONOMY.labelFor(product);
     $('pdp-name').textContent = product.name;
     $('pdp-stars').textContent = UI.stars(product.rating);
     $('pdp-reviews').textContent = `${product.rating || 0} · ${product.reviewCount || 0} demo reviews`;

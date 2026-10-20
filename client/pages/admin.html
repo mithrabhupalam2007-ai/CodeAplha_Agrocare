@@ -324,14 +324,16 @@
           <div class="form-row">
             <div class="field">
               <label>Main category</label>
-              <select class="input" name="type" id="pm-type" required>
-                <option>Seeds</option><option>Pesticides</option><option>Fertilizers</option><option>Farming Essentials</option>
-              </select>
+              <select class="input js-main-select" name="type" id="pm-type" required></select>
             </div>
             <div class="field">
-              <label>Subcategory <span class="text-muted" id="pm-sub-hint">(not needed for Farming Essentials)</span></label>
-              <select class="input" name="category" id="pm-category"></select>
+              <label>Heading section <span class="text-muted" id="pm-heading-hint"></span></label>
+              <select class="input" name="heading" id="pm-heading"></select>
             </div>
+          </div>
+          <div class="field">
+            <label>Subcategory <span class="text-muted" id="pm-sub-hint"></span></label>
+            <select class="input" name="category" id="pm-category" required></select>
           </div>
           <div class="form-row">
             <div class="field"><label>Brand / manufacturer</label><input class="input" name="brand" required /></div>
@@ -386,7 +388,7 @@
             <label class="check"><input type="checkbox" name="manualOutOfStock" /> Manually mark out of stock</label>
           </div>
           <div class="alert show alert--demo" style="margin-top:16px;">
-            Pesticide products added here should carry verified label information before real sale. This demo store marks new listings as demo data.
+            Crop-protection products added here should carry verified label information before real sale. This demo store marks new listings as demo data.
           </div>
         </div>
         <div class="modal__foot">
@@ -409,10 +411,8 @@
           <input type="hidden" name="id" />
           <div class="field"><label>Name</label><input class="input" name="name" required /></div>
           <div class="field">
-            <label>Type</label>
-            <select class="input" name="type" required>
-              <option>Seeds</option><option>Pesticides</option><option>Fertilizers</option><option>Farming Essentials</option>
-            </select>
+            <label>Main category</label>
+            <select class="input js-main-select" name="type" required></select>
           </div>
           <div class="field"><label>Description</label><textarea class="input" name="description" rows="2"></textarea></div>
           <div class="field"><label>Image path</label><input class="input" name="image" placeholder="/images/categories/xyz.jpg" /></div>

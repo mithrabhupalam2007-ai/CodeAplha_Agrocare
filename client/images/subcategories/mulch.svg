@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Mulch demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(260,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(260,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(126 168) scale(1.05)">
+<ellipse cx="0" cy="2" rx="42" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-44" y="-44" width="76" height="40" rx="4" fill="hsl(260,52%,58%)" stroke="#234832" stroke-width="3"/>
+<ellipse cx="32" cy="-24" rx="12" ry="20" fill="hsl(260,56%,48%)" stroke="#234832" stroke-width="3"/>
+<ellipse cx="32" cy="-24" rx="5" ry="9" fill="#fffbe9" stroke="#234832" stroke-width="2.4"/>
+<ellipse cx="-44" cy="-24" rx="8" ry="20" fill="hsl(260,56%,64%)" stroke="#234832" stroke-width="3"/>
+<path d="M-44 -36 h76 M-44 -16 h76" stroke="#fff" stroke-width="2" opacity=".45"/></g><rect x="204" y="150" width="82" height="18" rx="6" fill="hsl(260,30%,34%)" stroke="#234832" stroke-width="2.6"/><g transform="translate(224 150) scale(0.5)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-36" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g><g transform="translate(262 150) scale(0.48)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-56" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -58 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

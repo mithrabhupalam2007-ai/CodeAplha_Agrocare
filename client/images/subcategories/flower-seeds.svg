@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Flower Seeds demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(335,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(335,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(108 168) scale(1)">
+<ellipse cx="0" cy="2" rx="30" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-32" y="-86" width="64" height="86" rx="7" fill="hsl(335,54%,60%)" stroke="#234832" stroke-width="3"/>
+<path d="M-32 -86 h64 l-7 -13 h-50 z" fill="hsl(335,58%,42%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<rect x="-22" y="-62" width="44" height="36" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+
+<circle cx="0" cy="-46" r="5" fill="hsl(45,75%,55%)" stroke="#234832" stroke-width="2"/>
+<circle cx="-9" cy="-51" r="5" fill="hsl(335,65%,66%)" stroke="#234832" stroke-width="2"/>
+<circle cx="9" cy="-51" r="5" fill="hsl(335,65%,66%)" stroke="#234832" stroke-width="2"/>
+<circle cx="-9" cy="-41" r="5" fill="hsl(335,65%,66%)" stroke="#234832" stroke-width="2"/>
+<circle cx="9" cy="-41" r="5" fill="hsl(335,65%,66%)" stroke="#234832" stroke-width="2"/>
+<circle cx="0" cy="-14" r="8" fill="hsl(335,64%,44%)" stroke="#234832" stroke-width="2.5"/></g><g transform="translate(200 168) scale(1)">
+<ellipse cx="0" cy="2" rx="14" ry="4" fill="#234832" opacity=".12"/>
+<path d="M0 -8 v-52" stroke="#234832" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M0 -34 q-14 -4 -20 -14 M0 -46 q14 -4 20 -14" fill="none" stroke="#234832" stroke-width="2.4" stroke-linecap="round"/>
+<g transform="translate(0 -64)"><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(335,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(0)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(335,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(60)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(335,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(120)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(335,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(180)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(335,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(240)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(335,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(300)"/><circle cx="0" cy="0" r="7" fill="hsl(45,78%,56%)" stroke="#234832" stroke-width="2.4"/></g></g><g transform="translate(258 168) scale(0.7)">
+<ellipse cx="0" cy="2" rx="14" ry="4" fill="#234832" opacity=".12"/>
+<path d="M0 -8 v-52" stroke="#234832" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M0 -34 q-14 -4 -20 -14 M0 -46 q14 -4 20 -14" fill="none" stroke="#234832" stroke-width="2.4" stroke-linecap="round"/>
+<g transform="translate(0 -64)"><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(45,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(0)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(45,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(60)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(45,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(120)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(45,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(180)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(45,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(240)"/><ellipse cx="0" cy="-16" rx="7" ry="11" fill="hsl(45,66%,66%)" stroke="#234832" stroke-width="2.2" transform="rotate(300)"/><circle cx="0" cy="0" r="7" fill="hsl(45,78%,56%)" stroke="#234832" stroke-width="2.4"/></g></g>
+<g>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Seeds</text>
+</g>
+</svg>

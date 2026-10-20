@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Sticky Traps demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(55,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(55,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(128 168) scale(1.05)">
+<ellipse cx="0" cy="2" rx="18" ry="5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-58" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<rect x="-34" y="-116" width="68" height="58" rx="6" fill="hsl(55,84%,62%)" stroke="#234832" stroke-width="3"/>
+<rect x="-34" y="-116" width="68" height="12" rx="6" fill="hsl(55,80%,52%)"/>
+<circle cx="-16" cy="-88" r="4" fill="#234832" opacity=".8"/><circle cx="-2" cy="-96" r="3.4" fill="#234832" opacity=".8"/>
+<circle cx="12" cy="-84" r="4" fill="#234832" opacity=".8"/><circle cx="4" cy="-72" r="3.4" fill="#234832" opacity=".8"/>
+<circle cx="-14" cy="-68" r="3" fill="#234832" opacity=".8"/><circle cx="20" cy="-98" r="3" fill="#234832" opacity=".8"/></g><g transform="translate(220 168) scale(0.85)">
+<ellipse cx="0" cy="2" rx="18" ry="5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-58" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<rect x="-34" y="-116" width="68" height="58" rx="6" fill="hsl(50,84%,62%)" stroke="#234832" stroke-width="3"/>
+<rect x="-34" y="-116" width="68" height="12" rx="6" fill="hsl(50,80%,52%)"/>
+<circle cx="-16" cy="-88" r="4" fill="#234832" opacity=".8"/><circle cx="-2" cy="-96" r="3.4" fill="#234832" opacity=".8"/>
+<circle cx="12" cy="-84" r="4" fill="#234832" opacity=".8"/><circle cx="4" cy="-72" r="3.4" fill="#234832" opacity=".8"/>
+<circle cx="-14" cy="-68" r="3" fill="#234832" opacity=".8"/><circle cx="20" cy="-98" r="3" fill="#234832" opacity=".8"/></g><g transform="translate(272 158) scale(0.7)">
+<ellipse cx="0" cy="0" rx="10" ry="8" fill="hsl(10,45%,45%)" stroke="#234832" stroke-width="2.4"/>
+<ellipse cx="-10" cy="-8" rx="11" ry="6" fill="#ffffff" fill-opacity=".75" stroke="#234832" stroke-width="2" transform="rotate(-24 -10 -8)"/>
+<ellipse cx="10" cy="-8" rx="11" ry="6" fill="#ffffff" fill-opacity=".75" stroke="#234832" stroke-width="2" transform="rotate(24 10 -8)"/>
+<circle cx="0" cy="-6" r="4" fill="hsl(10,50%,38%)" stroke="#234832" stroke-width="2"/>
+<path d="M-8 8 l-6 8 M8 8 l6 8" stroke="#234832" stroke-width="2.2" stroke-linecap="round"/></g>
+<g>
+<rect x="166" y="14" width="138" height="24" rx="12" fill="#234832"/>
+<text x="235" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Protection</text>
+</g>
+</svg>

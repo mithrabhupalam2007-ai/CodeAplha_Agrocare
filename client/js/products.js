@@ -67,13 +67,11 @@
     document.querySelectorAll('#type-chips .chip').forEach((c) => {
       c.classList.toggle('active', (c.dataset.type || '') === state.type);
     });
-    const titles = {
-      Seeds: ['Seeds', 'Vegetable, fruit and field-crop seeds with variety and sowing information.'],
-      Pesticides: ['Pesticides', 'Crop protection listings with clearly labelled demo label information.'],
-      Fertilizers: ['Fertilizers', 'Organic manures, NPK blends and micronutrients for every soil type.'],
-      'Farming Essentials': ['Farming Essentials', 'Tools, sprayers and safety equipment for the field and farm.'],
-    };
-    const [t, s] = titles[state.type] || ['All Products', 'Fresh from the store database — search, filter and find what your crop needs.'];
+    // Titles come from the store taxonomy; unknown/blank type = catalogue view.
+    const [t, s] =
+      state.type && TAXONOMY.isMain(state.type)
+        ? [state.type, TAXONOMY.MAIN_BLURBS[state.type]]
+        : ['All Products', 'Fresh from the store database — search, filter and find what your crop needs.'];
     document.getElementById('page-title').textContent = state.category || (state.q ? `Search: “${state.q}”` : t);
     document.getElementById('page-sub').textContent = s;
   }
@@ -152,6 +150,36 @@
   }
 
   /* ---------------- filter option loading ---------------- */
+  /** `${type}\u0000${name}` -> product count from GET /categories. */
+  let categoryCounts = new Map();
+  /** Unique subcategory names in server order (shared names collapse). */
+  let categoryNames = [];
+
+  /**
+   * Rebuild the subcategory <select> for the active main-category chip:
+   * with a chip selected only that category's subcategories are offered
+   * (in taxonomy order, with that category's own count), otherwise the
+   * full list. The current selection is kept when it still belongs to the
+   * visible set.
+   */
+  function renderCategoryOptions() {
+    const sel = el('f-category');
+    sel.innerHTML = '<option value="">All subcategories</option>';
+    const names = state.type ? TAXONOMY.subcategoriesOf(state.type) : categoryNames;
+    names.forEach((name) => {
+      const count = state.type
+        ? categoryCounts.get(`${state.type}\u0000${name}`)
+        : categoryCounts.get(name);
+      if (count === undefined) return; // no such subcategory document
+      const o = document.createElement('option');
+      o.value = name;
+      o.textContent = `${name} (${count})`;
+      sel.appendChild(o);
+    });
+    if (state.category && names.includes(state.category)) sel.value = state.category;
+    else state.category = '';
+  }
+
   async function loadFilterOptions() {
     try {
       const [cats, cropsData] = await Promise.all([
@@ -159,13 +187,18 @@
         api.get('/products' + api.qs({ limit: 48 })),
       ]);
 
-      const catSel = el('f-category');
-      cats.categories.forEach((c) => {
-        const o = document.createElement('option');
-        o.value = c.name;
-        o.textContent = `${c.name} (${c.productCount})`;
-        catSel.appendChild(o);
+      // Counts are per {main category, name} pair; for the unfiltered view
+      // shared names collapse to one option carrying their best count.
+      categoryCounts = new Map();
+      categoryNames = [];
+      (cats.categories || []).forEach((c) => {
+        categoryCounts.set(`${c.type}\u0000${c.name}`, c.productCount);
+        if (!categoryCounts.has(c.name) || categoryCounts.get(c.name) < c.productCount) {
+          categoryCounts.set(c.name, c.productCount);
+        }
+        if (!categoryNames.includes(c.name)) categoryNames.push(c.name);
       });
+      renderCategoryOptions();
 
       const crops = new Set();
       cropsData.products.forEach((p) => (p.crops || []).forEach((c) => crops.add(c)));
@@ -207,6 +240,17 @@
     UI.mountFooter();
     if (!UI.requireLogin()) return; // shop is only reachable after login
 
+    // One chip per main category, straight from the store taxonomy so the
+    // row can never drift from the catalogue ("All" lives in the markup).
+    const chipsRow = el('type-chips');
+    TAXONOMY.MAIN.forEach((type) => {
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.dataset.type = type;
+      chip.textContent = type;
+      chipsRow.appendChild(chip);
+    });
+
     hydrateFromURL();
     syncFormFromState();
     loadFilterOptions();
@@ -228,6 +272,7 @@
         state.type = chip.dataset.type || '';
         state.category = '';
         state.page = 1;
+        renderCategoryOptions(); // subcategory list follows the active chip
         pushURL();
         syncFormFromState();
         fetchProducts();

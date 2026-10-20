@@ -7,6 +7,7 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { ORDER_STATUSES } = require('../models/Order');
 const { decorate, decorateAll } = require('./productController');
+const taxonomy = require('../utils/taxonomy');
 const v = require('../utils/validators');
 
 const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
@@ -119,10 +120,11 @@ const listProducts = asyncHandler(async (req, res) => {
     filter.isNewRelease = true;
   }
 
-  if (q.category && String(q.category).trim()) filter.category = String(q.category).trim();
+  if (q.category && String(q.category).trim()) filter.subcategory = String(q.category).trim();
+  if (q.primaryCategory && String(q.primaryCategory).trim()) filter.primaryCategory = String(q.primaryCategory).trim();
   if (q.search && String(q.search).trim()) {
     const rx = new RegExp(String(q.search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    filter.$or = [{ name: rx }, { brand: rx }, { category: rx }];
+    filter.$or = [{ name: rx }, { brand: rx }, { subcategory: rx }];
   }
 
   const page = Math.max(1, parseInt(q.page, 10) || 1);
@@ -167,7 +169,7 @@ const listOutOfStock = asyncHandler(async (req, res) => {
   }
   if (q.search && String(q.search).trim()) {
     const rx = new RegExp(String(q.search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    and.push({ $or: [{ name: rx }, { brand: rx }, { category: rx }] });
+    and.push({ $or: [{ name: rx }, { brand: rx }, { subcategory: rx }] });
   }
   if (and.length) filter.$and = and;
 
@@ -415,11 +417,10 @@ const listAllCategories = asyncHandler(async (req, res) => {
   res.json({ success: true, categories });
 });
 
-/** POST /api/admin/categories */
+/** POST /api/admin/categories — only taxonomy subcategories can exist. */
 const createCategory = asyncHandler(async (req, res) => {
   const body = req.body || {};
   const name = typeof body.name === 'string' ? body.name.trim() : '';
-  const allowedTypes = ['Seeds', 'Pesticides', 'Fertilizers', 'Farming Essentials'];
 
   v.assertValid({
     name: v.requiredString(name, 'Category name', { min: 2, max: 80 }),
@@ -427,13 +428,23 @@ const createCategory = asyncHandler(async (req, res) => {
       ? v.requiredString(body.description, 'Description', { min: 0, max: 400 })
       : null,
   });
-  if (!allowedTypes.includes(body.type)) {
-    throw new ApiError(400, `Type must be one of: ${allowedTypes.join(', ')}`);
+  if (!taxonomy.isMainCategory(body.type)) {
+    throw new ApiError(400, `Type must be one of: ${taxonomy.MAIN_CATEGORIES.join(', ')}`);
+  }
+
+  // The (main category, subcategory) pair must exist in the store taxonomy —
+  // no parallel category system can be created next to it.
+  const pair = taxonomy.validatePair({ primaryCategory: body.type, subcategory: name });
+  if (pair.error) throw new ApiError(400, pair.error);
+
+  if (await Category.exists({ name: pair.subcategory, type: pair.primaryCategory })) {
+    throw new ApiError(409, `"${pair.subcategory}" already exists under ${pair.primaryCategory}.`);
   }
 
   const category = await Category.create({
-    name,
-    type: body.type,
+    name: pair.subcategory,
+    type: pair.primaryCategory,
+    heading: pair.heading,
     image: typeof body.image === 'string' ? body.image.trim() : '',
     description: typeof body.description === 'string' ? body.description.trim() : '',
   });
@@ -446,17 +457,31 @@ const updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!mongoose.isValidObjectId(id)) throw new ApiError(400, 'Invalid category id.');
 
-  const allowedTypes = ['Seeds', 'Pesticides', 'Fertilizers', 'Farming Essentials'];
+  const current = await Category.findById(id);
+  if (!current) throw new ApiError(404, 'Category not found.');
+
   const data = {};
   if (req.body.name !== undefined) {
     const err = v.requiredString(req.body.name, 'Category name', { min: 2, max: 80 });
     if (err) throw new ApiError(400, err);
     data.name = String(req.body.name).trim();
   }
-  if (req.body.type !== undefined) {
-    if (!allowedTypes.includes(req.body.type)) throw new ApiError(400, `Type must be one of: ${allowedTypes.join(', ')}`);
-    data.type = req.body.type;
+  if (req.body.type !== undefined) data.type = String(req.body.type).trim();
+
+  if (data.name !== undefined || data.type !== undefined) {
+    // Renaming/moving must still resolve to a real taxonomy pair.
+    const pair = taxonomy.validatePair({
+      primaryCategory: data.type !== undefined ? data.type : current.type,
+      subcategory: data.name !== undefined ? data.name : current.name,
+    });
+    if (pair.error) throw new ApiError(400, pair.error);
+    data.name = pair.subcategory;
+    data.type = pair.primaryCategory;
+    data.heading = pair.heading;
+    const clash = await Category.exists({ _id: { $ne: id }, name: data.name, type: data.type });
+    if (clash) throw new ApiError(409, `"${data.name}" already exists under ${data.type}.`);
   }
+
   if (req.body.description !== undefined) data.description = String(req.body.description).trim().slice(0, 400);
   if (req.body.image !== undefined) data.image = String(req.body.image).trim().slice(0, 300);
   if (req.body.active !== undefined) data.active = Boolean(req.body.active);
@@ -475,7 +500,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(id);
   if (!category) throw new ApiError(404, 'Category not found.');
 
-  const inUse = await Product.countDocuments({ category: category.name, active: true });
+  const inUse = await Product.countDocuments({ subcategory: category.name, active: true });
   if (inUse > 0) {
     throw new ApiError(409, `Cannot delete: ${inUse} active product(s) still use this category.`);
   }

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Fruit Seeds demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(12,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(12,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(110 168) scale(1)">
+<ellipse cx="0" cy="2" rx="30" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-32" y="-86" width="64" height="86" rx="7" fill="hsl(12,54%,60%)" stroke="#234832" stroke-width="3"/>
+<path d="M-32 -86 h64 l-7 -13 h-50 z" fill="hsl(12,58%,42%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<rect x="-22" y="-62" width="44" height="36" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+
+<circle cx="0" cy="-45" r="11" fill="hsl(5,70%,58%)" stroke="#234832" stroke-width="2"/>
+<path d="M0 -56 q6 -6 12 -4" fill="none" stroke="#234832" stroke-width="2" stroke-linecap="round"/>
+<circle cx="0" cy="-14" r="8" fill="hsl(12,64%,44%)" stroke="#234832" stroke-width="2.5"/></g><g transform="translate(208 168) scale(1)">
+<ellipse cx="0" cy="2" rx="30" ry="6" fill="#234832" opacity=".12"/>
+<circle cx="-6" cy="-34" r="32" fill="hsl(95,55%,58%)" stroke="#234832" stroke-width="3"/>
+<path d="M-24 -54 q6 20 0 40 M-6 -66 q8 32 0 64 M12 -54 q-6 20 0 40" fill="none" stroke="#234832" stroke-width="2.4" opacity=".6"/>
+<path d="M-6 -66 q4 -8 12 -8" fill="none" stroke="#234832" stroke-width="3" stroke-linecap="round"/>
+<circle cx="36" cy="-22" r="20" fill="#fffbe9" stroke="#234832" stroke-width="3"/>
+<circle cx="36" cy="-22" r="11" fill="hsl(95,68%,64%)" stroke="#234832" stroke-width="2"/>
+<circle cx="33" cy="-25" r="1.8" fill="#234832"/><circle cx="39" cy="-21" r="1.8" fill="#234832"/><circle cx="35" cy="-17" r="1.8" fill="#234832"/></g>
+<g>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Seeds</text>
+</g>
+</svg>

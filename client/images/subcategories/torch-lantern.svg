@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Torch/Lantern demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(45,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(45,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(126 168) scale(1.15)">
+<ellipse cx="0" cy="2" rx="22" ry="5" fill="#234832" opacity=".12"/>
+<rect x="-14" y="-56" width="28" height="54" rx="9" fill="hsl(45,52%,58%)" stroke="#234832" stroke-width="3"/>
+<rect x="-14" y="-38" width="28" height="8" fill="hsl(45,56%,46%)"/>
+<path d="M-16 -56 l6 -20 h20 l6 20 z" fill="hsl(45,58%,44%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-10 -84 h20" stroke="#234832" stroke-width="3" stroke-linecap="round"/>
+<path d="M-6 -88 l-4 -14 M6 -88 l4 -14 M0 -90 v-16" stroke="hsl(48,92%,60%)" stroke-width="3.4" stroke-linecap="round"/>
+<rect x="-6" y="-26" width="12" height="14" rx="3" fill="#fffbe9" stroke="#234832" stroke-width="2.4"/></g><rect x="214" y="122" width="46" height="44" rx="10" fill="hsl(46,85%,62%)" stroke="#234832" stroke-width="3"/><path d="M224 122 q13 -18 26 0" fill="none" stroke="#234832" stroke-width="3"/><circle cx="237" cy="144" r="9" fill="#fffbe9" stroke="#234832" stroke-width="2.6"/>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

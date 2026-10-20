@@ -72,13 +72,16 @@ const UI = (() => {
   }
 
   /* ---------------- navbar ---------------- */
+  /* The seven main categories come straight from the store taxonomy (exact
+     order preserved), so nav links can never drift from the catalogue. */
   const NAV_LINKS = [
     { href: '/pages/home.html', label: 'Home', match: (p) => p.includes('home.html') },
     { href: '/pages/products.html', label: 'All Products', match: (p) => p.includes('products') && !location.search },
-    { href: '/pages/category.html?type=Seeds', label: 'Seeds', match: () => new URLSearchParams(location.search).get('type') === 'Seeds' },
-    { href: '/pages/category.html?type=Pesticides', label: 'Pesticides', match: () => new URLSearchParams(location.search).get('type') === 'Pesticides' },
-    { href: '/pages/category.html?type=Fertilizers', label: 'Fertilizers', match: () => new URLSearchParams(location.search).get('type') === 'Fertilizers' },
-    { href: '/pages/category.html?type=Farming%20Essentials', label: 'Farming Essentials', match: () => new URLSearchParams(location.search).get('type') === 'Farming Essentials' },
+    ...TAXONOMY.MAIN.map((type) => ({
+      href: TAXONOMY.categoryUrl(type),
+      label: type,
+      match: () => new URLSearchParams(location.search).get('type') === type,
+    })),
   ];
 
   function mountNav() {
@@ -201,16 +204,15 @@ const UI = (() => {
           <div class="footer__grid">
             <div>
               <a class="brand" href="/pages/home.html"><span class="brand__mark">${I.leaf}</span>Agro<em>Shield</em></a>
-              <p>Your one-stop agricultural marketplace for quality seeds, crop protection products, fertilizers and everyday farming essentials — built for Indian farmers and gardeners.</p>
-              <p class="mb-0" style="font-size:.8rem;opacity:.75;">Demo e-commerce project. Pesticide listings use clearly labelled demo data.</p>
+              <p>Your one-stop agricultural marketplace for quality seeds, crop protection, crop nutrition and farm equipment — built for Indian farmers and gardeners.</p>
+              <p class="mb-0" style="font-size:.8rem;opacity:.75;">Demo e-commerce project. Crop-protection listings use clearly labelled demo data.</p>
             </div>
             <div>
               <h4>Shop</h4>
               <ul>
-                <li><a href="/pages/category.html?type=Seeds">Seeds</a></li>
-                <li><a href="/pages/category.html?type=Pesticides">Pesticides</a></li>
-                <li><a href="/pages/category.html?type=Fertilizers">Fertilizers</a></li>
-                <li><a href="/pages/category.html?type=Farming%20Essentials">Farming Essentials</a></li>
+                ${TAXONOMY.MAIN.map(
+                  (type) => `<li><a href="${TAXONOMY.categoryUrl(type)}">${esc(type)}</a></li>`
+                ).join('')}
                 <li><a href="/pages/products.html">All Products</a></li>
               </ul>
             </div>
@@ -279,7 +281,8 @@ const UI = (() => {
       price: product.price,
       packSize: product.packSize,
       image: product.image,
-      category: product.category,
+      // Shown on cart/order rows: subcategory, else heading, else main.
+      category: TAXONOMY.labelFor(product),
       stock: product.stockQuantity,
     };
   }
@@ -288,11 +291,14 @@ const UI = (() => {
   /**
    * The one product card used across home rails, the seasonal carousel,
    * category/subcategory pages and the catalogue. Shows the subcategory
-   * (Farming Essentials products have no subcategory, so they show the
-   * main category instead), backend availability, wishlist toggle and a
-   * disabled purchase state for out-of-stock items.
+   * chip (falling back to the heading section, then the main category, for
+   * records not yet assigned a subcategory), backend availability,
+   * wishlist toggle and a disabled purchase state for out-of-stock items.
+   * `chipLabel` overrides the chip — the category page passes the sub being
+   * viewed so alias-matched records (Organic "Bio Miticides" ⇄ Crop
+   * Protection "Bio Miticides/Acaricides") display the local name.
    */
-  function productCard(p) {
+  function productCard(p, chipLabel) {
     const d = document.createElement('article');
     d.className = 'p-card';
     // Availability comes from the backend (active AND stock > 0 AND not
@@ -307,7 +313,7 @@ const UI = (() => {
         ? `Low Stock · ${p.stockQuantity} left`
         : 'In Stock';
     const wished = ((authStore.user && authStore.user.wishlist) || []).includes(p._id);
-    const subLabel = p.type === 'Farming Essentials' ? 'Farming Essentials' : p.category;
+    const subLabel = chipLabel || TAXONOMY.labelFor(p);
 
     d.innerHTML = `
       <div class="p-card__media">

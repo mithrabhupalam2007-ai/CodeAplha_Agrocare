@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 
 /**
- * Product model for seeds, pesticides, fertilizers and farming essentials.
+ * Product model for the seven-category AgroShield catalogue
+ * (Seeds, Crop Protection, Crop Nutrition, Equipments,
+ * Animal Husbandry, Organic, Tapas).
  *
  * NOTE ON PESTICIDE DATA: labelInfo / usage fields are populated from
  * clearly-labelled DEMO data during development. Before any real sale,
@@ -13,18 +15,39 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: [true, 'Product name is required'], trim: true, maxlength: 140 },
     description: { type: String, required: [true, 'Description is required'], trim: true, maxlength: 4000 },
     /**
-     * SUBCATEGORY value from server/utils/taxonomy.js (e.g. 'Vegetable Seeds',
-     * 'Herbicides (Weed Killers)'). Required for Seeds/Pesticides/Fertilizers
-     * and defaulted to the type name for Farming Essentials — enforced in
-     * productController.parseProductBody against the taxonomy, not here.
+     * MAIN category from server/utils/taxonomy.js (one of the seven names).
+     * Required — validated together with heading + subcategory against the
+     * taxonomy in productController.parseProductBody.
      */
-    category: { type: String, trim: true, index: true },
-    type: {
+    primaryCategory: {
       type: String,
       required: true,
-      enum: ['Seeds', 'Pesticides', 'Fertilizers', 'Farming Essentials'],
+      enum: ['Seeds', 'Crop Protection', 'Crop Nutrition', 'Equipments', 'Animal Husbandry', 'Organic', 'Tapas'],
       index: true,
     },
+    /**
+     * Heading section of the primary category that owns the subcategory
+     * (e.g. 'Horticulture Crops'). '' for Tapas, whose subcategories are
+     * listed directly without headings. Derived from the taxonomy, never
+     * free-form — enforced in productController.parseProductBody.
+     */
+    heading: { type: String, trim: true, default: '', index: true },
+    /**
+     * SUBCATEGORY value from server/utils/taxonomy.js (e.g. 'Vegetable Seeds',
+     * 'Miticides/Acaricides'). Required and validated against the primary
+     * category (case-insensitive) in productController.parseProductBody.
+     * Legacy records that could not be mapped to the new structure may hold
+     * '' — they stay visible in the main-category grid but belong to no
+     * subcategory until an administrator assigns one.
+     */
+    subcategory: { type: String, trim: true, default: '', index: true },
+    /**
+     * Extra main categories where this SAME canonical record is browsable
+     * (e.g. a bio-fungicide whose primaryCategory is 'Crop Protection' and
+     * which is additionally discoverable under 'Organic'). Supports the
+     * Organic/Tapas overlap without duplicate product rows.
+     */
+    additionalCategories: [{ type: String, enum: ['Seeds', 'Crop Protection', 'Crop Nutrition', 'Equipments', 'Animal Husbandry', 'Organic', 'Tapas'] }],
     brand: { type: String, required: [true, 'Brand / manufacturer is required'], trim: true, maxlength: 100 },
     /** URL/SEO friendly identifier generated from the name. */
     slug: { type: String, trim: true, index: true },
@@ -46,7 +69,7 @@ const productSchema = new mongoose.Schema(
     },
     /** Crops / intended uses — only for demo products marked as such. */
     crops: [{ type: String, trim: true }],
-    /** Seed-specific details (only for type = Seeds). */
+    /** Seed-specific details (only for primaryCategory = Seeds). */
     seedInfo: {
       variety: { type: String, trim: true, default: '' },
       cropType: { type: String, trim: true, default: '' },
@@ -104,7 +127,9 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.index({ name: 'text', description: 'text', brand: 'text' });
-productSchema.index({ category: 1, price: 1 });
+productSchema.index({ subcategory: 1, price: 1 });
+productSchema.index({ primaryCategory: 1, subcategory: 1, active: 1 });
+productSchema.index({ additionalCategories: 1, subcategory: 1, active: 1 });
 productSchema.index({ active: 1, stockQuantity: 1 });
 productSchema.index({ active: 1, isNewRelease: 1, releaseDate: -1 });
 

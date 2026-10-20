@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Traps and Lures demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(55,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(55,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(128 168) scale(1)">
+<ellipse cx="0" cy="2" rx="26" ry="6" fill="#234832" opacity=".12"/>
+<path d="M0 -74 v-24" stroke="#234832" stroke-width="3" stroke-linecap="round"/>
+<circle cx="0" cy="-104" r="7" fill="none" stroke="#234832" stroke-width="3"/>
+<path d="M-30 -74 h60 l-8 -18 h-44 z" fill="hsl(160,50%,54%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-22 -56 h44 l-6 38 a6 6 0 0 1 -6 5 h-20 a6 6 0 0 1 -6 -5 z" fill="#ffffff" fill-opacity=".7" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-22 -44 h44" stroke="#234832" stroke-width="2.2" opacity=".6"/>
+<circle cx="-8" cy="-34" r="3" fill="#234832" opacity=".7"/><circle cx="6" cy="-26" r="3" fill="#234832" opacity=".7"/></g><g transform="translate(208 168) scale(0.95)">
+<ellipse cx="0" cy="2" rx="20" ry="5" fill="#234832" opacity=".12"/>
+<rect x="-13" y="-64" width="26" height="60" rx="9" fill="hsl(55,58%,64%)" stroke="#234832" stroke-width="3"/>
+<rect x="-8" y="-74" width="16" height="10" rx="3" fill="hsl(55,62%,48%)" stroke="#234832" stroke-width="2.6"/>
+<rect x="-13" y="-46" width="26" height="14" rx="3" fill="#fffbe9" stroke="#234832" stroke-width="2.4"/>
+<rect x="-8" y="-42" width="16" height="6" rx="3" fill="hsl(55,70%,52%)"/>
+<ellipse cx="26" cy="-16" rx="14" ry="10" fill="hsl(55,66%,58%)" stroke="#234832" stroke-width="2.8"/>
+<path d="M18 -18 h16" stroke="#234832" stroke-width="2" opacity=".6"/></g><ellipse cx="262" cy="158" rx="12" ry="8" fill="hsl(55,72%,60%)" stroke="#234832" stroke-width="2.6"/>
+<g>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Tapas</text>
+</g>
+</svg>

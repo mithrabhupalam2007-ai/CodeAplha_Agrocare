@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Power Reaper demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(95,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(95,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(150 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="46" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-36" y="-70" width="54" height="46" rx="8" fill="hsl(95,52%,60%)" stroke="#234832" stroke-width="3"/>
+<rect x="-28" y="-62" width="24" height="16" rx="4" fill="#fffbe9" stroke="#234832" stroke-width="2.4"/>
+<path d="M18 -44 h34 v18 h-34 z" fill="hsl(95,56%,52%)" stroke="#234832" stroke-width="3"/>
+<circle cx="-24" cy="-16" r="12" fill="#6b4a33" stroke="#234832" stroke-width="3"/>
+<circle cx="6" cy="-16" r="12" fill="#6b4a33" stroke="#234832" stroke-width="3"/>
+<path d="M52 -26 h26 M52 -34 h26 M52 -42 h26" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/></g><g transform="translate(262 168) scale(0.7)">
+<ellipse cx="0" cy="2" rx="14" ry="4" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-70" stroke="#234832" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M0 -38 q-14 -4 -20 -16 M0 -54 q14 -4 20 -16" fill="none" stroke="#234832" stroke-width="2.4" stroke-linecap="round"/>
+<ellipse cx="0" cy="-94" rx="9" ry="22" fill="hsl(45,62%,58%)" stroke="#234832" stroke-width="2.6"/>
+<path d="M0 -116 l-8 -14 M0 -116 l0 -16 M0 -116 l8 -14 M-6 -104 l-10 -10 M6 -104 l10 -10" stroke="#234832" stroke-width="2.2" stroke-linecap="round"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

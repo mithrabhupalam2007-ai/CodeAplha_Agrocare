@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>All Products — AgroShield</title>
-  <meta name="description" content="Browse seeds, pesticides, fertilizers and farming tools on AgroShield. Search, filter by category and price, sort and shop." />
+  <meta name="description" content="Browse seeds, crop protection, crop nutrition and farm equipment on AgroShield. Search, filter by category and price, sort and shop." />
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/css/components.css" />
   <script defer src="/js/api.js"></script>
   <script defer src="/js/store.js"></script>
+  <script defer src="/js/taxonomy.js"></script>
   <script defer src="/js/ui.js"></script>
   <script defer src="/js/products.js"></script>
 </head>
@@ -35,11 +36,8 @@
     <section class="section section--tight">
       <div class="container">
         <div class="chip-row" id="type-chips">
+          <!-- main-category chips are filled from the store taxonomy by products.js -->
           <button class="chip active" data-type="">All</button>
-          <button class="chip" data-type="Seeds">Seeds</button>
-          <button class="chip" data-type="Pesticides">Pesticides</button>
-          <button class="chip" data-type="Fertilizers">Fertilizers</button>
-          <button class="chip" data-type="Farming Essentials">Farming Essentials</button>
         </div>
 
         <div class="catalog">
@@ -53,9 +51,9 @@
             </div>
 
             <div class="field">
-              <label for="f-category">Category</label>
+              <label for="f-category">Subcategory</label>
               <select class="input" id="f-category">
-                <option value="">All categories</option>
+                <option value="">All subcategories</option>
               </select>
             </div>
 

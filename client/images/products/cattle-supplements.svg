@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Cattle Mineral Mixture demo pack-shot">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(205,36%,93%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="800" height="520" fill="url(#bg)"/>
+<circle cx="120" cy="90" r="34" fill="hsl(205,60%,84%)" opacity=".6"/>
+<circle cx="690" cy="430" r="46" fill="hsl(205,60%,84%)" opacity=".5"/>
+<ellipse cx="400" cy="436" rx="200" ry="26" fill="#234832" opacity=".12"/>
+<g transform="translate(400 268)">
+<path d="M-104 -176 h208 l16 300 a16 16 0 0 1 -16 18 h-208 a16 16 0 0 1 -16 -18 z" fill="hsl(205,48%,60%)" stroke="#234832" stroke-width="6" stroke-linejoin="round"/>
+<path d="M-104 -176 h208" stroke="#234832" stroke-width="8" stroke-dasharray="14 10"/>
+<rect x="-72" y="-118" width="144" height="104" rx="12" fill="#fffbe9" stroke="#234832" stroke-width="5"/>
+<circle cx="0" cy="-66" r="26" fill="hsl(205,60%,48%)" stroke="#234832" stroke-width="5"/>
+<path d="M-46 -32 h92" stroke="#234832" stroke-width="5" opacity=".5" stroke-linecap="round"/></g>
+<rect x="180" y="452" width="440" height="44" rx="22" fill="#234832"/>
+<text x="400" y="481" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="bold" fill="#fdfcf3">Cattle Mineral Mixture</text>
+</svg>

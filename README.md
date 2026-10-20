@@ -1,8 +1,8 @@
-# 🌱 AgroShield — Pesticides & Seeds E-Commerce Platform
+# 🌱 AgroShield — Farm & Garden E-Commerce Platform
 
-A complete, responsive **full-stack agricultural e-commerce website** built with the **MERN-style stack** (Express + MongoDB + vanilla HTML/CSS/JS). AgroShield is an online marketplace for farmers, gardeners and agricultural customers to shop for seeds, pesticides, fertilizers and farming essentials.
+A complete, responsive **full-stack agricultural e-commerce website** built with the **MERN-style stack** (Express + MongoDB + vanilla HTML/CSS/JS). AgroShield is an online marketplace for farmers, gardeners and agricultural customers, organised into **seven main categories** — Seeds, Crop Protection, Crop Nutrition, Equipments, Animal Husbandry, Organic and Tapas — with **85 subcategories** in a validated three-level taxonomy (main category → heading → subcategory).
 
-> **Internship demo project.** All brands, prices and pesticide label data are clearly labelled demonstration data. See [Demo data & legal notice](#-demo-data--legal-notice) before any real-world use.
+> **Internship demo project.** All brands, prices and crop-protection label data are clearly labelled demonstration data. See [Demo data & legal notice](#-demo-data--legal-notice) before any real-world use.
 
 ---
 
@@ -14,11 +14,11 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 
 ### Customer
 - **User login / registration** — **email-only login** (no password field), registration collects name, email, phone and delivery address, back buttons to the selection page
-- **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), a horizontal **main-category slider** (Seeds / Pesticides / Fertilizers / Farming Essentials — arrows + swipe, whole-card links, selected category highlighted), a **Seasonal Products** section fed by the admin-configurable seasonal flags (with per-product display notes, a clearly-labelled fallback when none are configured, and a friendly empty state), plus New Releases, Featured, Crop Protection, Recently Added and Farming Essentials rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
-- **Category pages** (`/pages/category.html?type=…`) — a horizontal **subcategory slider** in the exact taxonomy order (Seeds 8 · Pesticides 10 · Fertilizers 10) where **every tile carries its own distinct illustration** (sourced from the single `TAXONOMY.subImage` mapping, lazy-loaded, consistent 110 px height, rounded corners, card-lift + zoom hover), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; subcategory views (`&sub=…`) filter + count + in-section search + price sorting; **Farming Essentials lists directly** (no subcategory slider) with demo images on every card; **any broken image falls back to a shared placeholder** (`/images/categories/image-fallback.svg`)
-- **Product catalogue** — live search, category/crop/price/availability filters, 7 sort options (+ “Recommended” which preserves the shuffled order), Load More pagination, empty states
-- **Product cards** — image, name, **subcategory**, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons — one shared card component (`UI.productCard`) renders identically on every listing page
-- **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, specs, seed variety & sowing info, pesticide label/safety blocks, batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
+- **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), then **directly below the navbar** a horizontal **seven-category carousel** in the exact taxonomy order (Seeds / Crop Protection / Crop Nutrition / Equipments / Animal Husbandry / Organic / Tapas — arrows + mobile swipe, whole-card links, selected category highlighted), a **Seasonal Products** section fed by the admin-configurable seasonal flags (with per-product display notes, a clearly-labelled fallback when none are configured, and a friendly empty state), plus New Releases, Featured, Featured Seeds, Crop Protection, Recently Added and Farm Equipment rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
+- **Category pages** (`/pages/category.html?type=…`) — one **heading section per taxonomy heading**, each with its own horizontal **subcategory carousel** in the exact order (Seeds 3 headings · 14 subcategories, Crop Protection 3 · 14, Crop Nutrition 3 · 11, Equipments 4 · 25, Animal Husbandry 2 · 7, Organic 2 · 7 — while **Tapas lists its 7 subcategories directly, with no heading sections**), where **every tile carries its own distinct illustration** (sourced from the single subcategory-tile mapping in `TAXONOMY`, lazy-loaded, consistent 110 px height, rounded corners, card-lift + zoom hover), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; clicking a tile filters the section **to that subcategory only** (`&sub=…`) with count + in-section search + price sorting; **any broken image falls back to a shared placeholder** (`/images/categories/image-fallback.svg`)
+- **Product catalogue** — live search, main-category chips + subcategory dropdown, crop/price/availability filters, 7 sort options (+ “Recommended” which preserves the shuffled order), Load More pagination, empty states
+- **Product cards** — image, name, **taxonomy chip (subcategory, heading or main category)**, pack size, price, **MRP + discount % when a genuine discount is configured**, live stock label (*In Stock / Low Stock / Out of Stock*), wishlist heart, details + add-to-cart buttons — one shared card component (`UI.productCard`) renders identically on every listing page
+- **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, **breadcrumb Home / Products / main category / subcategory / name**, specs with **Main category + Category** rows, seed variety & sowing info, crop-protection label/safety blocks (clearly-marked demo data), batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
 - **Out of stock handling** — highly visible “Out of Stock” panel with a “check back later” message, disabled Add to Cart & Buy Now, and the backend rejects orders for unavailable products (including products **manually blocked** by an administrator)
 - **Wishlist** — dedicated page with live availability, remove and one-click *Move to Cart* (out-of-stock items stay listed but cannot move)
 - **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar, **live re-check of every line against the database** (unavailable items are clearly labelled and **checkout is blocked** until the cart is purchasable)
@@ -32,14 +32,14 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 - **Separate admin login** — email only; only accounts with `role: admin` are accepted (verified on the backend against the database record)
 - **Dashboard Overview** — total products, active products, in-stock, out-of-stock, **newly released**, total orders, registered customers, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
 - **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items, with *new* and *manually blocked* badges
-- **Add New Product** — form with name, **main category + category-aware subcategory select** (the subcategory list follows the chosen main category and disappears for Farming Essentials), description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, **seasonal flag + seasonal display note** (drives the home-page Seasonal Products section), crops, specifications, **label & safety information**, batch number & expiry
+- **Add New Product** — form with name, **three-level taxonomy cascade: main category → heading → subcategory** (the heading list follows the chosen main category; the subcategory list follows the heading; **Tapas offers its own 7 subcategories directly with no heading step**), description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, **seasonal flag + seasonal display note** (drives the home-page Seasonal Products section), crops, specifications, **label & safety information**, batch number & expiry
 - **Edit Products & Prices** — quick inline price editing (uses the dedicated price endpoint) plus full-edit modal
 - **Newly Released Products** — flag/unflag any product as a new release; flagged products automatically appear in the customer home page section, newest first
 - **Inventory Management** — quick per-product stock updates, visibility toggle and manual out-of-stock switch
 - **Out-of-Stock Products** — shows *why* each product is unavailable (**quantity is zero** vs **manual block**), restocking (which clears the manual block), “Clear block” action, reason filter and search
 - **Manage Orders** — status transitions + automatic restock on cancel
 - **Manage Customers** — order counts and lifetime spend
-- **Categories** — create / edit / delete, blocked while products use the category
+- **Categories** — create / edit / delete, blocked while products use the category; stored **per main category** (unique on the `{name, type}` pair, 85 seeded subcategory documents with live per-pair product counts)
 
 ### Availability rule (single source of truth)
 
@@ -83,7 +83,7 @@ Other protections in place:
 | Database | MongoDB + Mongoose |
 | Auth | JSONwebtoken (JWT in httpOnly cookie, bearer fallback) — email-only demo login; bcryptjs retained for legacy password hashes |
 | Security | helmet, cors, express-rate-limit, mongo-sanitize |
-| Images | Wikimedia Commons photographs + generated SVG pack-shots (incl. 28 distinct subcategory tile illustrations from `server/scripts/generateDemoArt.js` and a shared broken-image fallback) |
+| Images | Wikimedia Commons photographs + generated SVG art (77 distinct subcategory-tile illustrations covering all 85 subcategory entries, 5 photo + 2 SVG main-category carousel cards, 58 product pack-shots from `server/scripts/generateDemoArt.js`, plus a shared broken-image fallback) |
 
 ---
 
@@ -102,7 +102,7 @@ Other protections in place:
 │   ├── js/
 │   │   ├── api.js              # fetch wrapper + auth strategy
 │   │   ├── store.js            # cart (localStorage) + auth cache
-│   │   ├── taxonomy.js         # client mirror of the store taxonomy (subcategories per main category)
+│   │   ├── taxonomy.js         # client mirror of the seven-category taxonomy (headings, subcategories, label helper)
 │   │   ├── ui.js               # icons, toasts, navbar/footer, guards, shared product card + carousel helper
 │   │   ├── entry.js            # selection page (?next= support)
 │   │   ├── home.js  products.js  product-details.js  category.js
@@ -121,12 +121,13 @@ Other protections in place:
 │   ├── routes/                 # modular Express routers
 │   ├── middleware/             # auth (JWT), rate limits, cookies, errors
 │   ├── utils/                  # ApiError, validators, token, delivery, orderId,
-│   │                           # taxonomy.js (single source of truth: main categories +
-│   │                           # subcategories, pair validation & canonicalization)
+│   │                           # taxonomy.js (single source of truth: 7 main categories,
+│   │                           # headings, subcategories, pair validation & canonicalization)
 │   ├── scripts/
-│   │   ├── seedProducts.js     # 53 demo products + 29 categories (idempotent, taxonomy-validated)
+│   │   ├── seedProducts.js     # 114 demo products + 85 categories (idempotent, taxonomy-validated)
+│   │   ├── migrateTaxonomy.js  # one-off: legacy type/category → primaryCategory/heading/subcategory
 │   │   ├── checkTaxonomyParity.js  # fails if client/server taxonomies drift or art is missing
-│   │   ├── generateDemoArt.js  # regenerates the SVG pack-shots + subcategory tiles
+│   │   ├── generateDemoArt.js  # regenerates the pack-shots, subcategory tiles + main-category cards
 │   │   ├── createAdmin.js      # bootstrap admin from .env
 │   │   ├── fetchPhotos.js      # one-off: hero/category photos
 │   │   └── fetchProductPhotos.js
@@ -175,7 +176,7 @@ Then edit `server/.env`:
 ### 3. Seed the database
 
 ```bash
-npm run seed          # 53 demo products + 29 categories (safe to re-run, taxonomy-validated)
+npm run seed          # 114 demo products + 85 categories (safe to re-run, taxonomy-validated)
 npm run create-admin  # creates the administrator from .env
 ```
 
@@ -218,13 +219,13 @@ Base URL: `http://localhost:5050/api`
 ### Catalogue
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/products` | user | List — supports `search, type, category, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, newRelease, shuffle, sort (incl. `release`), page, limit`; every item carries `available`, `stockStatus` and `discountPercent`. A `{type, category}` pair is validated against the store taxonomy (impossible combinations → 400). `shuffle=true` returns a fresh random sample (no duplicates) for the “Explore” sections |
+| GET | `/products` | user | List — supports `search, type, category, subcategory, crop, minPrice, maxPrice, inStock, featured, bestseller, seasonal, newRelease, shuffle, sort (incl. `release`), page, limit`; `type` matches a product's **primary or additional** category and a `{type, category}` pair is validated against the store taxonomy (impossible combinations → 400). Every item carries `available`, `stockStatus` and `discountPercent`. `shuffle=true` returns a fresh random sample (no duplicates) for the “Explore” sections |
 | GET | `/products/seasonal` | user | Products flagged `isSeasonal` with their display notes; when none are configured it falls back to popular picks and sets `demoFallback: true` so the UI can label them clearly |
 | GET | `/products/new-releases` | user | Products flagged as newly released, newest (`releaseDate`) first — powers the home page section |
 | GET | `/products/:id` | user | Detail (+ related products) — 404 for inactive products |
 | GET | `/products/:id/related` | user | “Related Products” carousel set (same subcategory first, top-up from other actives of the same main category, never includes itself) |
-| POST | `/products` | admin | Create product (name → auto slug, `category` **must be a valid subcategory of `type`**, `mrp`, `images[]`, `isNewRelease`, `releaseDate`, `manualOutOfStock`, `isSeasonal`, `seasonalNote`, …) |
-| PATCH | `/products/:id` | admin | Update product (partial updates re-validate the stored type/category pair) |
+| POST | `/products` | admin | Create product (name → auto slug, `primaryCategory` + `subcategory` **validated as a legal taxonomy pair** — legacy `type`/`category` names accepted as aliases, `heading` derived from the taxonomy, `additionalCategories[]` for cross-listing, `mrp`, `images[]`, `isNewRelease`, `releaseDate`, `manualOutOfStock`, `isSeasonal`, `seasonalNote`, …) |
+| PATCH | `/products/:id` | admin | Update product (partial updates re-validate the stored primary category / heading / subcategory trio) |
 | DELETE | `/products/:id` | admin | Deactivate (`?permanent=true` to delete) |
 | GET | `/categories` | user | Categories with live product counts |
 | POST | `/newsletter` | — | Subscribe |
@@ -253,7 +254,7 @@ Base URL: `http://localhost:5050/api`
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/admin/dashboard` | Stats (total/active/in-stock/out-of-stock/newly-released products, orders, customers, revenue), sales chart, low stock, top products, recent orders |
-| GET | `/admin/products` | Product list **including inactive items** — `status=active|inactive|instock|outofstock|newrelease`, `search`, `category`, `page`, `limit` |
+| GET | `/admin/products` | Product list **including inactive items** — `status=active|inactive|instock|outofstock|newrelease`, `search`, `category`/`subcategory` (validated against the taxonomy), `page`, `limit` |
 | GET | `/admin/products/:id` | Full product record **including inactive items** (used by the edit form) |
 | GET | `/admin/products/out-of-stock` | Products that are unavailable — `reason=manual|quantity`, `search`, `page` |
 | POST | `/admin/products` | Create product (alias of `POST /products`) |
@@ -265,7 +266,7 @@ Base URL: `http://localhost:5050/api`
 | GET | `/admin/orders` | All orders with search/status filter + pagination |
 | PATCH | `/admin/orders/:id` | Update order/payment status (restocks on cancel) |
 | GET | `/admin/customers` | Customers with order counts and spend |
-| GET/POST/PATCH/DELETE | `/admin/categories` | Category management |
+| GET/POST/PATCH/DELETE | `/admin/categories` | Category management (one document per `{name, type}` pair, per-pair product counts) |
 
 **Response shape:** success → `{ success: true, ... }` · failure → `{ success: false, message }`
 
@@ -281,8 +282,8 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Admin login: by email; customer email rejected on the admin page (403); admin email rejected on the user login page (403); customers blocked from `/pages/admin.html` and all admin APIs
 - [x] Sessions expire (JWT `exp`) — an expired token gets 401; logout clears the cookie so the session is invalid immediately
 - [x] Product/category APIs return 401 without a valid session
-- [x] Product data loaded from MongoDB (53 products, 29 categories)
-- [x] Search / category / price / stock / crop filters, all 7 sort orders, empty state, pagination
+- [x] Product data loaded from MongoDB (114 active demo products, 85 subcategory documents)
+- [x] Search / main-category chip / subcategory / price / stock / crop filters, all 7 sort orders, empty state, pagination
 - [x] Out-of-stock: badge + disabled Add to Cart/Buy Now in the UI, backend rejects checkout for unavailable stock with a clear message
 - [x] Cart quantity updates, stock caps, subtotal/delivery/total math
 - [x] Checkout: server-side price recomputation, stock validation, failed-order stock rollback, atomic decrement (no overselling)
@@ -306,16 +307,17 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Admin: inactive products stay hidden from customers but remain editable in the dashboard (admin detail endpoint)
 - [x] Out-of-stock management: reason filter (manual vs quantity), search, restock, clear-block actions
 - [x] Shipping / Privacy / Terms page public at `/pages/legal.html`, linked from the footer
-- [x] Home page main-category slider: 4 cards, arrows + swipe, whole-card links, selected category highlighted
+- [x] Home page main-category carousel: **7 cards in the exact taxonomy order**, sitting directly below the navbar, arrows + swipe, whole-card links
 - [x] Home page Seasonal Products section: live seasonal products with display notes; fallback clearly labelled when none configured; empty state; out-of-stock seasonal items not purchasable
-- [x] Category pages: subcategory sliders in the exact taxonomy order (Seeds 8, Pesticides 10, Fertilizers 10); Farming Essentials lists directly
-- [x] “Explore {Type}” sections shuffled per visit, 12 initially, Load More without duplicates, active-only and type-pure
-- [x] Subcategory views: filter + count + in-section search + price sorting
-- [x] Backend rejects impossible category/subcategory combinations (create, partial update and listing all return 400); lowercase spellings canonicalized; Farming Essentials defaults its category to the type name
-- [x] Admin product form: subcategory select follows the main category; seasonal flag + display note editable and pre-filled on edit
-- [x] Full 19-point browser acceptance suite (headless Chrome + CDP): 76/76 checks across home, the four category pages, subcategory views, PDP, admin and a 375px mobile pass
-- [x] Subcategory imagery: all 28 tiles have their own distinct, relevant illustration with alt text, lazy loading, consistent rounded sizing, hover effects and single-mapping sources; clicking every tile opens the correct sub view with the correct products (52/52 image acceptance checks)
-- [x] Farming Essentials demo images: sprayer, gloves, mask, hoe, shears, weed cutter + new safety goggles, watering can and measuring set — still a direct listing with no subcategory carousel
+- [x] Category pages: **heading sections with subcategory carousels in the exact taxonomy order** — Seeds 3/14, Crop Protection 3/14, Crop Nutrition 3/11, Equipments 4/25, Animal Husbandry 2/7, Organic 2/7; **Tapas lists its 7 subcategories directly (no headings)**
+- [x] “Explore {Type}” sections shuffled per visit (12 initially, Load More without duplicates), active-only and main-category-pure
+- [x] Subcategory views: **filter to that subcategory only** + count + in-section search + price sorting; Organic aliases (“Bio Miticides” ⇄ Crop Protection “Bio Miticides/Acaricides”) and cross-listed products resolve to the same canonical records
+- [x] Backend rejects impossible main-category/heading/subcategory combinations (create, partial update and listing all return 400)
+- [x] Admin product form: **three-level cascade (main category → heading → subcategory)**; Tapas offers its own 7 subcategories directly; seasonal flag + display note editable and pre-filled on edit; admin product/inventory search and filters work against the new taxonomy
+- [x] Navbar + footer Shop column list exactly the seven main categories; no retired category label (“Pesticides”, “Farming Essentials”, standalone “Fertilizers”) rendered as a category label or deep link
+- [x] Full **13-point** browser acceptance suite (headless Chrome + CDP): **91/91 checks** across the carousel, nav/footer, the exact heading/subcategory structure of all seven category pages, art loading, sub filtering + the Organic alias view, catalogue search/sort/filters, card chips, the admin cascade + save round-trip, the out-of-stock flow, PDP breadcrumbs/specs/related/label panel, a 375px mobile pass and page/API count parity
+- [x] Subcategory imagery: all 85 subcategory entries render their own tile illustration (77 distinct files — shared only where the same subcategory name legitimately exists under two main categories) with alt text and lazy loading; clicking every tile opens the correct sub view with the correct products
+- [x] Every main-category card and subcategory tile has relevant demo art with a descriptive filename; the home carousel works at desktop and mobile widths (mobile: burger nav, swipeable track, no horizontal page overflow)
 - [x] Broken-image fallback: a global capture-phase handler swaps any failed `<img>` once for `/images/categories/image-fallback.svg`, preserving alt text and guarding against swap loops
 
 ---
@@ -324,11 +326,11 @@ Verified against a running instance (see §15 of the project prompt):
 
 **User** — name, email (unique), phone, optional password hash (bcrypt, `select:false` — kept for legacy accounts / a future return to password auth; unused by email-only demo login), role (`customer|admin`), saved address, wishlist, timestamps
 
-**Product** — name, slug, description, **type (main category: Seeds | Pesticides | Fertilizers | Farming Essentials)**, **category (subcategory of that type — validated against `server/utils/taxonomy.js`)**, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, **isSeasonal** + **seasonalNote** (home-page Seasonal Products section), crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured/bestseller flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
+**Product** — name, slug, description, **primaryCategory (one of the seven main categories)**, **heading (derived from the taxonomy; empty for Tapas)**, **subcategory (validated as a legal `{primaryCategory, heading, subcategory}` combination against `server/utils/taxonomy.js`)**, **additionalCategories[] (extra main categories the product is also listed under — the single canonical record for the Organic overlap)**, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, **isSeasonal** + **seasonalNote** (home-page Seasonal Products section), crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, demo/active/featured/bestseller flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
 
 **Order** — unique readable `orderId`, user ref, item snapshots (name/price/packSize/image/quantity at purchase time), address snapshot, subtotal, delivery, total, payment method/status, order status (`Placed → Confirmed → Processing → Shipped → Delivered | Cancelled`), status history, timestamps + indexes
 
-**Category** — name (unique), type, image, description, active
+**Category** — name + type as a **compound unique key (`{name, type}`)** — the same subcategory name may exist under two main categories (85 documents), image, description, active
 
 **Newsletter** — email (unique), timestamps
 
@@ -336,9 +338,9 @@ Verified against a running instance (see §15 of the project prompt):
 
 ## 🌾 Demo data & legal notice
 
-- Every pesticide listing is **clearly marked as demo data** (`isDemoData: true`, “(Demo)” in the name, amber badges, warning banners on product pages).
+- Every crop-protection and other catalogue listing is **clearly marked as demo data** (`isDemoData: true`, “(Demo)” in the name, amber badges, warning banners on product pages).
 - Label, composition and registration fields are **placeholders**, not invented dosages or certifications.
-- Before any real sale: verify **Indian Insecticides Act registration**, seller licensing, and display genuine product label/safety information.
+- Before any real sale: verify **Indian Insecticides Act registration** for regulated crop-protection products, seller licensing, and display genuine product label/safety information.
 
 ## 📸 Image credits
 

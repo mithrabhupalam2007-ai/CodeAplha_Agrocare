@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Sugarcane Machine demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(45,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(45,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(150 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="44" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-42" y="-56" width="66" height="46" rx="9" fill="hsl(45,50%,58%)" stroke="#234832" stroke-width="3"/>
+<circle cx="-22" cy="-34" r="11" fill="#dfe8ea" stroke="#234832" stroke-width="3"/>
+<circle cx="2" cy="-34" r="11" fill="#dfe8ea" stroke="#234832" stroke-width="3"/>
+<path d="M-40 -70 h30 l4 14 h-38 z" fill="hsl(45,54%,48%)" stroke="#234832" stroke-width="2.8" stroke-linejoin="round"/>
+<path d="M30 -64 v-40 M40 -64 v-46 M50 -64 v-36" stroke="hsl(95,45%,48%)" stroke-width="6" stroke-linecap="round"/>
+<path d="M30 -76 h22 M32 -60 h20" stroke="hsl(45,55%,55%)" stroke-width="3" stroke-linecap="round"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

@@ -8,6 +8,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "seed": "node scripts/seedProducts.js",
+    "migrate:taxonomy": "node scripts/migrateTaxonomy.js",
+    "check-taxonomy": "node scripts/checkTaxonomyParity.js",
     "create-admin": "node scripts/createAdmin.js"
   },
   "keywords": [

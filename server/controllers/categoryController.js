@@ -7,19 +7,25 @@ const v = require('../utils/validators');
 
 /** GET /api/categories — active categories with live product counts. */
 const listCategories = asyncHandler(async (req, res) => {
+  const taxonomy = require('../utils/taxonomy');
   const categories = await Category.find({ active: true }).sort({ type: 1, name: 1 }).lean();
-  const counts = await Product.aggregate([
-    { $match: { active: true } },
-    { $group: { _id: { $toLower: '$category' }, count: { $sum: 1 } } },
-  ]);
-  const countMap = new Map(counts.map((c) => [c._id, c.count]));
+  /* Subcategory names repeat across main categories ('Bio Insecticides' is
+     sold under Crop Protection and Organic), so counts are resolved per
+     {type, name} pair with the same membership rule the product listing
+     uses (primary ownership OR additionalCategories). */
+  const counts = await Promise.all(
+    categories.map((c) =>
+      Product.countDocuments({
+        active: true,
+        subcategory: { $in: taxonomy.subsFor(c.type, c.name) },
+        $or: [{ primaryCategory: c.type }, { additionalCategories: c.type }],
+      })
+    )
+  );
 
   res.json({
     success: true,
-    categories: categories.map((c) => ({
-      ...c,
-      productCount: countMap.get(c.name.toLowerCase()) || 0,
-    })),
+    categories: categories.map((c, i) => ({ ...c, productCount: counts[i] })),
   });
 });
 

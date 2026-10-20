@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Fruit Enhancers demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(15,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(15,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(128 168) scale(1)">
+<ellipse cx="0" cy="2" rx="24" ry="6" fill="#234832" opacity=".12"/>
+<ellipse cx="0" cy="-32" rx="24" ry="36" fill="hsl(40,64%,58%)" stroke="#234832" stroke-width="3"/>
+<path d="M0 -62 v-10" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -70 q14 -8 24 -2 q-10 12 -24 6 z" fill="hsl(110,48%,52%)" stroke="#234832" stroke-width="2.4"/>
+<circle cx="0" cy="-30" r="4" fill="#234832"/><circle cx="8" cy="-40" r="3.4" fill="#234832"/><circle cx="-7" cy="-42" r="3.4" fill="#234832"/></g><g transform="translate(212 152) scale(0.95)">
+<path d="M-40 0 l16 -28 l16 12 l24 -36 l16 10" fill="none" stroke="hsl(15,60%,50%)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-40 0 l16 -28 l16 12 l24 -36 l16 10" fill="none" stroke="#234832" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+<path d="M48 -64 h12 v12" fill="none" stroke="#234832" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(268 168) scale(0.7)">
+<ellipse cx="0" cy="2" rx="24" ry="6" fill="#234832" opacity=".12"/>
+<ellipse cx="0" cy="-32" rx="28" ry="30" fill="hsl(5,64%,58%)" stroke="#234832" stroke-width="3"/>
+<path d="M0 -62 v-10" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -70 q14 -8 24 -2 q-10 12 -24 6 z" fill="hsl(110,48%,52%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-14 -36 q6 -8 14 -6" fill="none" stroke="#fff" stroke-width="2.4" opacity=".7"/></g>
+<g>
+<rect x="173.60000000000002" y="14" width="130.39999999999998" height="24" rx="12" fill="#234832"/>
+<text x="238.8" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Nutrition</text>
+</g>
+</svg>

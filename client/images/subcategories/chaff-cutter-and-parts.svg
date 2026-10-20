@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Chaff Cutter and Parts demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(45,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(45,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(150 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="44" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-40" y="-58" width="60" height="48" rx="9" fill="hsl(45,52%,60%)" stroke="#234832" stroke-width="3"/>
+<rect x="-32" y="-50" width="26" height="16" rx="4" fill="#fffbe9" stroke="#234832" stroke-width="2.4"/>
+<path d="M20 -58 l30 -22 v22 z" fill="hsl(45,56%,50%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="-14" cy="-22" r="10" fill="#dfe8ea" stroke="#234832" stroke-width="3"/>
+<path d="M46 -30 q16 -6 26 4" fill="none" stroke="hsl(45,60%,58%)" stroke-width="5" stroke-linecap="round"/>
+<circle cx="-34" cy="-8" r="4" fill="hsl(45,64%,56%)" stroke="#234832" stroke-width="2"/></g><path d="M246 158 l30 -8 M250 166 l28 2" stroke="hsl(45,62%,58%)" stroke-width="4" stroke-linecap="round"/><g transform="translate(284 168) scale(0.55)">
+<ellipse cx="0" cy="2" rx="34" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-34 -6 q-6 -64 6 -82 h56 q12 18 6 82 z" fill="hsl(50,46%,64%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-28 -76 q28 -11 56 0" fill="none" stroke="#234832" stroke-width="3"/>
+<rect x="-21" y="-55" width="42" height="29" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+<text x="0" y="-34" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#234832">F</text>
+<ellipse cx="0" cy="-5" rx="34" ry="7" fill="hsl(50,44%,54%)" stroke="#234832" stroke-width="3"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

@@ -1,11 +1,14 @@
 /**
- * Category page — handles the four main categories via ?type=… and any
+ * Category page — handles the seven main categories via ?type=… and any
  * subcategory view via &sub=…:
  *
- *   /pages/category.html?type=Seeds                     -> subcategory slider + "Explore Seeds"
+ *   /pages/category.html?type=Seeds                     -> heading sections of subcategory sliders + mixed grid
  *   /pages/category.html?type=Seeds&sub=Vegetable%20Seeds -> filtered subcategory view
- *   /pages/category.html?type=Farming%20Essentials      -> straight to the product listing
+ *   /pages/category.html?type=Tapas                     -> single slider of the seven Tapas subcategories
  *
+ * The heading structure (heading section -> subcategory cards) comes from
+ * the store taxonomy, one sliding carousel per heading section; clicking a
+ * subcategory card filters the grid to that subcategory only.
  * Products always come from the database (no hardcoded catalogue). The main
  * category view uses the backend shuffle for a fresh mixed selection on
  * every visit, then pages through it locally with "Load more" so a single
@@ -56,38 +59,67 @@
       el('cat-eyebrow').textContent = 'Main category';
       el('cat-title').textContent = type;
       el('cat-sub').textContent = card ? card.blurb : '';
-      el('cat-hero-img').src = card ? card.image : '/images/categories/field-crop-seeds.jpg';
+      el('cat-hero-img').src = card ? card.image : TAXONOMY.mainImage(type);
       el('cat-hero-img').alt = type;
       el('explore-eyebrow').textContent = 'Explore';
-      // Spec: the Explore section is named after the category; Farming
-      // Essentials has no subcategories and shows its listing directly.
-      el('explore-title').textContent = TAXONOMY.hasSubcategories(type) ? `Explore ${type}` : 'Farming Essentials';
+      // Spec: every main category (Tapas included) shows its own
+      // subcategories, so the Explore section is always named after it.
+      el('explore-title').textContent = `Explore ${type}`;
       el('cat-search').placeholder = `Search in ${type}…`;
     }
   }
 
-  /* ---------------- subcategory slider ---------------- */
+  /* ---------------- subcategory heading groups ---------------- */
+  /**
+   * One sliding carousel per heading section of the taxonomy, in order
+   * (Seeds: Horticulture Crops / Field Crops / Special Category, …).
+   * Tapas has no headings, so it renders a single ungrouped track.
+   */
   function renderSubcats() {
     const subs = TAXONOMY.subcategoriesOf(type);
-    // No slider in a subcategory view, and none for Farming Essentials.
+    // No subcategory carousels inside a sub view, and none if (hypothetically)
+    // a category ever ships without subcategories.
     if (sub || !subs.length) return;
 
-    el('subcat-heading').textContent = `${type} — ${subs.length} subcategories`;
-    const track = el('subcat-track');
-    subs.forEach((s) => {
-      const a = document.createElement('a');
-      a.className = 'subcat-card';
-      a.href = TAXONOMY.subcategoryUrl(type, s);
-      a.innerHTML = `
-        <img class="subcat-card__img" src="${UI.esc(TAXONOMY.subImage(s))}" alt="${UI.esc(s)}" loading="lazy" />
-        <div class="subcat-card__body">
-          <h3>${UI.esc(s)}</h3>
-          <span class="subcat-card__go">View products →</span>
+    const wrap = el('subcat-groups');
+    (TAXONOMY.STRUCTURE[type] || []).forEach((group) => {
+      const section = document.createElement('section');
+      section.className = 'section section--tight subcat-group';
+      const title = group.heading || `${type} — ${group.subcategories.length} subcategories`;
+      section.innerHTML = `
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Browse by subcategory</span>
+              <h2>${UI.esc(title)}</h2>
+            </div>
+            <div class="carousel__nav">
+              <button class="carousel__btn" type="button" data-prev aria-label="Scroll subcategories left">‹</button>
+              <button class="carousel__btn" type="button" data-next aria-label="Scroll subcategories right">›</button>
+            </div>
+          </div>
+          <div class="carousel" data-carousel>
+            <div class="carousel__track subcat-track"></div>
+          </div>
         </div>`;
-      track.appendChild(a);
+
+      const track = section.querySelector('.subcat-track');
+      group.subcategories.forEach((s) => {
+        const a = document.createElement('a');
+        a.className = 'subcat-card';
+        a.href = TAXONOMY.subcategoryUrl(type, s);
+        a.innerHTML = `
+          <img class="subcat-card__img" src="${UI.esc(TAXONOMY.subImage(s))}" alt="${UI.esc(s)}" loading="lazy" />
+          <div class="subcat-card__body">
+            <h3>${UI.esc(s)}</h3>
+            <span class="subcat-card__go">View products →</span>
+          </div>`;
+        track.appendChild(a);
+      });
+
+      wrap.appendChild(section);
+      UI.wireCarousel(section);
     });
-    el('subcat-section').classList.remove('hidden');
-    UI.wireCarousel(el('subcat-carousel'));
   }
 
   /* ---------------- product fetching ---------------- */
@@ -95,7 +127,7 @@
     el('cat-loader').classList.remove('hidden');
     try {
       const params = sub
-        ? { type, category: sub, limit: 60 }
+        ? { type, subcategory: sub, limit: 60 }
         : { type, shuffle: 'true', limit: 60 }; // fresh mixed selection per visit
       const data = await api.get(`/products${api.qs(params)}`);
       // Defensive dedupe — the backend $sample already returns distinct rows.
@@ -123,7 +155,8 @@
         if (!q) return true;
         return (
           p.name.toLowerCase().includes(q) ||
-          (p.category || '').toLowerCase().includes(q) ||
+          TAXONOMY.labelFor(p).toLowerCase().includes(q) ||
+          (p.heading || '').toLowerCase().includes(q) ||
           (p.brand || '').toLowerCase().includes(q) ||
           (p.packSize || '').toLowerCase().includes(q)
         );
@@ -157,7 +190,7 @@
     empty.classList.add('hidden');
     grid.classList.remove('hidden');
 
-    visible.slice(0, shown).forEach((p) => grid.appendChild(UI.productCard(p)));
+    visible.slice(0, shown).forEach((p) => grid.appendChild(UI.productCard(p, sub || undefined)));
 
     const shownNow = Math.min(shown, visible.length);
     shownLabel.textContent = `Showing ${shownNow} of ${visible.length} products`;

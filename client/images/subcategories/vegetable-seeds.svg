@@ -1,19 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Vegetable Seeds demo illustration">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="hsl(90,25%,95%)"/><stop offset="1" stop-color="hsl(45,40%,91%)"/></linearGradient></defs>
-<rect width="320" height="200" rx="18" fill="url(#bg)"/>
-<path d="M0 170 Q160 144 320 170 V200 H0 Z" fill="hsl(95,38%,86%)" opacity=".6"/>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(95,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(95,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(110 168) scale(1)">
+<ellipse cx="0" cy="2" rx="30" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-32" y="-86" width="64" height="86" rx="7" fill="hsl(95,54%,60%)" stroke="#234832" stroke-width="3"/>
+<path d="M-32 -86 h64 l-7 -13 h-50 z" fill="hsl(95,58%,42%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<rect x="-22" y="-62" width="44" height="36" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+
+<circle cx="-9" cy="-50" r="4" fill="hsl(38,62%,55%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="7" cy="-46" r="4" fill="hsl(28,66%,50%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="-2" cy="-36" r="3.5" fill="hsl(50,60%,52%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="0" cy="-14" r="8" fill="hsl(95,64%,44%)" stroke="#234832" stroke-width="2.5"/></g><g transform="translate(200 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-76" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -58 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -78 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g><g transform="translate(258 168) scale(0.75)">
+<ellipse cx="0" cy="2" rx="24" ry="6" fill="#234832" opacity=".12"/>
+<ellipse cx="0" cy="-32" rx="28" ry="30" fill="hsl(5,64%,58%)" stroke="#234832" stroke-width="3"/>
+<path d="M0 -62 v-10" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -70 q14 -8 24 -2 q-10 12 -24 6 z" fill="hsl(110,48%,52%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-14 -36 q6 -8 14 -6" fill="none" stroke="#fff" stroke-width="2.4" opacity=".7"/></g>
 <g>
-<rect x="48" y="52" width="92" height="112" rx="8" fill="hsl(95,45%,88%)" stroke="#234832" stroke-width="3.5"/>
-<rect x="48" y="52" width="92" height="26" rx="8" fill="#234832" opacity=".85"/>
-<rect x="60" y="90" width="68" height="54" rx="6" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
-<path d="M94 104 L86 126 h16 z" fill="hsl(22,75%,55%)" stroke="#234832" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="M94 104 v-8 M94 96 l-7 -6 M94 96 l7 -6" stroke="hsl(110,45%,38%)" stroke-width="3" stroke-linecap="round"/>
-<path d="M0 0 V-26" stroke="#234832" stroke-width="3.5"/>
-<path d="M186 150 C 170 150 164 136 168 126 C 180 128 185 140 186 150 Z" fill="hsl(95,48%,44%)"/>
-<path d="M186 144 C 202 142 208 130 204 120 C 192 122 187 134 186 144 Z" fill="hsl(95,58%,37%)" opacity=".9"/>
-<g transform="translate(232 146)"><path d="M0 0 V-30" stroke="#234832" stroke-width="3.5"/><path d="M0 -16 C -16 -16 -22 -30 -18 -40 C -6 -38 -1 -26 0 -16 Z" fill="hsl(95,48%,44%)"/><path d="M0 -22 C 16 -24 22 -36 18 -46 C 6 -44 1 -32 0 -22 Z" fill="hsl(95,58%,37%)" opacity=".9"/></g>
-<g transform="translate(278 152)"><path d="M0 0 V-24" stroke="#234832" stroke-width="3.5"/><path d="M0 -12 C -14 -12 -20 -24 -16 -32 C -6 -30 -1 -20 0 -12 Z" fill="hsl(95,48%,44%)"/></g></g>
-<rect x="243" y="14" width="59" height="23" rx="11.5" fill="#234832" opacity=".92"/>
-<text x="272.5" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#f3ead6" letter-spacing=".4">Seeds</text>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Seeds</text>
+</g>
 </svg>

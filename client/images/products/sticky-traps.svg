@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Sticky Trap Cards demo pack-shot">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(55,36%,93%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="800" height="520" fill="url(#bg)"/>
+<circle cx="120" cy="90" r="34" fill="hsl(55,60%,84%)" opacity=".6"/>
+<circle cx="690" cy="430" r="46" fill="hsl(55,60%,84%)" opacity=".5"/>
+<ellipse cx="400" cy="436" rx="200" ry="26" fill="#234832" opacity=".12"/>
+<g transform="translate(400 268)">
+<rect x="-130" y="-190" width="260" height="330" rx="16" fill="hsl(55,84%,60%)" stroke="#234832" stroke-width="6"/>
+<rect x="-130" y="-190" width="260" height="46" rx="16" fill="hsl(55,80%,50%)"/>
+<circle cx="0" cy="-167" r="12" fill="#fffbe9" stroke="#234832" stroke-width="5"/>
+<circle cx="-64" cy="-80" r="13" fill="#234832" opacity=".75"/><circle cx="6" cy="-110" r="11" fill="#234832" opacity=".75"/>
+<circle cx="66" cy="-64" r="13" fill="#234832" opacity=".75"/><circle cx="30" cy="-16" r="11" fill="#234832" opacity=".75"/>
+<circle cx="-50" cy="10" r="10" fill="#234832" opacity=".75"/><circle cx="84" cy="-130" r="10" fill="#234832" opacity=".75"/></g>
+<rect x="180" y="452" width="440" height="44" rx="22" fill="#234832"/>
+<text x="400" y="481" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="bold" fill="#fdfcf3">Sticky Trap Cards</text>
+</svg>

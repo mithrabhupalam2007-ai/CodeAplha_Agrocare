@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AgroShield — Quality Seeds, Pesticides &amp; Farming Essentials</title>
-  <meta name="description" content="AgroShield is an online marketplace for agricultural seeds, pesticides, fertilizers and farming essentials. Grow Better. Harvest More." />
+  <title>AgroShield — Quality Seeds, Crop Protection &amp; Farm Equipment</title>
+  <meta name="description" content="AgroShield is an online marketplace for agricultural seeds, crop protection, crop nutrition and farm equipment. Grow Better. Harvest More." />
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,6 +23,28 @@
   <div id="site-nav"></div>
 
   <main id="main">
+
+    <!-- ======================= MAIN CATEGORIES (SLIDING) ======================= -->
+    <section class="section" id="categories">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Shop by category</span>
+            <h2>Everything your farm needs</h2>
+            <p>Seven main categories in the store — swipe or use the arrows to browse, then tap a card to open its category page.</p>
+          </div>
+          <div class="carousel__nav">
+            <button class="carousel__btn" type="button" data-prev aria-label="Scroll categories left">‹</button>
+            <button class="carousel__btn" type="button" data-next aria-label="Scroll categories right">›</button>
+          </div>
+        </div>
+        <div class="carousel" data-carousel id="main-cat-carousel">
+          <div class="carousel__track mcat-track" id="main-cat-track">
+            <!-- filled by home.js from the store taxonomy -->
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- ======================= HERO ======================= -->
     <section class="hero">
       <img class="hero__bg" src="/images/hero-field.jpg" alt="Farmer walking through a lush green crop field" />
@@ -52,28 +74,6 @@
         <span>📞 Farmer-friendly support</span>
       </div>
     </div>
-
-    <!-- ======================= MAIN CATEGORIES (SLIDING) ======================= -->
-    <section class="section" id="categories">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">Shop by category</span>
-            <h2>Everything your farm needs</h2>
-            <p>Four main categories — swipe or use the arrows to browse, then tap a card to open its category page.</p>
-          </div>
-          <div class="carousel__nav">
-            <button class="carousel__btn" type="button" data-prev aria-label="Scroll categories left">‹</button>
-            <button class="carousel__btn" type="button" data-next aria-label="Scroll categories right">›</button>
-          </div>
-        </div>
-        <div class="carousel" data-carousel id="main-cat-carousel">
-          <div class="carousel__track mcat-track" id="main-cat-track">
-            <!-- filled by home.js from the store taxonomy -->
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- ======================= SEASONAL PRODUCTS ======================= -->
     <section class="section section--beige" id="seasonal">
@@ -159,7 +159,7 @@
             <h2>Crop Protection Products</h2>
             <p>Demo insecticide, fungicide and herbicide listings with clear safety information.</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Pesticides">All crop protection →</a>
+          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Crop%20Protection">All crop protection →</a>
         </div>
         <div class="product-grid" id="crop-grid"></div>
       </div>
@@ -180,16 +180,16 @@
       </div>
     </section>
 
-    <!-- ======================= FARMING ESSENTIALS ======================= -->
+    <!-- ======================= FARM EQUIPMENT ======================= -->
     <section class="section section--beige" id="essentials">
       <div class="container">
         <div class="section-head">
           <div>
             <span class="eyebrow">Everyday gear</span>
-            <h2>Farming Tools &amp; Essentials</h2>
+            <h2>Farm Equipment &amp; Tools</h2>
             <p>Sprayers, hand tools and protective equipment for daily farm work.</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Farming%20Essentials">All essentials →</a>
+          <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Equipments">All equipment →</a>
         </div>
         <div class="product-grid" id="essentials-grid"></div>
       </div>

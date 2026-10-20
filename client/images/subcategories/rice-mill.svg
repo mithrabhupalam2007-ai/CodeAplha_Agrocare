@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Rice Mill demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(215,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(215,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(146 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="40" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-34" y="-52" width="58" height="42" rx="9" fill="hsl(215,50%,60%)" stroke="#234832" stroke-width="3"/>
+<rect x="-26" y="-44" width="24" height="14" rx="4" fill="#fffbe9" stroke="#234832" stroke-width="2.4"/>
+<path d="M-8 -52 l4 -34 h30 l4 34 z" fill="hsl(215,54%,50%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<circle cx="-14" cy="-24" r="9" fill="#dfe8ea" stroke="#234832" stroke-width="3"/>
+<path d="M30 -30 q16 4 20 20 q-14 6 -22 -6" fill="hsl(45,70%,72%)" stroke="#234832" stroke-width="2.6"/>
+<circle cx="38" cy="-6" r="2.6" fill="hsl(45,70%,64%)"/><circle cx="46" cy="-8" r="2.6" fill="hsl(45,70%,64%)"/></g><g transform="translate(256 168) scale(0.75)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 q-6 -46 8 -70" fill="none" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -30 q-18 -8 -26 -22 M0 -52 q16 -8 24 -24" fill="none" stroke="#234832" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M8 -76 q22 4 26 26 q-14 8 -24 -4 q-8 -12 -2 -22" fill="hsl(45,66%,64%)" stroke="#234832" stroke-width="2.6"/>
+<circle cx="16" cy="-64" r="3.4" fill="hsl(45,70%,52%)" stroke="#234832" stroke-width="1.6"/>
+<circle cx="26" cy="-56" r="3.4" fill="hsl(45,70%,52%)" stroke="#234832" stroke-width="1.6"/>
+<circle cx="22" cy="-44" r="3.4" fill="hsl(45,70%,52%" stroke="#234832" stroke-width="1.6"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

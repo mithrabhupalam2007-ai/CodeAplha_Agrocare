@@ -31,8 +31,17 @@ if (JSON.stringify(client.MAIN) !== JSON.stringify(taxonomy.MAIN_CATEGORIES)) {
   fail(`main categories differ:\n  server: ${taxonomy.MAIN_CATEGORIES.join(' | ')}\n  client: ${client.MAIN.join(' | ')}`);
 }
 
-// 2. Subcategory lists, in order, for every type
+// 2. Heading sections + subcategory lists, in order, for every main category
 for (const type of taxonomy.MAIN_CATEGORIES) {
+  const serverGroups = taxonomy.CATEGORY_STRUCTURE[type];
+  const clientGroups = client.STRUCTURE && client.STRUCTURE[type];
+  if (!clientGroups) {
+    fail(`client is missing STRUCTURE["${type}"]`);
+    continue;
+  }
+  if (JSON.stringify(serverGroups) !== JSON.stringify(clientGroups)) {
+    fail(`heading structure for "${type}" differs:\n  server: ${JSON.stringify(serverGroups)}\n  client: ${JSON.stringify(clientGroups)}`);
+  }
   const serverSubs = taxonomy.SUBCATEGORIES[type];
   const clientSubs = client.SUBS[type];
   if (!clientSubs) {
@@ -57,6 +66,13 @@ for (const subs of Object.values(taxonomy.SUBCATEGORIES)) {
     );
     if (!fs.existsSync(file)) fail(`missing subcategory art: ${path.basename(file)}`);
   }
+}
+
+// 4. Every main-category card image exists on disk
+const catDir = path.join(__dirname, '..', '..', 'client', 'images', 'categories');
+for (const [type, img] of Object.entries(client.MAIN_IMAGES || {})) {
+  const file = path.join(catDir, img.replace('/images/categories/', ''));
+  if (!fs.existsSync(file)) fail(`missing main-category art for "${type}": ${img}`);
 }
 
 if (failed) {

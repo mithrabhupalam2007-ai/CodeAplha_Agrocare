@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Bio Viricides demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(265,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(265,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(150 168) scale(1)">
+<ellipse cx="0" cy="2" rx="20" ry="5" fill="#234832" opacity=".12"/>
+<g stroke="#234832" stroke-width="3" stroke-linecap="round">
+<path d="M0 -74 v-16 M0 -16 v14 M-44 -46 h-16 M44 -46 h16 M-30 -76 l-12 -12 M30 -76 l12 -12 M-30 -22 l-14 12 M30 -22 l14 12"/>
+</g>
+<g fill="hsl(265,56%,58%)" stroke="#234832" stroke-width="3">
+<circle cx="0" cy="-46" r="28"/>
+</g>
+<circle cx="-9" cy="-54" r="5" fill="#fffbe9" stroke="#234832" stroke-width="2"/>
+<circle cx="8" cy="-40" r="6" fill="#fffbe9" stroke="#234832" stroke-width="2"/>
+<circle cx="-6" cy="-34" r="3.4" fill="#fffbe9" stroke="#234832" stroke-width="1.8"/>
+<g fill="hsl(265,60%,48%)" stroke="#234832" stroke-width="2">
+<circle cx="0" cy="-90" r="5"/><circle cx="0" cy="-2" r="5"/><circle cx="-60" cy="-46" r="5"/><circle cx="60" cy="-46" r="5"/>
+<circle cx="-42" cy="-88" r="5"/><circle cx="42" cy="-88" r="5"/><circle cx="-44" cy="-10" r="5"/><circle cx="44" cy="-10" r="5"/>
+</g></g><g transform="translate(240 168) scale(0.8)">
+<ellipse cx="0" cy="2" rx="24" ry="5" fill="#234832" opacity=".12"/>
+<path d="M-8 -84 h16 v22 l22 44 a10 10 0 0 1 -9 15 h-42 a10 10 0 0 1 -9 -15 l22 -44 z" fill="#ffffff" fill-opacity=".6" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-19 -40 l14 28 h20 l14 -28 z" fill="hsl(265,60%,62%)"/>
+<path d="M-9 -86 h18" stroke="#234832" stroke-width="4" stroke-linecap="round"/>
+<circle cx="-6" cy="-18" r="4" fill="hsl(265,70%,52%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="7" cy="-26" r="3" fill="hsl(265,70%,52%)" stroke="#234832" stroke-width="1.8"/></g>
+<g>
+<rect x="166" y="14" width="138" height="24" rx="12" fill="#234832"/>
+<text x="235" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Protection</text>
+</g>
+</svg>

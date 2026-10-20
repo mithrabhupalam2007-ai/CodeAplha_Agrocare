@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Forages demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(100,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(100,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(125 168) scale(1)">
+<ellipse cx="0" cy="2" rx="24" ry="5.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 q-4 -30 -18 -44 M0 -6 q0 -34 0 -50 M0 -6 q4 -30 18 -44" fill="none" stroke="#234832" stroke-width="2.8" stroke-linecap="round"/>
+<g fill="hsl(100,48%,54%)" stroke="#234832" stroke-width="2.2">
+<path d="M-24 -52 q-10 -4 -12 -14 q12 -2 16 8 z"/><path d="M-30 -50 q2 -12 12 -14 q6 10 -2 16 z"/>
+<path d="M-18 -66 q-10 -4 -12 -14 q12 -2 16 8 z"/><path d="M-24 -64 q2 -12 12 -14 q6 10 -2 16 z"/>
+<path d="M24 -52 q10 -4 12 -14 q-12 -2 -16 8 z"/><path d="M30 -50 q-2 -12 -12 -14 q-6 10 2 16 z"/>
+<path d="M18 -66 q10 -4 12 -14 q-12 -2 -16 8 z"/><path d="M24 -64 q-2 -12 -12 -14 q-6 10 2 16 z"/>
+<path d="M-7 -76 q-10 -4 -12 -14 q12 -2 16 8 z"/><path d="M-1 -78 q2 -12 12 -14 q6 10 -2 16 z"/>
+</g>
+<circle cx="-26" cy="-40" r="7" fill="#fffbe9" stroke="#234832" stroke-width="2.2"/>
+<circle cx="26" cy="-40" r="7" fill="#fffbe9" stroke="#234832" stroke-width="2.2"/>
+<circle cx="4" cy="-62" r="7" fill="#fffbe9" stroke="#234832" stroke-width="2.2"/></g><g transform="translate(210 168) scale(0.8)">
+<ellipse cx="0" cy="2" rx="24" ry="5.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 q-4 -30 -18 -44 M0 -6 q0 -34 0 -50 M0 -6 q4 -30 18 -44" fill="none" stroke="#234832" stroke-width="2.8" stroke-linecap="round"/>
+<g fill="hsl(108,48%,54%)" stroke="#234832" stroke-width="2.2">
+<path d="M-24 -52 q-10 -4 -12 -14 q12 -2 16 8 z"/><path d="M-30 -50 q2 -12 12 -14 q6 10 -2 16 z"/>
+<path d="M-18 -66 q-10 -4 -12 -14 q12 -2 16 8 z"/><path d="M-24 -64 q2 -12 12 -14 q6 10 -2 16 z"/>
+<path d="M24 -52 q10 -4 12 -14 q-12 -2 -16 8 z"/><path d="M30 -50 q-2 -12 -12 -14 q-6 10 2 16 z"/>
+<path d="M18 -66 q10 -4 12 -14 q-12 -2 -16 8 z"/><path d="M24 -64 q-2 -12 -12 -14 q-6 10 2 16 z"/>
+<path d="M-7 -76 q-10 -4 -12 -14 q12 -2 16 8 z"/><path d="M-1 -78 q2 -12 12 -14 q6 10 -2 16 z"/>
+</g>
+<circle cx="-26" cy="-40" r="7" fill="#fffbe9" stroke="#234832" stroke-width="2.2"/>
+<circle cx="26" cy="-40" r="7" fill="#fffbe9" stroke="#234832" stroke-width="2.2"/>
+<circle cx="4" cy="-62" r="7" fill="#fffbe9" stroke="#234832" stroke-width="2.2"/></g><g transform="translate(266 168) scale(0.7)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-56" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(95,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(95,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -58 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(95,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g>
+<g>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Seeds</text>
+</g>
+</svg>

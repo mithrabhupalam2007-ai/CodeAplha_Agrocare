@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Cattle Feed demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(30,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(30,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(122 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="34" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-34 -6 q-6 -64 6 -82 h56 q12 18 6 82 z" fill="hsl(30,46%,64%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-28 -76 q28 -11 56 0" fill="none" stroke="#234832" stroke-width="3"/>
+<rect x="-21" y="-55" width="42" height="29" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+<text x="0" y="-34" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#234832">Feed</text>
+<ellipse cx="0" cy="-5" rx="34" ry="7" fill="hsl(30,44%,54%)" stroke="#234832" stroke-width="3"/></g><g transform="translate(230 168) scale(1)">
+<ellipse cx="0" cy="2" rx="26" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-24 -56 q-10 -6 -14 -18 q12 -2 16 6 M24 -56 q10 -6 14 -18 q-12 -2 -16 6" fill="hsl(35,45%,72%)" stroke="#234832" stroke-width="2.8" stroke-linejoin="round"/>
+<ellipse cx="0" cy="-44" rx="30" ry="34" fill="hsl(30,40%,80%)" stroke="#234832" stroke-width="3"/>
+<ellipse cx="0" cy="-30" rx="17" ry="13" fill="hsl(18,45%,78%)" stroke="#234832" stroke-width="2.6"/>
+<circle cx="-6" cy="-28" r="2.8" fill="#234832"/><circle cx="6" cy="-28" r="2.8" fill="#234832"/>
+<circle cx="-11" cy="-52" r="4.4" fill="#234832"/><circle cx="11" cy="-52" r="4.4" fill="#234832"/>
+<path d="M-20 -66 q6 -8 12 -6 M8 -72 q6 -6 12 -2" fill="none" stroke="#234832" stroke-width="2.4" opacity=".5"/></g>
+<g>
+<rect x="158.4" y="14" width="145.6" height="24" rx="12" fill="#234832"/>
+<text x="231.2" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Animal Husbandry</text>
+</g>
+</svg>

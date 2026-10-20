@@ -142,10 +142,16 @@
       ]);
 
       // category filter dropdown (the product-form subcategory select is
-      // driven by TAXONOMY instead — see fillSubcategories)
+      // driven by TAXONOMY instead — see fillSubcategories). Names shared
+      // between main categories appear once: the backend matches them all.
       const filterSel = $('prod-cat');
       if (filterSel.options.length === 1) {
-        cats.categories.forEach((c) => filterSel.add(new Option(c.name, c.name)));
+        const seen = new Set();
+        cats.categories.forEach((c) => {
+          if (seen.has(c.name)) return;
+          seen.add(c.name);
+          filterSel.add(new Option(c.name, c.name));
+        });
       }
 
       tbody.innerHTML = data.products.length
@@ -155,7 +161,7 @@
         <tr>
           <td><img src="${UI.esc(p.image)}" alt="" /></td>
           <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.esc(p.packSize)}</span>${p.isDemoData ? ' <span class="badge badge--amber">demo</span>' : ''}${p.isNewRelease ? ' <span class="badge badge--green">new</span>' : ''}${p.manualOutOfStock ? ' <span class="badge badge--red">blocked</span>' : ''}</td>
-          <td>${UI.esc(p.category)}</td>
+          <td>${UI.esc(TAXONOMY.labelFor(p))}</td>
           <td><b>${UI.inr(p.price)}</b>${p.discountPercent > 0 ? `<br/><span class="text-muted" style="font-size:.75rem;">MRP ${UI.inr(p.mrp)}</span>` : ''}</td>
           <td><span class="badge ${p.stockQuantity === 0 ? 'badge--red' : p.stockQuantity <= 5 ? 'badge--amber' : 'badge--green'}">${p.stockQuantity}</span></td>
           <td><span class="badge ${p.active ? 'badge--green' : 'badge--grey'}">${p.active ? 'Active' : 'Inactive'}</span></td>
@@ -213,22 +219,51 @@
   }
 
   /**
-   * Populate the product-form subcategory select for a main category.
-   * Farming Essentials has no subcategories — the select is emptied and
-   * hidden; the backend then defaults the product's category to its type.
+   * Populate every main-category <select> (product form + category form)
+   * from the store taxonomy, keeping the current value when still valid.
    */
-  function fillSubcategories(type, selected) {
-    const sel = $('pm-category');
-    const field = sel.closest('.field');
+  function fillMainOptions() {
+    document.querySelectorAll('.js-main-select').forEach((sel) => {
+      const current = sel.value;
+      sel.innerHTML = '';
+      TAXONOMY.MAIN.forEach((m) => sel.add(new Option(m, m)));
+      if (current && TAXONOMY.isMain(current)) sel.value = current;
+    });
+  }
+
+  /**
+   * Heading-section select for a main category (first cascade level).
+   * Tapas has no heading sections — the select is disabled with an empty
+   * value and its seven subcategories are offered directly.
+   */
+  function fillHeadings(type, selected) {
+    const sel = $('pm-heading');
     sel.innerHTML = '';
-    const subs = TAXONOMY.subcategoriesOf(type);
-    if (!subs.length) {
-      sel.add(new Option('— none for this category —', ''));
-      field.classList.add('hidden');
-      $('pm-sub-hint').textContent = '(not needed for Farming Essentials)';
+    const headings = TAXONOMY.headingsOf(type).filter(Boolean);
+    if (!headings.length) {
+      sel.add(new Option('— no heading sections —', ''));
+      sel.disabled = true;
+      $('pm-heading-hint').textContent = '(Tapas lists its subcategories directly)';
       return;
     }
-    field.classList.remove('hidden');
+    sel.disabled = false;
+    $('pm-heading-hint').textContent = `(${headings.length} sections)`;
+    sel.add(new Option('All heading sections', ''));
+    headings.forEach((h) => sel.add(new Option(h, h)));
+    if (selected && headings.includes(selected)) sel.value = selected;
+  }
+
+  /**
+   * Subcategory select (second cascade level): the subs of the chosen
+   * heading, or every sub of the main category when no heading is picked.
+   * Every one of the seven main categories has subcategories.
+   */
+  function fillSubcategories(type, heading, selected) {
+    const sel = $('pm-category');
+    sel.innerHTML = '';
+    const subs = heading
+      ? TAXONOMY.subcategoriesUnder(type, heading)
+      : TAXONOMY.subcategoriesOf(type);
     $('pm-sub-hint').textContent = `(${subs.length} options)`;
     sel.add(new Option('Choose a subcategory…', ''));
     subs.forEach((s) => sel.add(new Option(s, s)));
@@ -241,7 +276,11 @@
     form.id.value = '';
     $('pm-title').textContent = 'Add product';
     form.active.checked = true;
-    fillSubcategories(form.type.value); // reset select to match current type
+    fillMainOptions();
+    // After form.reset() the main select is back on its first option —
+    // rebuild the rest of the cascade to match it.
+    fillHeadings(form.type.value);
+    fillSubcategories(form.type.value, form.heading.value);
     form.isSeasonal.checked = false;
     form.seasonalNote.value = '';
 
@@ -254,9 +293,11 @@
           form.id.value = product._id;
           form.name.value = product.name;
           form.description.value = product.description;
-          form.type.value = product.type;
-          // repopulate the subcategory select for this type, then select it
-          fillSubcategories(product.type, product.category);
+          form.type.value = product.primaryCategory || TAXONOMY.MAIN[0];
+          // Repopulate the cascade for this main category, then select the
+          // record's heading (if any) and subcategory.
+          fillHeadings(product.primaryCategory, product.heading);
+          fillSubcategories(product.primaryCategory, product.heading, product.subcategory);
           form.brand.value = product.brand;
           form.packSize.value = product.packSize;
           form.price.value = product.price;
@@ -342,8 +383,9 @@
     const payload = {
       name: f.name.value.trim(),
       description: f.description.value.trim(),
-      category: f.category.value,
-      type: f.type.value,
+      primaryCategory: f.type.value,
+      heading: f.heading.value,
+      subcategory: f.category.value,
       brand: f.brand.value.trim(),
       packSize: f.packSize.value.trim(),
       price: Number(f.price.value),
@@ -365,10 +407,11 @@
       active: f.active.checked,
     };
 
-    // Friendly pre-flight: every category except Farming Essentials needs a
-    // subcategory (the server enforces this too).
-    if (TAXONOMY.hasSubcategories(payload.type) && !payload.category) {
-      toast(`Please choose a subcategory for ${payload.type}.`, 'error');
+    // Friendly pre-flight: every one of the seven main categories has
+    // subcategories and a product must belong to one (the server enforces
+    // this too; the heading is derived from the taxonomy).
+    if (!payload.subcategory) {
+      toast(`Please choose a subcategory for ${payload.primaryCategory}.`, 'error');
       $('pm-category').focus();
       return;
     }
@@ -461,7 +504,7 @@
                   ? `<button class="btn btn--accent btn--sm" data-manual-toggle="${p._id}" data-value="false" data-name="${UI.esc(p.name)}">Clear block</button>`
                   : '';
                 return `<tr>
-                  ${img}${name}<td>${UI.esc(p.category)}</td>${price}
+                  ${img}${name}<td>${UI.esc(TAXONOMY.labelFor(p))}</td>${price}
                   <td>${reasonCell(p)}</td>
                   ${stockInput}
                   <td><div class="cell-actions">${editBtn}${clearBtn}</div></td>
@@ -551,7 +594,7 @@
         <tr>
           <td><img src="${UI.esc(p.image)}" alt="" /></td>
           <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)}</span></td>
-          <td>${UI.esc(p.category)}</td>
+          <td>${UI.esc(TAXONOMY.labelFor(p))}</td>
           <td>${p.mrp ? UI.inr(p.mrp) : '<span class="text-muted">—</span>'}</td>
           <td><b>${UI.inr(p.price)}</b></td>
           <td>${disc}</td>
@@ -619,7 +662,7 @@
         <tr>
           <td><img src="${UI.esc(p.image)}" alt="" /></td>
           <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.inr(p.price)}</span></td>
-          <td>${UI.esc(p.category)}</td>
+          <td>${UI.esc(TAXONOMY.labelFor(p))}</td>
           <td>${p.releaseDate ? UI.formatDate(p.releaseDate) : '<span class="text-muted">—</span>'}</td>
           <td><span class="badge ${p.isNewRelease ? 'badge--green' : 'badge--grey'}">${p.isNewRelease ? 'New release' : 'Not flagged'}</span></td>
           <td>
@@ -870,8 +913,16 @@
     $('btn-add-product').addEventListener('click', () => openProductModal());
     $('btn-add-cat').addEventListener('click', () => openCategoryModal());
     $('product-form').addEventListener('submit', saveProduct);
-    // subcategory options depend on the chosen main category
-    $('pm-type').addEventListener('change', (e) => fillSubcategories(e.target.value));
+    // Main-category selects come straight from the store taxonomy.
+    fillMainOptions();
+    // Cascade: main category -> heading section -> subcategory options.
+    $('pm-type').addEventListener('change', (e) => {
+      fillHeadings(e.target.value);
+      fillSubcategories(e.target.value, $('pm-heading').value);
+    });
+    $('pm-heading').addEventListener('change', (e) =>
+      fillSubcategories($('pm-type').value, e.target.value)
+    );
     $('category-form').addEventListener('submit', saveCategory);
 
     const closeModal = (bd) => {

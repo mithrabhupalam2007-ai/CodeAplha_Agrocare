@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Bio Miticide demo pack-shot">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(300,36%,93%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="800" height="520" fill="url(#bg)"/>
+<circle cx="120" cy="90" r="34" fill="hsl(300,60%,84%)" opacity=".6"/>
+<circle cx="690" cy="430" r="46" fill="hsl(300,60%,84%)" opacity=".5"/>
+<ellipse cx="400" cy="436" rx="200" ry="26" fill="#234832" opacity=".12"/>
+<g transform="translate(400 268)">
+<rect x="-56" y="-186" width="112" height="52" rx="12" fill="hsl(300,52%,44%)" stroke="#234832" stroke-width="6"/>
+<rect x="-34" y="-134" width="68" height="26" fill="hsl(300,58%,56%)" stroke="#234832" stroke-width="6"/>
+<path d="M-34 -108 q-60 42 -60 122 v104 a28 28 0 0 0 28 28 h132 a28 28 0 0 0 28 -28 v-104 q0 -80 -60 -122 z" fill="hsl(300,58%,62%)" stroke="#234832" stroke-width="6" stroke-linejoin="round"/>
+<rect x="-66" y="-52" width="132" height="104" rx="12" fill="#fffbe9" stroke="#234832" stroke-width="5"/>
+<path d="M-32 0 h64 M0 -32 v64" stroke="#234832" stroke-width="6" stroke-linecap="round"/></g>
+<rect x="180" y="452" width="440" height="44" rx="22" fill="#234832"/>
+<text x="400" y="481" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="bold" fill="#fdfcf3">Bio Miticide</text>
+</svg>

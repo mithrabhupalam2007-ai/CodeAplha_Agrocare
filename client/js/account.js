@@ -200,7 +200,7 @@
         <a href="/pages/product-details.html?id=${p._id}"><img src="${UI.esc(p.image)}" alt="${UI.esc(p.name)}" loading="lazy" /></a>
       </div>
       <div class="p-card__body">
-        <span class="p-card__cat">${UI.esc(p.category)}</span>
+        <span class="p-card__cat">${UI.esc(TAXONOMY.labelFor(p))}</span>
         <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${UI.esc(p.name)}</a></h3>
         <div class="p-card__meta"><span>${UI.esc(p.packSize)}</span>
           <span class="p-card__stock ${p.stockQuantity > 0 ? 'in' : 'out'}"><span class="dot"></span>${p.stockQuantity > 0 ? 'In stock' : 'Out of stock'}</span>

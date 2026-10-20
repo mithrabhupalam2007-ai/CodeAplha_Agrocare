@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Plain Growth Promoters demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(95,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(95,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(118 168) scale(1)">
+<ellipse cx="0" cy="2" rx="30" ry="6" fill="#234832" opacity=".12"/>
+<rect x="-32" y="-86" width="64" height="86" rx="7" fill="hsl(95,54%,60%)" stroke="#234832" stroke-width="3"/>
+<path d="M-32 -86 h64 l-7 -13 h-50 z" fill="hsl(95,58%,42%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<rect x="-22" y="-62" width="44" height="36" rx="5" fill="#fffbe9" stroke="#234832" stroke-width="2.5"/>
+
+<path d="M-14 -44 q14 -14 28 0 q-14 12 -28 0 z" fill="hsl(110,45%,55%)" stroke="#234832" stroke-width="2"/>
+<circle cx="0" cy="-14" r="8" fill="hsl(95,64%,44%)" stroke="#234832" stroke-width="2.5"/></g><g transform="translate(214 168) scale(1.1)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-76" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(105,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(105,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -58 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(105,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -78 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(105,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g>
+<g>
+<rect x="173.60000000000002" y="14" width="130.39999999999998" height="24" rx="12" fill="#234832"/>
+<text x="238.8" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Nutrition</text>
+</g>
+</svg>

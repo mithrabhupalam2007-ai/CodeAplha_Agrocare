@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Category — AgroShield</title>
-  <meta name="description" content="Browse AgroShield product categories — Seeds, Pesticides, Fertilizers and Farming Essentials — with subcategory browsing, search and sorting." />
+  <meta name="description" content="Browse AgroShield product categories — Seeds, Crop Protection, Crop Nutrition, Equipments, Animal Husbandry, Organic and Tapas — with subcategory browsing, search and sorting." />
   <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="/css/components.css" />
   <script defer src="/js/api.js"></script>
   <script defer src="/js/store.js"></script>
-  <script defer src="/js/ui.js"></script>
   <script defer src="/js/taxonomy.js"></script>
+  <script defer src="/js/ui.js"></script>
   <script defer src="/js/category.js"></script>
 </head>
 <body>
@@ -46,26 +46,10 @@
       </div>
     </section>
 
-    <!-- ============ SUBCATEGORY SLIDER (hidden for Farming Essentials) ============ -->
-    <section class="section section--tight hidden" id="subcat-section">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">Browse by subcategory</span>
-            <h2 id="subcat-heading">Subcategories</h2>
-          </div>
-          <div class="carousel__nav">
-            <button class="carousel__btn" type="button" data-prev aria-label="Scroll subcategories left">‹</button>
-            <button class="carousel__btn" type="button" data-next aria-label="Scroll subcategories right">›</button>
-          </div>
-        </div>
-        <div class="carousel" data-carousel id="subcat-carousel">
-          <div class="carousel__track subcat-track" id="subcat-track">
-            <!-- filled by category.js -->
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- ============ SUBCATEGORY GROUPS (one sliding carousel per heading
+         section; Tapas shows its seven subcategories in a single track).
+         The sections are built by category.js from the store taxonomy. ============ -->
+    <div id="subcat-groups"></div>
 
     <!-- ============ PRODUCTS ============ -->
     <section class="section" id="products-section">

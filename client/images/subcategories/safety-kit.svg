@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Safety Kit demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(205,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(205,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(150 168) scale(1.25)">
+<ellipse cx="0" cy="2" rx="44" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-46 -8 q-8 -34 2 -44 q6 -4 8 8 v-22 q0 -8 8 -8 q8 0 8 10 v-14 q0 -8 8 -8 q8 0 8 12 v16 q0 -10 8 -8 q8 2 6 14 l-4 26 q-2 14 -18 14 q-18 0 -24 -10 z" fill="hsl(205,58%,64%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<rect x="-6" y="-64" width="56" height="26" rx="13" fill="#fffbe9" stroke="#234832" stroke-width="3"/>
+<circle cx="8" cy="-51" r="9" fill="hsl(195,70%,72%)" stroke="#234832" stroke-width="2.6"/>
+<circle cx="36" cy="-51" r="9" fill="hsl(195,70%,72%)" stroke="#234832" stroke-width="2.6"/>
+<path d="M17 -51 h10" stroke="#234832" stroke-width="2.6"/>
+<path d="M46 -66 l14 -8 M46 -38 l14 6" stroke="#234832" stroke-width="3" stroke-linecap="round"/>
+<path d="M-4 -22 h48 q4 22 -20 24 h-8 q-24 -2 -20 -24 z" fill="hsl(200,30%,88%)" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M4 -16 h32 M2 -8 h36" stroke="#234832" stroke-width="2.2" opacity=".6"/>
+<path d="M-4 -22 l-12 -6 M44 -22 l12 -6" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

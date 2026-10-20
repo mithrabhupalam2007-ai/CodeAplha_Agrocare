@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Pipe demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(140,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(140,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(142 168) scale(1.2)">
+<ellipse cx="0" cy="2" rx="36" ry="6" fill="#234832" opacity=".12"/>
+<path d="M-46 -14 h70 a14 14 0 0 1 14 14 v-46" fill="none" stroke="hsl(140,50%,52%)" stroke-width="16" stroke-linecap="round"/>
+<path d="M-46 -14 h70 a14 14 0 0 1 14 14 v-46" fill="none" stroke="#234832" stroke-width="3" stroke-linecap="round" opacity=".85"/>
+<rect x="-56" y="-24" width="12" height="20" rx="3" fill="hsl(140,54%,44%)" stroke="#234832" stroke-width="2.6"/>
+<circle cx="38" cy="-70" r="5" fill="hsl(200,70%,62%)" stroke="#234832" stroke-width="2.2"/>
+<circle cx="38" cy="-52" r="4" fill="hsl(200,70%,62%)" stroke="#234832" stroke-width="2.2"/></g><ellipse cx="256" cy="162" rx="30" ry="9" fill="hsl(200,65%,62%)" stroke="#234832" stroke-width="2.6"/>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

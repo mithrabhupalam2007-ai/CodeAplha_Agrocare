@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Drip Kit demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(25,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(25,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(122 168) scale(0.6)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-36" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g><g transform="translate(188 168) scale(0.6)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-56" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -58 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g><g transform="translate(256 168) scale(0.55)">
+<ellipse cx="0" cy="2" rx="16" ry="4.5" fill="#234832" opacity=".12"/>
+<path d="M0 -6 v-36" stroke="#234832" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M0 -18 q-16 -4 -24 -14 q--16 -6 --24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/><path d="M0 -38 q16 -4 24 -14 q-16 -6 -24 14 z" fill="hsl(110,52%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M-9 -2 h18" stroke="#234832" stroke-width="3" stroke-linecap="round"/></g><g transform="translate(152 168) scale(1.35)">
+<path d="M-56 -10 h112" fill="none" stroke="hsl(25,50%,48%)" stroke-width="7" stroke-linecap="round"/>
+<path d="M-56 -10 h112" fill="none" stroke="#234832" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+<rect x="-40" y="-18" width="12" height="9" rx="3" fill="hsl(25,56%,56%)" stroke="#234832" stroke-width="2.2"/>
+<rect x="-4" y="-18" width="12" height="9" rx="3" fill="hsl(25,56%,56%)" stroke="#234832" stroke-width="2.2"/>
+<rect x="32" y="-18" width="12" height="9" rx="3" fill="hsl(25,56%,56%)" stroke="#234832" stroke-width="2.2"/>
+<circle cx="-34" cy="6" r="4.5" fill="hsl(200,70%,62%)" stroke="#234832" stroke-width="2"/>
+<circle cx="2" cy="8" r="4.5" fill="hsl(200,70%,62%)" stroke="#234832" stroke-width="2"/>
+<circle cx="38" cy="5" r="4.5" fill="hsl(200,70%,62%)" stroke="#234832" stroke-width="2"/>
+<path d="M-56 -10 q-14 -10 -22 -34 M56 -10 q14 -10 22 -34" fill="none" stroke="#234832" stroke-width="3" stroke-linecap="round" opacity=".7"/></g>
+<g>
+<rect x="204" y="14" width="100" height="24" rx="12" fill="#234832"/>
+<text x="254" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Equipments</text>
+</g>
+</svg>

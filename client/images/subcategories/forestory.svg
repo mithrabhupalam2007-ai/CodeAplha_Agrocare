@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Forestory demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(115,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(115,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(128 168) scale(1.05)">
+<ellipse cx="0" cy="2" rx="22" ry="5.5" fill="#234832" opacity=".12"/>
+<path d="M-6 -8 v-46 h12 v46 z" fill="hsl(24,42%,44%)" stroke="#234832" stroke-width="2.6"/>
+<path d="M0 -30 l-16 -14 M0 -48 l16 -14" stroke="#234832" stroke-width="3" stroke-linecap="round"/>
+<circle cx="0" cy="-84" r="34" fill="hsl(115,46%,54%)" stroke="#234832" stroke-width="3"/>
+<circle cx="-26" cy="-64" r="20" fill="hsl(115,46%,50%)" stroke="#234832" stroke-width="3"/>
+<circle cx="26" cy="-64" r="20" fill="hsl(115,46%,52%)" stroke="#234832" stroke-width="3"/>
+<path d="M-14 -92 q14 -10 28 -2" fill="none" stroke="#fff" stroke-width="2.4" opacity=".5"/></g><g transform="translate(222 168) scale(0.8)">
+<ellipse cx="0" cy="2" rx="22" ry="5.5" fill="#234832" opacity=".12"/>
+<path d="M-6 -8 v-46 h12 v46 z" fill="hsl(24,42%,44%)" stroke="#234832" stroke-width="2.6"/>
+<path d="M0 -30 l-16 -14 M0 -48 l16 -14" stroke="#234832" stroke-width="3" stroke-linecap="round"/>
+<circle cx="0" cy="-84" r="34" fill="hsl(120,46%,54%)" stroke="#234832" stroke-width="3"/>
+<circle cx="-26" cy="-64" r="20" fill="hsl(120,46%,50%)" stroke="#234832" stroke-width="3"/>
+<circle cx="26" cy="-64" r="20" fill="hsl(120,46%,52%)" stroke="#234832" stroke-width="3"/>
+<path d="M-14 -92 q14 -10 28 -2" fill="none" stroke="#fff" stroke-width="2.4" opacity=".5"/></g><g transform="translate(272 168) scale(0.7)">
+<ellipse cx="0" cy="2" rx="20" ry="5" fill="#234832" opacity=".12"/>
+<path d="M-18 -34 l4 32 h28 l4 -32 z" fill="#6b4a33" stroke="#234832" stroke-width="2.8" stroke-linejoin="round"/>
+<path d="M-18 -34 h36" stroke="#234832" stroke-width="3"/>
+<path d="M0 -36 v-30" stroke="#234832" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M0 -50 q-14 -4 -20 -14 q14 -4 20 8 z" fill="hsl(105,50%,54%)" stroke="#234832" stroke-width="2.4"/>
+<path d="M0 -62 q14 -4 20 -14 q-14 -4 -20 8 z" fill="hsl(105,50%,58%)" stroke="#234832" stroke-width="2.4"/></g>
+<g>
+<rect x="242" y="14" width="62" height="24" rx="12" fill="#234832"/>
+<text x="273" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Seeds</text>
+</g>
+</svg>

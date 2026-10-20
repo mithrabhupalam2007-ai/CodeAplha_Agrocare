@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Bio Nematicides demo illustration">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(150,40%,92%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="320" height="200" fill="url(#bg)"/>
+<circle cx="58" cy="52" r="20" fill="hsl(150,65%,82%)" opacity=".55"/>
+<path d="M0 168 h320" stroke="#234832" stroke-width="2" opacity=".25"/>
+<g transform="translate(118 158) scale(1)">
+<ellipse cx="0" cy="2" rx="30" ry="5.5" fill="#234832" opacity=".12"/>
+<path d="M-44 -18 q18 -26 40 -6 q22 20 44 -6" fill="none" stroke="hsl(45,64%,58%)" stroke-width="11" stroke-linecap="round"/>
+<path d="M-44 -18 q18 -26 40 -6 q22 20 44 -6" fill="none" stroke="#234832" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+<circle cx="40" cy="-26" r="3" fill="#234832"/></g><g transform="translate(222 168) scale(0.95)">
+<ellipse cx="0" cy="2" rx="24" ry="5" fill="#234832" opacity=".12"/>
+<path d="M-8 -84 h16 v22 l22 44 a10 10 0 0 1 -9 15 h-42 a10 10 0 0 1 -9 -15 l22 -44 z" fill="#ffffff" fill-opacity=".6" stroke="#234832" stroke-width="3" stroke-linejoin="round"/>
+<path d="M-19 -40 l14 28 h20 l14 -28 z" fill="hsl(150,60%,62%)"/>
+<path d="M-9 -86 h18" stroke="#234832" stroke-width="4" stroke-linecap="round"/>
+<circle cx="-6" cy="-18" r="4" fill="hsl(150,70%,52%)" stroke="#234832" stroke-width="1.8"/>
+<circle cx="7" cy="-26" r="3" fill="hsl(150,70%,52%)" stroke="#234832" stroke-width="1.8"/></g><path d="M276 104 l16 6 v14 q0 16 -16 24 q-16 -8 -16 -24 v-14 z" fill="hsl(150,45%,62%)" stroke="#234832" stroke-width="2.6" stroke-linejoin="round"/>
+<g>
+<rect x="166" y="14" width="138" height="24" rx="12" fill="#234832"/>
+<text x="235" y="30" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12.5" font-weight="bold" fill="#fdfcf3">Crop Protection</text>
+</g>
+</svg>

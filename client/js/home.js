@@ -1,6 +1,7 @@
 /**
- * Home page: main-category slider, seasonal products carousel,
- * featured / seed / crop / essentials product rails, newsletter.
+ * Home page: main-category sliding carousel (seven categories, right below
+ * the navbar), seasonal products carousel, featured / seed / crop-protection
+ * / equipment product rails, newsletter.
  */
 (() => {
   function skeleton(container) {
@@ -135,9 +136,9 @@
     loadNewReleases();
     loadProducts('featured-grid', { featured: true, limit: 4, sort: 'featured' });
     loadProducts('seed-grid', { type: 'Seeds', bestseller: true, limit: 4, sort: 'rating' });
-    loadProducts('crop-grid', { type: 'Pesticides', limit: 4, sort: 'rating' });
+    loadProducts('crop-grid', { type: 'Crop Protection', limit: 4, sort: 'rating' });
     loadProducts('recent-grid', { limit: 4, sort: 'newest' });
-    loadProducts('essentials-grid', { type: 'Farming Essentials', limit: 4, sort: 'featured' });
+    loadProducts('essentials-grid', { type: 'Equipments', limit: 4, sort: 'featured' });
 
     if (authStore.isLoggedIn) await authStore.refresh();
     UI.refreshBadges();

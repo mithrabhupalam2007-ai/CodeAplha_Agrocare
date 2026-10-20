@@ -52,7 +52,7 @@ const getWishlist = asyncHandler(async (req, res) => {
     path: 'wishlist',
     match: { active: true },
     select:
-      'name price mrp packSize image images category type stockQuantity manualOutOfStock active rating reviewCount brand',
+      'name price mrp packSize image images primaryCategory heading subcategory additionalCategories stockQuantity manualOutOfStock active rating reviewCount brand',
   });
   // Decorate with the shared availability fields (available / stockStatus /
   // discountPercent) so the wishlist page can show live status.

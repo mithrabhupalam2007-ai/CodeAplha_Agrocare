@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" role="img" aria-label="Soil pH Balancer demo pack-shot">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(50,36%,93%)"/><stop offset="1" stop-color="#f4efdc"/>
+</linearGradient></defs>
+<rect width="800" height="520" fill="url(#bg)"/>
+<circle cx="120" cy="90" r="34" fill="hsl(50,60%,84%)" opacity=".6"/>
+<circle cx="690" cy="430" r="46" fill="hsl(50,60%,84%)" opacity=".5"/>
+<ellipse cx="400" cy="436" rx="200" ry="26" fill="#234832" opacity=".12"/>
+<g transform="translate(400 268)">
+<path d="M-124 -2 q-18 -190 20 -238 h208 q38 48 20 238 z" fill="hsl(50,46%,64%)" stroke="#234832" stroke-width="6" stroke-linejoin="round"/>
+<path d="M-104 -218 q104 -34 208 0" fill="none" stroke="#234832" stroke-width="7"/>
+<rect x="-74" y="-156" width="148" height="96" rx="12" fill="#fffbe9" stroke="#234832" stroke-width="5"/>
+<text x="0" y="-88" text-anchor="middle" font-family="Georgia,serif" font-size="52" font-weight="bold" fill="#234832">pH</text>
+<ellipse cx="0" cy="-4" rx="124" ry="18" fill="hsl(50,44%,54%)" stroke="#234832" stroke-width="6"/></g>
+<rect x="180" y="452" width="440" height="44" rx="22" fill="#234832"/>
+<text x="400" y="481" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="bold" fill="#fdfcf3">Soil pH Balancer</text>
+</svg>
