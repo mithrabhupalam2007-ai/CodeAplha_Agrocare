@@ -34,7 +34,7 @@ const productSchema = new mongoose.Schema(
     heading: { type: String, trim: true, default: '', index: true },
     /**
      * SUBCATEGORY value from server/utils/taxonomy.js (e.g. 'Vegetable Seeds',
-     * 'Miticides/Acaricides'). Required and validated against the primary
+     * 'Insecticides'). Required and validated against the primary
      * category (case-insensitive) in productController.parseProductBody.
      * Legacy records that could not be mapped to the new structure may hold
      * '' — they stay visible in the main-category grid but belong to no

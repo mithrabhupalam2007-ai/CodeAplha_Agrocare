@@ -741,14 +741,12 @@ const SUB_TILES = {
   Fungicides: { hue: 165, scene: `${bottle(118, 168, 1, 165)}${bushPlant(216, 168, 0.8, 110)}<circle cx="204" cy="108" r="5" fill="hsl(28,55%,50%)" stroke="${K}" stroke-width="2"/><circle cx="226" cy="96" r="4.4" fill="hsl(28,55%,50%)" stroke="${K}" stroke-width="2"/><circle cx="230" cy="118" r="4" fill="hsl(28,55%,50%)" stroke="${K}" stroke-width="2"/>` },
   Herbicides: { hue: 95, scene: `${bottle(118, 168, 1, 95)}<path d="M198 168 q-8 -32 8 -50 q18 14 8 32 q-3 12 -16 18 z" fill="hsl(82,32%,56%)" stroke="${K}" stroke-width="2.6"/><path d="M252 108 v30 M245 131 l7 8 l7 -8" fill="none" stroke="#b3543a" stroke-width="4.4" stroke-linecap="round"/>` },
   Bactericides: { hue: 190, scene: `${bottle(118, 168, 1, 190)}${microbe(216, 168, 0.8, 190)}` },
-  'Miticides/Acaricides': { hue: 330, scene: `${bottle(118, 168, 1, 330)}${bug(214, 154, 1, 330, 'mite')}${bug(258, 165, 0.7, 340, 'mite')}` },
 
   /* ---- Crop Protection (bio) ------------------------------------------- */
   'Bio Insecticides': { hue: 100, scene: `<path d="M52 152 q20 -24 48 -20 q-4 28 -32 32 q-15 2 -16 -12 z" fill="hsl(100,45%,52%)" stroke="${K}" stroke-width="2.6"/><path d="M60 148 q18 -14 38 -14" fill="none" stroke="${K}" stroke-width="2" opacity=".6"/>${bug(116, 158, 0.85, 5, 'beetle')}${bottle(212, 168, 0.95, 90)}` },
   'Bio Fungicides': { hue: 145, scene: `${flask(128, 168, 1, 145)}${microbe(226, 168, 0.85, 145)}<circle cx="268" cy="120" r="4" fill="hsl(145,60%,48%)" stroke="${K}" stroke-width="1.8"/><circle cx="280" cy="138" r="3.4" fill="hsl(145,60%,48%)" stroke="${K}" stroke-width="1.8"/>` },
   'Bio Viricides': { hue: 265, scene: `${virus(150, 168, 1, 265)}${flask(240, 168, 0.8, 265)}` },
   'Bio Nematicides': { hue: 150, scene: `${worm(118, 158, 1, 45)}${flask(222, 168, 0.95, 150)}<path d="M276 104 l16 6 v14 q0 16 -16 24 q-16 -8 -16 -24 v-14 z" fill="hsl(150,45%,62%)" stroke="${K}" stroke-width="2.6" stroke-linejoin="round"/>` },
-  'Bio Miticides/Acaricides': { hue: 300, scene: `${microbe(124, 168, 0.9, 300)}${bug(214, 156, 1, 330, 'mite')}${bug(260, 164, 0.65, 320, 'mite')}` },
 
   /* ---- Crop Protection (traps and lures) ------------------------------- */
   'Sticky Traps': { hue: 55, scene: `${trapCard(128, 168, 1.05, 55)}${trapCard(220, 168, 0.85, 50)}${bug(272, 158, 0.7, 10, 'fly')}` },
@@ -811,8 +809,6 @@ const SUB_TILES = {
   'Poultry Supplements': { hue: 45, scene: `${sack(122, 168, 0.95, 45, 'Cal')}${chicken(230, 168, 1.1, 35)}` },
   'Poultry Equipment': { hue: 20, scene: `${tubeFeeder(132, 168, 1.15, 20)}${chicken(240, 168, 1, 40)}<path d="M278 150 h22 v9 a7 7 0 0 1 -7 7 h-8 a7 7 0 0 1 -7 -7 z" fill="hsl(200,60%,66%)" stroke="${K}" stroke-width="2.4"/>` },
 
-  /* ---- Organic (display name; shared bio names reuse the tiles above) -- */
-  'Bio Miticides': { hue: 285, scene: `${microbe(126, 168, 0.9, 285)}${bug(214, 156, 0.95, 330, 'mite')}${bug(260, 164, 0.65, 320, 'mite')}` },
 
   /* ---- Tapas (curated collection subcategories) ------------------------ */
   'Crop Nutrition': { hue: 95, scene: `${packet(118, 168, 0.9, 95, leafGlyph)}${sack(208, 168, 0.9, 110, 'N')}${plant(272, 168, 0.65, 110, 3)}` },
@@ -943,7 +939,6 @@ const PRODUCT_ART = [
   // Crop Protection
   { file: 'bio-viricide.svg', caption: 'Bio Viricide', shape: 'bottle', hue: 265 },
   { file: 'bio-nematicide.svg', caption: 'Bio Nematicide', shape: 'bottle', hue: 150 },
-  { file: 'bio-miticide.svg', caption: 'Bio Miticide', shape: 'bottle', hue: 300 },
   { file: 'sticky-traps.svg', caption: 'Sticky Trap Cards', shape: 'card', hue: 55 },
   { file: 'pheromone-lures.svg', caption: 'Pheromone Lure Capsules', shape: 'box', hue: 20 },
   { file: 'pheromone-traps.svg', caption: 'Funnel Pheromone Trap', shape: 'jar', hue: 160 },

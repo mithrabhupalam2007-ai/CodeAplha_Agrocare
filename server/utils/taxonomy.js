@@ -43,8 +43,8 @@ const CATEGORY_STRUCTURE = {
     { heading: 'Special Category', subcategories: ['Polyhouse', 'Exotics', 'Urban Garden'] },
   ],
   'Crop Protection': [
-    { heading: 'Chemical Pesticides', subcategories: ['Insecticides', 'Fungicides', 'Herbicides', 'Bactericides', 'Miticides/Acaricides'] },
-    { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides', 'Bio Miticides/Acaricides'] },
+    { heading: 'Chemical Pesticides', subcategories: ['Insecticides', 'Fungicides', 'Herbicides', 'Bactericides'] },
+    { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides'] },
     { heading: 'Traps and Lures', subcategories: ['Sticky Traps', 'Pheromone Lures', 'Pheromone Traps', 'Solar Light Traps'] },
   ],
   'Crop Nutrition': [
@@ -63,7 +63,7 @@ const CATEGORY_STRUCTURE = {
     { heading: 'Poultry', subcategories: ['Poultry Supplements', 'Poultry Equipment'] },
   ],
   Organic: [
-    { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides', 'Bio Miticides'] },
+    { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides'] },
     { heading: 'Crop Nutrition', subcategories: ['Bio/Organic Fertilizers', 'Bio Stimulants'] },
   ],
   Tapas: [
@@ -76,22 +76,9 @@ const SUBCATEGORIES = Object.fromEntries(
   MAIN_CATEGORIES.map((m) => [m, CATEGORY_STRUCTURE[m].flatMap((g) => g.subcategories)])
 );
 
-/**
- * Cross-category spellings of the same concept. The prompt lists
- * 'Bio Miticides/Acaricides' under Crop Protection but 'Bio Miticides'
- * under Organic — a single canonical record must be discoverable in both
- * contexts, so matching widens to these accepted spellings.
- * Keyed `mainCategory -> displayed subcategory -> [stored spellings]`.
- */
-const SUB_ALIASES = {
-  Organic: { 'Bio Miticides': ['Bio Miticides', 'Bio Miticides/Acaricides'] },
-  'Crop Protection': { 'Bio Miticides/Acaricides': ['Bio Miticides/Acaricides', 'Bio Miticides'] },
-};
-
 /** The stored-subcategory spellings that satisfy a (mainCategory, sub) browse. */
 function subsFor(mainCategory, sub) {
-  const alias = (SUB_ALIASES[mainCategory] || {})[sub];
-  return alias ? alias.slice() : [sub];
+  return [sub];
 }
 
 const isMainCategory = (x) => MAIN_CATEGORIES.includes(x);
@@ -261,7 +248,6 @@ module.exports = {
   MAIN_CATEGORIES,
   CATEGORY_STRUCTURE,
   SUBCATEGORIES,
-  SUB_ALIASES,
   isMainCategory,
   headingsOf,
   subcategoriesOf,

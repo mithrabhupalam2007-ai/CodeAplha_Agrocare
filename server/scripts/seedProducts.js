@@ -58,14 +58,11 @@ const SUB_DESCRIPTIONS = {
   Fungicides: 'Demo fungicide listings for fungal disease management.',
   Herbicides: 'Demo weed-management listings for field and orchard use.',
   Bactericides: 'Demo bacterial-disease management listings (label data is fictional).',
-  'Miticides/Acaricides': 'Demo mite-control listings for crops and orchards (label data is fictional).',
   // Crop Protection — bio
   'Bio Insecticides': 'Neem-based and microbial demo products for low-chemical farming.',
   'Bio Fungicides': 'Microbial bio-fungicide demo listings (label data is fictional).',
   'Bio Viricides': 'Demo virus-management bio listings (label data is fictional).',
   'Bio Nematicides': 'Demo bio nematicide listings for soil nematode management.',
-  'Bio Miticides/Acaricides': 'Demo bio mite-control listings (label data is fictional).',
-  'Bio Miticides': 'Organic-side display name of the bio mite-control listings (label data is fictional).',
   // Crop Protection — traps and lures
   'Sticky Traps': 'Yellow and blue sticky trap listings for monitoring and mass trapping.',
   'Pheromone Lures': 'Species-specific pheromone lure capsule listings (demo).',
@@ -472,15 +469,6 @@ const PRODUCTS = [
     specifications: PESTICIDE_SPEC,
   }),
   P({
-    name: 'FarmGuard Mite Kill Acaricide (Demo)',
-    description: 'Fictional acaricide demo listing for demonstrating the Acaricides (Mite Killers) subcategory. Not a registered product.',
-    category: 'Miticides/Acaricides', type: 'Crop Protection', brand: 'FarmGuard (Demo)', price: 390, packSize: '500 ml',
-    image: '/images/products/acaricide-mite.svg', stockQuantity: 48, rating: 4.1,
-    crops: ['Fruits', 'Vegetables'],
-    labelInfo: { ...DEMO_LABEL },
-    specifications: PESTICIDE_SPEC,
-  }),
-  P({
     name: 'SafeKill Rodenticide Bait Blocks (Demo)',
     description: 'Fictional rodenticide bait-block demo listing for demonstrating the Rodenticides subcategory. Not a real product — secure all bait stations against children and animals.',
     category: '', type: 'Crop Protection', heading: 'Chemical Pesticides', brand: 'SafeKill (Demo)', price: 150, packSize: '100 g (blocks)',
@@ -833,15 +821,6 @@ const PRODUCTS = [
     image: '/images/products/bio-nematicide.svg', stockQuantity: 38, rating: 4.1,
     crops: ['Vegetables', 'Pulses'],
     labelInfo: { ...DEMO_LABEL, composition: 'DEMO DATA — microbial/botanical nematicide listing; composition and registration not verified.' },
-    specifications: PESTICIDE_SPEC,
-  }),
-  P({
-    name: 'BioAgro MiteSafe Bio Miticide (Demo)',
-    description: 'DEMO LISTING for a bio miticide product type. No performance claim is made — always follow the verified product label.',
-    category: 'Bio Miticides/Acaricides', type: 'Crop Protection', additionalCategories: ['Organic'], brand: 'BioAgro (Demo)', price: 355, packSize: '250 ml',
-    image: '/images/products/bio-miticide.svg', stockQuantity: 33, rating: 4.0,
-    crops: ['Fruits', 'Vegetables'],
-    labelInfo: { ...DEMO_LABEL, composition: 'DEMO DATA — bio miticide listing; composition and registration not verified.' },
     specifications: PESTICIDE_SPEC,
   }),
   P({

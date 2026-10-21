@@ -295,8 +295,7 @@ const UI = (() => {
    * records not yet assigned a subcategory), backend availability,
    * wishlist toggle and a disabled purchase state for out-of-stock items.
    * `chipLabel` overrides the chip — the category page passes the sub being
-   * viewed so alias-matched records (Organic "Bio Miticides" ⇄ Crop
-   * Protection "Bio Miticides/Acaricides") display the local name.
+   * viewed so cross-listed records name the sub you are browsing.
    */
   function productCard(p, chipLabel) {
     const d = document.createElement('article');

@@ -23,8 +23,8 @@ const TAXONOMY = (() => {
       { heading: 'Special Category', subcategories: ['Polyhouse', 'Exotics', 'Urban Garden'] },
     ],
     'Crop Protection': [
-      { heading: 'Chemical Pesticides', subcategories: ['Insecticides', 'Fungicides', 'Herbicides', 'Bactericides', 'Miticides/Acaricides'] },
-      { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides', 'Bio Miticides/Acaricides'] },
+      { heading: 'Chemical Pesticides', subcategories: ['Insecticides', 'Fungicides', 'Herbicides', 'Bactericides'] },
+      { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides'] },
       { heading: 'Traps and Lures', subcategories: ['Sticky Traps', 'Pheromone Lures', 'Pheromone Traps', 'Solar Light Traps'] },
     ],
     'Crop Nutrition': [
@@ -43,7 +43,7 @@ const TAXONOMY = (() => {
       { heading: 'Poultry', subcategories: ['Poultry Supplements', 'Poultry Equipment'] },
     ],
     Organic: [
-      { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides', 'Bio Miticides'] },
+      { heading: 'Bio/Organic Pesticides', subcategories: ['Bio Insecticides', 'Bio Fungicides', 'Bio Viricides', 'Bio Nematicides'] },
       { heading: 'Crop Nutrition', subcategories: ['Bio/Organic Fertilizers', 'Bio Stimulants'] },
     ],
     Tapas: [
