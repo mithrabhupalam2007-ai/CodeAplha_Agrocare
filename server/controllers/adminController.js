@@ -8,6 +8,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { ORDER_STATUSES } = require('../models/Order');
 const { decorate, decorateAll } = require('./productController');
 const taxonomy = require('../utils/taxonomy');
+const pricing = require('../utils/pricing');
 const v = require('../utils/validators');
 
 const LOW_STOCK_THRESHOLD = Number(process.env.LOW_STOCK_THRESHOLD) || 5;
@@ -214,7 +215,7 @@ const getProductAdmin = asyncHandler(async (req, res) => {
 /** PATCH /api/admin/products/:id/price — change the selling price (and optional MRP). */
 const updatePrice = asyncHandler(async (req, res) => {
   requireValidId(req);
-  const { price, mrp } = req.body || {};
+  const { price, mrp, allowOutOfRangePrice } = req.body || {};
   const set = {};
 
   if (price !== undefined) {
@@ -232,8 +233,24 @@ const updatePrice = asyncHandler(async (req, res) => {
   }
   if (!Object.keys(set).length) throw new ApiError(400, 'Supply a price and/or mrp value.');
 
+  const existing = await Product.findById(req.params.id).lean();
+  if (!existing) throw new ApiError(404, 'Product not found.');
+
+  // Category price band: reject out-of-band edits unless the admin sends the
+  // explicit override flag, which is audited on the record as priceExempt.
+  if (set.price !== undefined) {
+    const range = pricing.rangeFor(existing.primaryCategory);
+    if (range) {
+      const outside = set.price < range.min || set.price > range.max;
+      const override = allowOutOfRangePrice === true || allowOutOfRangePrice === 'true';
+      if (outside && !override) {
+        throw new ApiError(400, pricing.priceRangeError(existing.primaryCategory, set.price));
+      }
+      set.priceExempt = outside;
+    }
+  }
+
   const product = await Product.findByIdAndUpdate(req.params.id, { $set: set }, { new: true, runValidators: true });
-  if (!product) throw new ApiError(404, 'Product not found.');
   res.json({ success: true, message: `Price updated for "${product.name}".`, product: decorate(product) });
 });
 

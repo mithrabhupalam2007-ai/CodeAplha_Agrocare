@@ -15,6 +15,13 @@
  *
  *   npm run seed
  *
+ * IMPORTED CATALOGUE
+ * server/data/importedProducts.json (generated once by
+ * server/scripts/importImages.js from the owner's images/ folder) is
+ * upserted after the demo products — real brand photos with deterministic
+ * in-band prices and stable 3.5–4.5 demo ratings, keyed by their import
+ * slug so re-runs stay idempotent.
+ *
  * DEMO-DATA NOTICE
  * All brands, prices, label text and specifications below are fictional
  * demonstration data. In particular, pesticide label / registration fields
@@ -29,6 +36,10 @@ const { connectDB, disconnectDB } = require('../config/db');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const taxonomy = require('../utils/taxonomy');
+const { PRICE_RANGES } = require('../utils/pricing');
+
+/** Imported real-photo catalogue (one-time output of scripts/importImages.js). */
+const IMPORTED = require('../data/importedProducts.json');
 
 /** URL-style slug shared with the art generator (server/scripts/generateDemoArt.js). */
 const slug = (s) =>
@@ -225,7 +236,7 @@ const PRODUCTS = [
     name: 'Paddy (Rice) Seed - Sugandha (Demo)',
     description: 'Aromatic long-grain paddy demo seed listing suited to transplanted cultivation under normal water management.',
     category: 'Paddy', type: 'Seeds', brand: 'KrishiBeej (Demo)', price: 480, packSize: '5 kg',
-    image: '/images/products/paddy-seed.svg', stockQuantity: 85, featured: true, isSeasonal: true, seasonalNote: 'Kharif sowing season (demo)', rating: 4.6,
+    image: '/images/products/paddy-seed.svg', stockQuantity: 85, featured: true, isSeasonal: true, seasonalNote: 'Kharif sowing season (demo)', rating: 4.5,
     crops: ['Paddy', 'Rice'],
     seedInfo: { variety: 'Sugandha (demo variety)', cropType: 'Paddy', germinationPercent: 88, daysToGerminate: '3-5 days', sowingInstructions: 'Demo guidance: nursery raise 25 days, transplant 2-3 seedlings per hill at 20 x 15 cm.' },
     specifications: [{ label: 'Grain type', value: 'Long slender (demo)' }, { label: 'Duration', value: '125-135 days (demo)' }],
@@ -274,7 +285,7 @@ const PRODUCTS = [
     name: 'Watermelon Seed - Chandan (Demo)',
     description: 'Sweet, round watermelon demo seed listing with strong vine vigour and uniform fruit size.',
     category: 'Fruit Seeds', type: 'Seeds', brand: 'KrishiBeej (Demo)', price: 165, packSize: '10 g',
-    image: '/images/products/watermelon-seed.jpg', stockQuantity: 68, isSeasonal: true, seasonalNote: 'Summer season pick (demo)', rating: 4.6,
+    image: '/images/products/watermelon-seed.jpg', stockQuantity: 68, isSeasonal: true, seasonalNote: 'Summer season pick (demo)', rating: 4.5,
     crops: ['Watermelon'],
     seedInfo: { variety: 'Chandan (demo variety)', cropType: 'Watermelon', germinationPercent: 86, daysToGerminate: '5-8 days', sowingInstructions: 'Demo guidance: raise transplants in poly bags, plant out at 2 x 1.5 m spacing.' },
     specifications: [{ label: 'Rind', value: 'Striped dark green (demo)' }],
@@ -530,7 +541,7 @@ const PRODUCTS = [
     name: 'AgroShield Vermicompost 5 kg',
     description: 'Screened organic vermicompost for gardens and field application. Improves soil structure and moisture retention when worked into the topsoil.',
     category: 'Bio/Organic Fertilizers', type: 'Crop Nutrition', additionalCategories: ['Organic'], brand: 'AgroShield Naturals', price: 250, packSize: '5 kg',
-    image: '/images/products/vermicompost.svg', stockQuantity: 160, featured: true, rating: 4.6,
+    image: '/images/products/vermicompost.svg', stockQuantity: 160, featured: true, rating: 4.5,
     crops: ['Vegetables', 'Fruits', 'Flowers'],
     specifications: [
       { label: 'Type', value: 'Organic manure' },
@@ -666,7 +677,7 @@ const PRODUCTS = [
     name: 'AgroShield 16 L Knapsack Sprayer',
     description: 'Comfortable 16-litre knapsack sprayer with adjustable brass nozzle, padded straps and a pressure pump for fields and orchards.',
     category: 'Sprayers', type: 'Equipments', brand: 'AgroShield Tools', price: 1899, packSize: '1 unit (16 L)',
-    image: '/images/products/knapsack-sprayer.svg', stockQuantity: 34, featured: true, bestseller: true, rating: 4.6,
+    image: '/images/products/knapsack-sprayer.svg', stockQuantity: 34, featured: true, bestseller: true, rating: 4.5,
     specifications: [
       { label: 'Capacity', value: '16 litres' },
       { label: 'Pump', value: 'Dual-action lever pump' },
@@ -800,7 +811,7 @@ const PRODUCTS = [
     name: 'Urban Terrace Garden Seed Pack (Demo)',
     description: 'Mixed terrace-garden pack of five small packs (tomato, chilli, coriander, spinach, marigold) for balcony and rooftop gardens (demo listing).',
     category: 'Urban Garden', type: 'Seeds', brand: 'CitySprout (Demo)', price: 199, packSize: '5 varieties / 50 g',
-    image: '/images/products/urban-garden-seeds.svg', stockQuantity: 110, rating: 4.6, featured: true,
+    image: '/images/products/urban-garden-seeds.svg', stockQuantity: 110, rating: 4.5, featured: true,
     crops: ['Tomato', 'Chilli', 'Coriander', 'Spinach', 'Marigold'],
     seedInfo: { variety: 'Mixed pack (demo)', cropType: 'Mixed vegetables', germinationPercent: 75, daysToGerminate: '4-10 days', sowingInstructions: 'Demo guidance: sow in 8-12 inch grow bags on a sunny terrace; harvest little and often.' },
   }),
@@ -1422,6 +1433,35 @@ for (const p of PRODUCTS) {
   p.additionalCategories = pair.additionalCategories;
 }
 
+/**
+ * Legacy demo prices predate the category price bands — the owner chose to
+ * keep them as-is, so stamp priceExempt and let the catalogue validation
+ * report them as known exceptions instead of hard failures.
+ */
+for (const p of PRODUCTS) {
+  const r = PRICE_RANGES[p.primaryCategory];
+  p.priceExempt = Boolean(r) && (p.price < r.min || p.price > r.max);
+}
+
+/**
+ * Imported catalogue records (real brand photos): classification + demo
+ * price/rating are computed by importImages.js; only the heading is
+ * derived here so the taxonomy stays the single source of truth.
+ */
+for (const p of IMPORTED) {
+  const pair = validatePair({
+    primaryCategory: p.primaryCategory,
+    subcategory: p.subcategory,
+    additionalCategories: p.additionalCategories,
+  });
+  if (pair.error) throw new Error(`Imported product "${p.name}" fails taxonomy: ${pair.error}`);
+  p.primaryCategory = pair.primaryCategory;
+  p.subcategory = pair.subcategory;
+  p.heading = pair.heading;
+  p.additionalCategories = pair.additionalCategories;
+  p.priceExempt = false;
+}
+
 async function seed() {
   await connectDB();
 
@@ -1440,7 +1480,8 @@ async function seed() {
   if (stale.deletedCount) console.log(`[seed] Removed ${stale.deletedCount} stale category record(s).`);
 
   let productCount = 0;
-  const usedSlugs = new Set();
+  // Imported slugs are reserved up front so a demo slug can never collide.
+  const usedSlugs = new Set(IMPORTED.map((p) => p.slug));
   for (const product of PRODUCTS) {
     const { name, ...rest } = product;
     // URL slug derived from the name (deduplicated inside this batch).
@@ -1457,6 +1498,14 @@ async function seed() {
     productCount += 1;
   }
 
+  // Imported catalogue products — upserted by their stable import slug.
+  let importedCount = 0;
+  for (const product of IMPORTED) {
+    const { slug: importSlug, ...rest } = product;
+    await Product.updateOne({ slug: importSlug }, { $set: { ...rest, slug: importSlug } }, { upsert: true });
+    importedCount += 1;
+  }
+
   // Clear any lingering pre-restructure fields (type/category). This has to
   // go through the raw collection: Mongoose strict mode silently strips
   // $unset paths that are absent from the schema, so an inline $unset in the
@@ -1470,7 +1519,7 @@ async function seed() {
   const totalCategories = await Category.countDocuments();
   const seasonal = await Product.countDocuments({ active: true, isSeasonal: true });
   console.log(`[seed] Upserted ${categoryCount} categories (${totalCategories} total in DB).`);
-  console.log(`[seed] Upserted ${productCount} demo products (${total} total in DB; ${seasonal} seasonal).`);
+  console.log(`[seed] Upserted ${productCount} demo products + ${importedCount} imported catalogue products (${total} total in DB; ${seasonal} seasonal).`);
   if (UNMAPPED.length) {
     console.log(`[seed] ${UNMAPPED.length} legacy demo product(s) have no fitting subcategory in the new structure.`);
     console.log('[seed] They keep a heading + primary category (visible in the main grid) but no subcategory:');

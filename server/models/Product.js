@@ -122,6 +122,14 @@ const productSchema = new mongoose.Schema(
     seasonalNote: { type: String, trim: true, maxlength: 140, default: '' },
     rating: { type: Number, min: 0, max: 5, default: 0 },
     reviewCount: { type: Number, min: 0, default: 0 },
+    /**
+     * Audited exception flag for prices outside the category band in
+     * server/utils/pricing.js: set when an administrator saves through
+     * the explicit allowOutOfRangePrice override, and stamped on legacy
+     * demo products whose original seed price lies outside the band.
+     * The catalogue validation script reports these as known exceptions.
+     */
+    priceExempt: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );

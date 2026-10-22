@@ -116,6 +116,26 @@
 }
 .p-card__price-row .pack { font-size: 0.8rem; color: var(--muted); }
 
+/* Demo rating — "★★★★☆ 4.2/5.0" shown beside product names on cards,
+   the PDP and related-product cards (stable demo data, not reviews). */
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 6px;
+  line-height: 1;
+}
+.rating__stars {
+  color: var(--amber, #d99e0b);
+  font-size: 0.92rem;
+  letter-spacing: 1px;
+}
+.rating__num {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
 .p-card__actions {
   display: grid;
   grid-template-columns: 1fr auto;

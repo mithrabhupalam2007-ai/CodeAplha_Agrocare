@@ -126,33 +126,41 @@
   }
 
   /* ================= products ================= */
-  const prodState = { page: 1, search: '', category: '' };
+  const prodState = { page: 1, search: '', type: '', category: '' };
+
+  /**
+   * Subcategory filter options: the subs of the chosen main category, or
+   * every sub across all seven mains (deduplicated) when none is picked.
+   */
+  function fillSubFilter() {
+    const sel = $('prod-cat');
+    const current = prodState.category;
+    sel.innerHTML = '';
+    sel.add(new Option('All subcategories', ''));
+    const subs = prodState.type
+      ? TAXONOMY.subcategoriesOf(prodState.type)
+      : [...new Set(TAXONOMY.MAIN.flatMap((m) => TAXONOMY.subcategoriesOf(m)))];
+    subs.forEach((s) => sel.add(new Option(s, s)));
+    if (current && subs.includes(current)) sel.value = current;
+  }
 
   async function loadProducts() {
     const tbody = $('prod-table');
     tbody.innerHTML = '<tr><td colspan="7"><div class="spinner"></div></td></tr>';
     try {
-      const [data, cats] = await Promise.all([
-        // /admin/products also returns inactive items, so admins can manage everything.
-        api.get(
-          '/admin/products' +
-            api.qs({ search: prodState.search, category: prodState.category, page: prodState.page, limit: 10 })
-        ),
-        api.get('/admin/categories'),
-      ]);
-
-      // category filter dropdown (the product-form subcategory select is
-      // driven by TAXONOMY instead — see fillSubcategories). Names shared
-      // between main categories appear once: the backend matches them all.
-      const filterSel = $('prod-cat');
-      if (filterSel.options.length === 1) {
-        const seen = new Set();
-        cats.categories.forEach((c) => {
-          if (seen.has(c.name)) return;
-          seen.add(c.name);
-          filterSel.add(new Option(c.name, c.name));
-        });
-      }
+      // /admin/products also returns inactive items, so admins can manage
+      // everything. `type` filters the main category, `category` the
+      // subcategory (historic API alias).
+      const data = await api.get(
+        '/admin/products' +
+          api.qs({
+            search: prodState.search,
+            type: prodState.type,
+            category: prodState.category,
+            page: prodState.page,
+            limit: 10,
+          })
+      );
 
       tbody.innerHTML = data.products.length
         ? data.products
@@ -160,9 +168,9 @@
               (p) => `
         <tr>
           <td><img src="${UI.esc(p.image)}" alt="" /></td>
-          <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.esc(p.packSize)}</span>${p.isDemoData ? ' <span class="badge badge--amber">demo</span>' : ''}${p.isNewRelease ? ' <span class="badge badge--green">new</span>' : ''}${p.manualOutOfStock ? ' <span class="badge badge--red">blocked</span>' : ''}</td>
+          <td><b>${UI.esc(p.name)}</b><br/><span class="text-muted" style="font-size:.78rem;">${UI.esc(p.brand)} · ${UI.esc(p.packSize)}</span>${p.isDemoData ? ' <span class="badge badge--amber">demo</span>' : ''}${p.isNewRelease ? ' <span class="badge badge--green">new</span>' : ''}${p.manualOutOfStock ? ' <span class="badge badge--red">blocked</span>' : ''}<br/>${UI.ratingInline(p.rating)}</td>
           <td>${UI.esc(TAXONOMY.labelFor(p))}</td>
-          <td><b>${UI.inr(p.price)}</b>${p.discountPercent > 0 ? `<br/><span class="text-muted" style="font-size:.75rem;">MRP ${UI.inr(p.mrp)}</span>` : ''}</td>
+          <td><b>${UI.inr(p.price)}</b>${p.discountPercent > 0 ? `<br/><span class="text-muted" style="font-size:.75rem;">MRP ${UI.inr(p.mrp)}</span>` : ''}${p.priceExempt ? '<br/><span class="badge badge--red" title="Outside the category price band — owner-approved exception">price exempt</span>' : ''}</td>
           <td><span class="badge ${p.stockQuantity === 0 ? 'badge--red' : p.stockQuantity <= 5 ? 'badge--amber' : 'badge--green'}">${p.stockQuantity}</span></td>
           <td><span class="badge ${p.active ? 'badge--green' : 'badge--grey'}">${p.active ? 'Active' : 'Inactive'}</span></td>
           <td>
@@ -176,6 +184,19 @@
             )
             .join('')
         : '<tr><td colspan="7" class="text-center text-muted" style="padding:30px;">No products match your search.</td></tr>';
+
+      // A broken image path (file deleted or never imported) is flagged in
+      // place so admins can spot and repair it.
+      tbody.querySelectorAll('img').forEach((img) =>
+        img.addEventListener(
+          'error',
+          () => {
+            const td = img.closest('td');
+            if (td) td.innerHTML = '<span class="badge badge--red">missing image</span>';
+          },
+          { once: true }
+        )
+      );
 
       renderPager($('prod-pager'), data.pagination, (p) => {
         prodState.page = p;
@@ -239,6 +260,9 @@
   function fillHeadings(type, selected) {
     const sel = $('pm-heading');
     sel.innerHTML = '';
+    // Live price-band hint for the chosen main category (client mirror of
+    // server/utils/pricing.js — the backend stays the source of truth).
+    if ($('pm-price-hint')) $('pm-price-hint').textContent = PRICING.rangeLabel(type);
     const headings = TAXONOMY.headingsOf(type).filter(Boolean);
     if (!headings.length) {
       sel.add(new Option('— no heading sections —', ''));
@@ -389,6 +413,8 @@
       brand: f.brand.value.trim(),
       packSize: f.packSize.value.trim(),
       price: Number(f.price.value),
+      // Explicit, audited escape hatch for prices outside the category band.
+      allowOutOfRangePrice: f.allow_out_of_range.checked,
       mrp: f.mrp.value === '' ? null : Number(f.mrp.value),
       stockQuantity: Number(f.stockQuantity.value),
       image: f.image.value.trim(),
@@ -638,6 +664,22 @@
       toast(data.message);
       loadPriceList();
     } catch (err) {
+      // Out-of-band prices are rejected by the backend unless the admin
+      // explicitly authorizes the override (recorded as priceExempt).
+      if (
+        String(err.message).includes('outside the allowed range') &&
+        confirm(`${err.message}\n\nApply an authorized out-of-range override? The record will be flagged as a price exception.`)
+      ) {
+        try {
+          const data = await api.patch(`/admin/products/${id}/price`, { price, allowOutOfRangePrice: true });
+          toast(data.message);
+          loadPriceList();
+          return;
+        } catch (e2) {
+          toast(e2.message, 'error');
+          return;
+        }
+      }
       toast(err.message, 'error');
     }
   }
@@ -953,6 +995,16 @@
         prodState.page = 1;
         loadProducts();
       }, 350);
+    });
+    // main-category + subcategory filters for the product list
+    TAXONOMY.MAIN.forEach((m) => $('prod-type').add(new Option(m, m)));
+    fillSubFilter();
+    $('prod-type').addEventListener('change', (e) => {
+      prodState.type = e.target.value;
+      prodState.category = '';
+      prodState.page = 1;
+      fillSubFilter();
+      loadProducts();
     });
     $('prod-cat').addEventListener('change', (e) => {
       prodState.category = e.target.value;

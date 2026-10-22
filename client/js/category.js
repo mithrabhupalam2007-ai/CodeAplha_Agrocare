@@ -23,6 +23,7 @@
   let all = []; // fetched, deduped
   let visible = []; // after search + sort
   let shown = 0;
+  let totalAll = 0; // API's total for this filter (may exceed the 60 fetched)
 
   const SORTS = {
     // "Recommended" keeps the server's order exactly — for the main category
@@ -130,6 +131,9 @@
         ? { type, subcategory: sub, limit: 60 }
         : { type, shuffle: 'true', limit: 60 }; // fresh mixed selection per visit
       const data = await api.get(`/products${api.qs(params)}`);
+      // The page fetches a shuffled/capped batch (limit 60), but the header
+      // count must reflect the API's true total for this filter.
+      totalAll = (data.pagination && data.pagination.total) || (data.products || []).length;
       // Defensive dedupe — the backend $sample already returns distinct rows.
       const seen = new Set();
       all = (data.products || []).filter((p) => {
@@ -139,6 +143,7 @@
       });
     } catch (err) {
       all = [];
+      totalAll = 0;
       el('cat-grid').innerHTML = `<div class="alert show alert--error">${UI.esc(err.message)}</div>`;
     } finally {
       el('cat-loader').classList.add('hidden');
@@ -183,7 +188,7 @@
         ? 'No products match your search in this section.'
         : 'No products have been listed in this section yet. Check back soon!';
       empty.classList.remove('hidden');
-      el('cat-count').textContent = all.length ? `${all.length} products` : 'No products yet';
+      el('cat-count').textContent = totalAll ? `${totalAll} products` : 'No products yet';
       return;
     }
 
@@ -195,7 +200,7 @@
     const shownNow = Math.min(shown, visible.length);
     shownLabel.textContent = `Showing ${shownNow} of ${visible.length} products`;
     more.hidden = shownNow >= visible.length;
-    el('cat-count').textContent = `${all.length} product${all.length === 1 ? '' : 's'}${sub ? ` in ${sub}` : ` in ${type}`}`;
+    el('cat-count').textContent = `${totalAll} product${totalAll === 1 ? '' : 's'}${sub ? ` in ${sub}` : ` in ${type}`}`;
   }
 
   /* ---------------- boot ---------------- */

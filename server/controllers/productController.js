@@ -5,6 +5,7 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const v = require('../utils/validators');
 const taxonomy = require('../utils/taxonomy');
+const pricing = require('../utils/pricing');
 
 /** Escape user input before embedding it in a RegExp. */
 function escapeRegex(str) {
@@ -390,6 +391,23 @@ function parseProductBody(body, { partial = false, existing = {} } = {}) {
     else out.price = Math.round(price * 100) / 100;
   } else if (!partial) {
     errors.price = 'Price is required';
+  }
+
+  // Category price band (server/utils/pricing.js): a saved price must fall
+  // inside the band of the product's primary category unless the admin
+  // explicitly overrides — the override is audited via priceExempt.
+  if (out.price !== undefined && !errors.price) {
+    const category = out.primaryCategory || existing.primaryCategory;
+    const range = pricing.rangeFor(category);
+    if (range) {
+      const outside = out.price < range.min || out.price > range.max;
+      const override = body.allowOutOfRangePrice === true || body.allowOutOfRangePrice === 'true';
+      if (outside && !override) {
+        errors.price = pricing.priceRangeError(category, out.price);
+      } else {
+        out.priceExempt = outside; // in range clears any previous override
+      }
+    }
   }
 
   if (body.mrp !== undefined && body.mrp !== null && body.mrp !== '') {

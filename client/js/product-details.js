@@ -244,6 +244,7 @@
       <div class="p-card__body">
         <span class="p-card__cat">${UI.esc(TAXONOMY.labelFor(p))}</span>
         <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${UI.esc(p.name)}</a></h3>
+        ${UI.ratingInline(p.rating)}
         <div class="p-card__meta">
           <span>${UI.esc(p.packSize)}</span>
           <span class="p-card__stock ${stockCls}"><span class="dot"></span>${stockTxt}</span>
@@ -360,7 +361,9 @@
     $('pdp-cat').textContent = TAXONOMY.labelFor(product);
     $('pdp-name').textContent = product.name;
     $('pdp-stars').textContent = UI.stars(product.rating);
-    $('pdp-reviews').textContent = `${product.rating || 0} · ${product.reviewCount || 0} demo reviews`;
+    // Stable demo rating (3.5–4.5), explicitly labelled — never presented
+    // as verified customer reviews.
+    $('pdp-reviews').textContent = `${Number(product.rating || 0).toFixed(1)}/5.0 demo rating`;
     $('pdp-brand').textContent = product.brand;
     $('pdp-desc').textContent = product.description;
     $('pdp-price').textContent = UI.inr(product.price);

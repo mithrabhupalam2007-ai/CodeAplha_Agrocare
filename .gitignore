@@ -24,6 +24,13 @@ coverage/
 dist/
 .cache/
 
+# --- Local owner material ---
+# Source photo dump the catalogue import reads from (server/scripts/importImages.js);
+# the curated copies live in client/images/products/imported/ and ARE committed.
+images/
+# Local DB safety dumps (npm run backup)
+server/backups/
+
 # --- Local temp test files ---
 tmp/
 *.local

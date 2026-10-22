@@ -15,6 +15,7 @@
   <script defer src="/js/api.js"></script>
   <script defer src="/js/store.js"></script>
   <script defer src="/js/taxonomy.js"></script>
+  <script defer src="/js/pricing.js"></script>
   <script defer src="/js/ui.js"></script>
   <script defer src="/js/admin.js"></script>
 </head>
@@ -144,7 +145,8 @@
                 <h2>Products</h2>
                 <div class="tools">
                   <input type="search" id="prod-search" placeholder="Search products..." aria-label="Search products" />
-                  <select id="prod-cat" aria-label="Filter by category"><option value="">All categories</option></select>
+                  <select id="prod-type" aria-label="Filter by main category"><option value="">All main categories</option></select>
+                  <select id="prod-cat" aria-label="Filter by subcategory"><option value="">All subcategories</option></select>
                   <button class="btn btn--primary btn--sm" id="btn-add-product">+ Add product</button>
                 </div>
               </div>
@@ -340,7 +342,12 @@
             <div class="field"><label>Pack size</label><input class="input" name="packSize" placeholder="e.g. 500 g" required /></div>
           </div>
           <div class="form-row">
-            <div class="field"><label>Price (₹)</label><input class="input" name="price" type="number" min="0" step="0.01" required /></div>
+            <div class="field">
+              <label>Price (₹)</label>
+              <input class="input" name="price" type="number" min="0" step="0.01" required />
+              <small id="pm-price-hint" class="text-muted" style="display:block;margin-top:4px;"></small>
+              <label class="check" style="margin-top:6px;"><input type="checkbox" name="allow_out_of_range" /> Authorize out-of-range price (audited exception)</label>
+            </div>
             <div class="field"><label>MRP / original price (₹) <span class="text-muted">— optional</span></label><input class="input" name="mrp" type="number" min="0" step="0.01" placeholder="Shown only when above price" /></div>
           </div>
           <div class="form-row">

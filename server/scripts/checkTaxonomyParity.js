@@ -75,8 +75,27 @@ for (const [type, img] of Object.entries(client.MAIN_IMAGES || {})) {
   if (!fs.existsSync(file)) fail(`missing main-category art for "${type}": ${img}`);
 }
 
+// 5. The client price-band mirror (client/js/pricing.js) matches the server
+//    source of truth (server/utils/pricing.js).
+const { PRICE_RANGES, DEMO_RATING } = require('../utils/pricing');
+const pricingClientFile = path.join(__dirname, '..', '..', 'client', 'js', 'pricing.js');
+const pricingSandbox = { window: {} };
+vm.createContext(pricingSandbox);
+vm.runInContext(fs.readFileSync(pricingClientFile, 'utf8'), pricingSandbox);
+const clientPricing = pricingSandbox.window.PRICING;
+if (!clientPricing) {
+  fail(`client/js/pricing.js does not define window.PRICING`);
+} else {
+  if (JSON.stringify(clientPricing.PRICE_RANGES) !== JSON.stringify(PRICE_RANGES)) {
+    fail(`price bands differ:\n  server: ${JSON.stringify(PRICE_RANGES)}\n  client: ${JSON.stringify(clientPricing.PRICE_RANGES)}`);
+  }
+  if (JSON.stringify(clientPricing.DEMO_RATING) !== JSON.stringify(DEMO_RATING)) {
+    fail(`demo rating band differs (server ${JSON.stringify(DEMO_RATING)} vs client ${JSON.stringify(clientPricing.DEMO_RATING)})`);
+  }
+}
+
 if (failed) {
   console.error('[parity] FAILED — fix the lists above (server/utils/taxonomy.js is the source of truth).');
   process.exit(1);
 }
-console.log('[parity] OK — client and server taxonomies match, and all subcategory art exists.');
+console.log('[parity] OK — client and server taxonomies + price bands match, and all subcategory art exists.');

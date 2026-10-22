@@ -8,6 +8,9 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "seed": "node scripts/seedProducts.js",
+    "backup": "node scripts/backupDb.js",
+    "import-images": "node scripts/importImages.js",
+    "validate:catalogue": "node scripts/validateCatalogue.js",
     "migrate:taxonomy": "node scripts/migrateTaxonomy.js",
     "check-taxonomy": "node scripts/checkTaxonomyParity.js",
     "create-admin": "node scripts/createAdmin.js"

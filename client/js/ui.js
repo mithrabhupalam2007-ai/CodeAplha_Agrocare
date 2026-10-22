@@ -47,6 +47,18 @@ const UI = (() => {
     return '★'.repeat(r) + '☆'.repeat(5 - r);
   };
 
+  /**
+   * Inline rating snippet — "★★★★☆ 4.2/5.0" for the demo rating stored on
+   * the product (stable demo data between 3.5 and 4.5, NOT verified
+   * customer reviews). Empty string for records without a rating.
+   */
+  const ratingInline = (rating) => {
+    const r = Number(rating);
+    if (!r) return '';
+    return `<span class="rating" title="Demo rating"><span class="rating__stars" aria-hidden="true">${stars(r)}</span>`
+      + `<span class="rating__num">${r.toFixed(1)}/5.0</span></span>`;
+  };
+
   const esc = (s) =>
     String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
@@ -332,6 +344,7 @@ const UI = (() => {
       <div class="p-card__body">
         <span class="p-card__cat">${esc(subLabel)}</span>
         <h3 class="p-card__name"><a href="/pages/product-details.html?id=${p._id}">${esc(p.name)}</a></h3>
+        ${ratingInline(p.rating)}
         <div class="p-card__meta">
           <span>${esc(p.packSize)}</span>
           <span class="p-card__stock ${stockCls}"><span class="dot"></span>${stockTxt}</span>
@@ -422,7 +435,7 @@ const UI = (() => {
   }
 
   return {
-    I, inr, formatDate, stars, esc, toast,
+    I, inr, formatDate, stars, ratingInline, esc, toast,
     mountNav, mountFooter, refreshBadges,
     requireLogin, requireAdmin, cartLine,
     productCard, toggleWishlist, wireCarousel,
