@@ -26,6 +26,13 @@ const orderSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    /**
+     * Optional idempotency key sent by the checkout page. A browser that
+     * double-submits the same checkout (double click, retry after a flaky
+     * network, refresh re-POST) reuses one key, so the unique index below
+     * collapses those attempts into a single order.
+     */
+    clientRequestId: { type: String, trim: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     items: {
       type: [orderItemSchema],
@@ -65,6 +72,12 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ createdAt: -1 });
+// Duplicate-submit protection: at most one order per (user, clientRequestId).
+// Partial so legacy orders without the key are unaffected.
+orderSchema.index(
+  { user: 1, clientRequestId: 1 },
+  { unique: true, partialFilterExpression: { clientRequestId: { $type: 'string' } } }
+);
 
 module.exports = mongoose.model('Order', orderSchema);
 module.exports.ORDER_STATUSES = ORDER_STATUSES;

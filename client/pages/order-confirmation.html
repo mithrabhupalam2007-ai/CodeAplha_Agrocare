@@ -27,11 +27,20 @@
         <div class="loading-row" id="loader"><div class="spinner"></div></div>
 
         <div class="confirm-hero hidden" id="confirm-root">
+          <div class="confetti-burst" id="confetti" aria-hidden="true"></div>
           <div class="tick">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           </div>
-          <h1>Order placed successfully!</h1>
-          <p class="text-muted">Thank you for shopping with AgroShield. A confirmation with your order details is shown below.</p>
+          <h1>Order Placed Successfully!</h1>
+          <p class="text-muted">Thank you for shopping with AgroShield — your order is confirmed and saved to your order history.</p>
+
+          <div class="confirm-stats">
+            <span class="confirm-stat"><span class="lbl">Products</span><b id="o-count">—</b></span>
+            <span class="confirm-stat confirm-stat--total"><span class="lbl">Total</span><b id="o-total-hl">—</b></span>
+            <span class="confirm-stat"><span class="lbl">Ordered on</span><b id="o-datetime">—</b></span>
+            <span class="confirm-stat"><span class="lbl">Payment</span><b id="o-pay-status">—</b></span>
+          </div>
+
           <div class="order-id-chip" id="order-id">—</div>
 
           <div class="panel" style="text-align:left;" id="order-panel">
@@ -62,7 +71,7 @@
           </div>
 
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;">
-            <a class="btn btn--primary btn--lg" href="/pages/account.html#orders">View My Orders</a>
+            <a class="btn btn--primary btn--lg" href="/pages/account.html#orders">View Order History</a>
             <a class="btn btn--outline btn--lg" href="/pages/products.html">Continue Shopping</a>
           </div>
         </div>

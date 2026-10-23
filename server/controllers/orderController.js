@@ -17,6 +17,9 @@ const v = require('../utils/validators');
  *  4. computes subtotal / delivery / total itself,
  *  5. writes the order with snapshots, then
  *  6. restocks automatically if anything fails afterwards.
+ * Duplicate submissions (double click / retry) that reuse the same
+ * clientRequestId are collapsed into the first order — the extra stock that
+ * was taken is returned before the existing order is handed back.
  */
 const createOrder = asyncHandler(async (req, res) => {
   const body = req.body || {};
@@ -35,6 +38,14 @@ const createOrder = asyncHandler(async (req, res) => {
   if (!['cod', 'demo'].includes(paymentMethod)) {
     throw new ApiError(400, 'Please choose a valid payment method (Cash on Delivery or Demo Payment).');
   }
+
+  // Optional idempotency key generated once per checkout page load. Repeated
+  // submissions of the SAME checkout (double click, network retry) reuse it and
+  // collapse into one order; a fresh checkout gets a fresh key.
+  const clientRequestId =
+    typeof body.clientRequestId === 'string' && /^[A-Za-z0-9_-]{8,64}$/.test(body.clientRequestId.trim())
+      ? body.clientRequestId.trim()
+      : undefined;
 
   if (!Array.isArray(body.items) || body.items.length === 0) {
     throw new ApiError(400, 'Your cart is empty.');
@@ -114,6 +125,7 @@ const createOrder = asyncHandler(async (req, res) => {
       try {
         order = await Order.create({
           orderId: generateOrderId(),
+          clientRequestId,
           user: req.user._id,
           items: items.map(({ product, qty }) => ({
             product: product._id,
@@ -135,6 +147,27 @@ const createOrder = asyncHandler(async (req, res) => {
         });
         break;
       } catch (err) {
+        const duplicateKey =
+          err.code === 11000 && err.keyPattern && err.keyPattern.clientRequestId;
+        if (duplicateKey && clientRequestId) {
+          // The same checkout was already submitted earlier: give this
+          // request's stock back, then hand the caller the existing order.
+          await Promise.all(
+            decremented.map(({ id, qty }) => Product.updateOne({ _id: id }, { $inc: { stockQuantity: qty } }))
+          );
+          decremented.length = 0; // outer catch must not restock twice
+          const existing = await Order.findOne({ user: req.user._id, clientRequestId }).lean();
+          if (existing) {
+            return res.json({
+              success: true,
+              alreadyPlaced: true,
+              message: 'This checkout was already placed — showing the existing order.',
+              order: existing,
+              cartItemIds: existing.items.map((it) => it.product.toString()),
+            });
+          }
+          throw new ApiError(409, 'This checkout was already submitted. Please check My Orders.');
+        }
         if (err.code === 11000 && attempt < 2) continue; // order id collision -> retry
         throw err;
       }

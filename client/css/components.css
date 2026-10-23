@@ -419,7 +419,7 @@
 }
 
 /* ---------------- Order confirmation ---------------- */
-.confirm-hero { text-align: center; max-width: 660px; margin: 0 auto; }
+.confirm-hero { text-align: center; max-width: 660px; margin: 0 auto; position: relative; }
 .confirm-hero .tick {
   width: 84px;
   height: 84px;
@@ -429,10 +429,80 @@
   display: grid;
   place-items: center;
   color: var(--success);
-  animation: pop 0.5s ease;
+  animation: pop 0.5s ease, tickGlow 1.6s ease 0.5s both;
 }
 .confirm-hero .tick svg { width: 44px; height: 44px; }
+.confirm-hero .tick path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: tickDraw 0.5s ease 0.3s forwards; }
 @keyframes pop { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes tickDraw { to { stroke-dashoffset: 0; } }
+@keyframes tickGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(60, 140, 90, 0); }
+  40% { box-shadow: 0 0 0 16px rgba(60, 140, 90, 0.16); }
+}
+
+/* success message pop-in */
+.confirm-hero h1 { animation: confirmPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 0.15s both; }
+.confirm-hero .text-muted { animation: confirmPop 0.45s ease 0.3s both; }
+@keyframes confirmPop {
+  from { transform: translateY(14px) scale(0.88); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* hero stats: product count, highlighted total, date+time, payment status */
+.confirm-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 16px 0 4px;
+}
+.confirm-stat {
+  background: var(--beige-50);
+  border: 1px solid var(--line);
+  border-radius: var(--r-m);
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 110px;
+  animation: confirmPop 0.5s ease 0.45s both;
+}
+.confirm-stat .lbl {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--green-600);
+  font-weight: 600;
+}
+.confirm-stat b { font-size: 1.02rem; color: var(--green-800); white-space: nowrap; }
+.confirm-stat--total b {
+  font-size: 1.2rem;
+  color: var(--green-700);
+  background: var(--green-50);
+  border-radius: var(--r-pill);
+  padding: 2px 12px;
+}
+
+/* confetti burst — green / beige / white bits flying out from behind the tick */
+.confetti-burst { position: absolute; top: 46px; left: 50%; width: 0; height: 0; pointer-events: none; z-index: 3; }
+.confetti-bit {
+  position: absolute;
+  display: block;
+  width: 8px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--c, var(--green-700));
+  box-shadow: 0 0 0 1px rgba(25, 53, 38, 0.18);
+  opacity: 0;
+  animation: confettiBurst 1.2s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+}
+.confetti-bit--dot { width: 9px; height: 9px; border-radius: 50%; }
+.confetti-bit--bar { width: 15px; height: 5px; border-radius: 3px; }
+@keyframes confettiBurst {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate(var(--dx, 0), var(--dy, 60px)) rotate(var(--r, 360deg)); opacity: 0; }
+}
 
 .order-id-chip {
   display: inline-block;
@@ -444,6 +514,22 @@
   letter-spacing: 0.06em;
   color: var(--green-800);
   margin: 6px 0 18px;
+  animation: confirmPop 0.5s ease 0.55s both;
+}
+
+/* accessibility: no burst, no motion — just the finished state */
+@media (prefers-reduced-motion: reduce) {
+  .confirm-hero h1,
+  .confirm-hero .text-muted,
+  .confirm-hero .tick,
+  .confirm-stat,
+  .order-id-chip {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .confirm-hero .tick path { animation: none !important; stroke-dashoffset: 0 !important; }
+  .confetti-bit { display: none !important; }
 }
 
 /* ---------------- Orders / account ---------------- */

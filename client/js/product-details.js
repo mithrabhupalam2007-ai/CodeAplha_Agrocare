@@ -422,9 +422,10 @@
         toast('This product is currently unavailable.', 'error');
         return;
       }
-      cart.add(UI.cartLine(product), currentQty());
-      UI.refreshBadges();
-      location.href = '/pages/checkout.html';
+      // Express checkout for just this product and quantity — the cart is
+      // never touched. If the visitor is logged out, requireLogin (and the
+      // login page) preserve this query string, so they come straight back.
+      location.href = `/pages/checkout.html?buy=${product._id}&qty=${currentQty()}`;
     });
 
     $('add-wish').addEventListener('click', async (e) => {

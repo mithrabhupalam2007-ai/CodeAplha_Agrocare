@@ -2,20 +2,34 @@
  * Checkout: prefills the saved address, validates the form client-side,
  * then POSTs only { items: [{product, quantity}], shippingAddress, paymentMethod }.
  * The server owns pricing, stock and totals.
+ *
+ * Two modes:
+ *  - "cart" (default):    checkout every cart line; purchased lines are
+ *                         removed from the cart after success.
+ *  - "Buy Now" (?buy=<id>): express checkout for ONE product at the chosen
+ *                         quantity — the cart is never touched.
+ * A per-page-load clientRequestId is sent with every order so that double
+ * clicks or network retries collapse into a single order on the server.
  */
 (() => {
   const FREE_THRESHOLD = 499;
   const FLAT_DELIVERY = 49;
   const $ = (id) => document.getElementById(id);
 
-  /* ---------------- summary ---------------- */
-  function renderSummary() {
-    const items = cart.items();
-    if (!items.length) return false;
+  const buyId = new URLSearchParams(location.search).get('buy');
+  const BUY_MODE = Boolean(buyId && buyId !== 'cart');
+  /** Buy Now line: { id, name, image, price, packSize, qty } */
+  let buyItem = null;
+  let buyGone = false;
 
-    $('summary-items').innerHTML = items
-      .map(
-        (i) => `
+  /** One key per page load; a retry of the SAME checkout reuses it. */
+  const clientRequestId = (() => {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return `cr-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+  })();
+
+  /* ---------------- summary ---------------- */
+  const summaryLine = (i) => `
       <div class="mini-item">
         <img src="${UI.esc(i.image)}" alt="" />
         <span class="grow">
@@ -23,17 +37,26 @@
           <span class="qt">${i.qty} × ${UI.esc(i.packSize)} · ${UI.inr(i.price)}</span>
         </span>
         <span class="pr">${UI.inr(i.price * i.qty)}</span>
-      </div>`
-      )
-      .join('');
+      </div>`;
 
-    const subtotal = cart.subtotal();
+  function summaryItems() {
+    return BUY_MODE ? (buyItem ? [buyItem] : []) : cart.items();
+  }
+
+  function renderSummary() {
+    const items = summaryItems();
+    if (!items.length) return false;
+
+    $('summary-items').innerHTML = items.map(summaryLine).join('');
+
+    const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
     const delivery = subtotal >= FREE_THRESHOLD ? 0 : FLAT_DELIVERY;
     $('c-subtotal').textContent = UI.inr(subtotal);
     $('c-delivery').textContent = delivery === 0 ? 'FREE' : UI.inr(delivery);
     $('c-total').textContent = UI.inr(subtotal + delivery);
-    $('c-note').textContent =
-      subtotal >= FREE_THRESHOLD
+    $('c-note').textContent = BUY_MODE
+      ? 'Express checkout for this product only — your cart stays untouched. The server re-verifies price and stock.'
+      : subtotal >= FREE_THRESHOLD
         ? 'Free delivery applied. Server will re-verify prices and stock.'
         : `Includes ${UI.inr(FLAT_DELIVERY)} delivery. Server will re-verify prices and stock.`;
     return true;
@@ -96,7 +119,9 @@
       btn.classList.add('is-disabled');
       box.innerHTML = `<strong>Checkout blocked</strong><br>${liveIssues
         .map((i) => UI.esc(i))
-        .join('<br>')}<br><a href="/pages/cart.html">Return to your cart</a>`;
+        .join('<br>')}<br><a href="${
+        BUY_MODE ? '/pages/products.html' : '/pages/cart.html'
+      }">${BUY_MODE ? 'Continue shopping' : 'Return to your cart'}</a>`;
       box.classList.add('show');
       box.dataset.blocked = '1';
     } else {
@@ -111,6 +136,7 @@
   }
 
   async function verifyCart() {
+    if (BUY_MODE) return verifyBuyItem();
     liveIssues.length = 0;
     const items = cart.items();
     await Promise.all(
@@ -138,6 +164,39 @@
         }
       })
     );
+    renderSummary();
+    applyPlaceOrderState();
+    return liveIssues.length === 0;
+  }
+
+  /* ---------------- Buy Now verification ----------------
+   * Same contract as verifyCart, but for the single express-checkout
+   * product: fetch it, clamp the quantity to real stock, and block the
+   * submit if it is unavailable or gone.
+   * ------------------------------------------------------ */
+  async function verifyBuyItem() {
+    liveIssues.length = 0;
+    buyGone = false;
+    const qty = Math.max(1, parseInt(new URLSearchParams(location.search).get('qty'), 10) || 1);
+    try {
+      const data = await api.get(`/products/${buyId}`);
+      const p = data.product;
+      let q = qty;
+      if (p.available === false) {
+        liveIssues.push(
+          p.stockStatus === 'unavailable'
+            ? `"${p.name}" is no longer available.`
+            : `"${p.name}" is out of stock.`
+        );
+      } else if (q > p.stockQuantity) {
+        q = Math.max(1, p.stockQuantity); // clamp to what can actually ship
+      }
+      buyItem = { ...UI.cartLine(p), qty: q };
+    } catch (err) {
+      buyGone = true;
+      buyItem = null;
+      liveIssues.push('This product is no longer available. Please continue shopping.');
+    }
     renderSummary();
     applyPlaceOrderState();
     return liveIssues.length === 0;
@@ -182,7 +241,10 @@
     }
 
     const payload = {
-      items: cart.toPayload(),
+      items: BUY_MODE
+        ? [{ product: buyItem.id, quantity: buyItem.qty }]
+        : cart.toPayload(),
+      clientRequestId,
       paymentMethod: document.querySelector('input[name="payment"]:checked').value,
       shippingAddress: {
         fullName: $('c-name').value.trim(),
@@ -198,14 +260,16 @@
     try {
       const data = await api.post('/orders', payload);
 
-      // Clear only the items that were purchased (server echoes their ids).
-      const bought = new Set(data.cartItemIds || []);
-      cart.items()
-        .filter((i) => bought.has(i.id))
-        .forEach((i) => cart.remove(i.id));
-      UI.refreshBadges();
+      // Clear only the purchased lines from the cart (never in Buy Now mode).
+      if (!BUY_MODE) {
+        const bought = new Set(data.cartItemIds || []);
+        cart.items()
+          .filter((i) => bought.has(i.id))
+          .forEach((i) => cart.remove(i.id));
+        UI.refreshBadges();
+      }
 
-      toast('Order placed successfully!');
+      toast(data.alreadyPlaced ? 'This order was already placed — showing your receipt.' : 'Order placed successfully!');
       location.href = `/pages/order-confirmation.html?id=${encodeURIComponent(data.order.orderId)}`;
     } catch (err) {
       if (err.status === 401) {
@@ -234,24 +298,34 @@
     UI.mountFooter();
     if (!UI.requireLogin()) return; // shop is only reachable after login
 
-    const hasItems = renderSummary();
-    if (!hasItems) {
-      $('checkout-form').classList.add('hidden');
-      $('checkout-empty').classList.remove('hidden');
-      return;
-    }
-
-    // Checkout requires a logged-in customer.
-    if (!UI.requireLogin()) return;
     const user = await authStore.refresh();
     if (!user) return; // redirect handled by requireLogin on next pass
-    if (user.role === 'admin') {
-      // admins may still order; nothing to block
-    }
     prefill();
-    UI.refreshBadges();
 
-    verifyCart(); // async — blocks the submit button if anything is unavailable
+    if (BUY_MODE) {
+      // Express checkout: load the single product; the cart stays untouched.
+      $('checkout-form').classList.remove('hidden');
+      await verifyBuyItem();
+      if (buyGone) {
+        $('checkout-form').classList.add('hidden');
+        const empty = $('checkout-empty');
+        empty.querySelector('h3').textContent = 'This product is no longer available';
+        empty.querySelector('p').textContent =
+          'It may have been removed or gone out of stock. Browse our catalogue to find alternatives.';
+        empty.classList.remove('hidden');
+        return;
+      }
+    } else {
+      const hasItems = renderSummary();
+      if (!hasItems) {
+        $('checkout-form').classList.add('hidden');
+        $('checkout-empty').classList.remove('hidden');
+        return;
+      }
+      verifyCart(); // async — blocks the submit button if anything is unavailable
+    }
+
+    UI.refreshBadges();
 
     Object.keys(validators).forEach((field) => {
       const input = document.querySelector(`[name="${field}"]`);

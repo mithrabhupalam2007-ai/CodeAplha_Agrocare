@@ -8,12 +8,12 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 
 ## ✨ Features
 
-### Login selection (entry page)
-- **`/` is a login selection page** — visitors choose *Login as Admin* or *Login as User* before anything else
+### Login (entry page)
+- **`/` is a single welcome/login page** — one *Login* button (no role selection, no admin option in the visible interface); sign-in happens on `/pages/login.html`
 - The home page, catalogue, cart, checkout and account pages are **not accessible before login** (enforced by the server *and* client-side guards, with `?next=` return-to support)
 
 ### Customer
-- **User login / registration** — **email-only login** (no password field), registration collects name, email, phone and delivery address, back buttons to the selection page
+- **Login / registration** — **email-only login** (no password field — documented demo mode), registration collects name, email, phone and delivery address, back buttons to the welcome page, plain login always redirects to the **home page**
 - **Home page** — hero banner (“Protect Your Crops. Grow Your Future.”), then **directly below the navbar** a horizontal **seven-category carousel** in the exact taxonomy order (Seeds / Crop Protection / Crop Nutrition / Equipments / Animal Husbandry / Organic / Tapas — arrows + mobile swipe, whole-card links, selected category highlighted), a **Seasonal Products** section fed by the admin-configurable seasonal flags (with per-product display notes, a clearly-labelled fallback when none are configured, and a friendly empty state), plus New Releases, Featured, Featured Seeds, Crop Protection, Recently Added and Farm Equipment rails, safe-farming guidance, demo reviews, FAQs, newsletter subscription
 - **Category pages** (`/pages/category.html?type=…`) — one **heading section per taxonomy heading**, each with its own horizontal **subcategory carousel** in the exact order (Seeds 3 headings · 12 subcategories, Crop Protection 3 · 12, Crop Nutrition 3 · 11, Equipments 4 · 25, Animal Husbandry 2 · 7, Organic 2 · 6 — while **Tapas lists its 7 subcategories directly, with no heading sections**), where **every tile carries its own distinct illustration** (sourced from the single subcategory-tile mapping in `TAXONOMY`, lazy-loaded, consistent 110 px height, rounded corners, card-lift + zoom hover), then an **“Explore {Type}”** product section that is **shuffled fresh on every visit**, shows 12 initially and grows via *Load More* without ever repeating a product; clicking a tile filters the section **to that subcategory only** (`&sub=…`) with count + in-section search + price sorting; **any broken image falls back to a shared placeholder** (`/images/categories/image-fallback.svg`)
 - **Product catalogue** — live search, main-category chips + subcategory dropdown, crop/price/availability filters, 7 sort options (+ “Recommended” which preserves the shuffled order), Load More pagination, empty states
@@ -21,15 +21,16 @@ A complete, responsive **full-stack agricultural e-commerce website** built with
 - **Product details** — image gallery with thumbnails + **click-to-zoom lightbox**, availability badge, **numeric demo rating explicitly labelled “demo rating”**, **breadcrumb Home / Products / main category / subcategory / name**, specs with **Main category + Category** rows, seed variety & sowing info, crop-protection label/safety blocks (clearly-marked demo data), batch/expiry, **“You May Also Like” horizontal carousel** (arrows + touch swipe, never includes the product itself), quantity picker, **Add to Cart / Buy Now / Wishlist**, back-to-products link
 - **Out of stock handling** — highly visible “Out of Stock” panel with a “check back later” message, disabled Add to Cart & Buy Now, and the backend rejects orders for unavailable products (including products **manually blocked** by an administrator)
 - **Wishlist** — dedicated page with live availability, remove and one-click *Move to Cart* (out-of-stock items stay listed but cannot move)
-- **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar, **live re-check of every line against the database** (unavailable items are clearly labelled and **checkout is blocked** until the cart is purchasable)
-- **Checkout** — address form with validation, Cash on Delivery + clearly-labelled demo payment, pre-submit availability check, server-side price/stock verification
-- **Orders** — confirmation page, My Orders with status timeline, self-cancellation (Placed/Confirmed only) with automatic restock
+- **Cart** — persisted in `localStorage` across refreshes, quantity controls with stock caps, free-delivery progress bar, **live re-check of every line against the database** (unavailable items are clearly labelled and the single **Buy All** purchase button is disabled until the cart is purchasable; an empty cart shows a disabled Buy All)
+- **Checkout** — two ways in: **Buy Now** on a product page opens an *express checkout* for just that product and quantity (`checkout.html?buy=<id>&qty=<n>`, cart untouched), while the cart's single **Buy All** button orders every available cart line together (the old *Proceed to Checkout* button is gone); address form with validation, Cash on Delivery + clearly-labelled demo payment, pre-submit availability check, server-side price/stock verification
+- **Order Successful page** — dedicated confirmation with a **celebratory burst animation** (animated green checkmark + green/beige/white confetti, pop-in message, `prefers-reduced-motion` respected), heading **“Order Placed Successfully!”**, unique order id, **product count, highlighted total, ordered date and time, payment status**, item images/names/quantities/prices, delivery address, order status, and *View Order History* / *Continue Shopping* buttons; shown only after the backend really created the order (failures show an error instead)
+- **Orders** — stored permanently in the database with **purchase-time snapshots** (name, price, image, pack size), My Orders history newest-first with **View Details** (opens the full receipt), status timeline, self-cancellation (Placed/Confirmed only) with automatic restock; **repeat submissions of the same checkout are collapsed into one order** via a per-page `clientRequestId` idempotency key
 - **Account** — profile editing, saved address, logout; the navbar account menu links to Profile, Orders, Wishlist and Logout
 - **Policies page** — shipping information, privacy policy and terms (`/pages/legal.html`), linked from the footer
 - **Auth** — email-only register/login with field validation, JWT session (httpOnly cookie + bearer fallback)
 
 ### Admin (`/pages/admin-login.html` → `/pages/admin.html`)
-- **Separate admin login** — email only; only accounts with `role: admin` are accepted (verified on the backend against the database record)
+- **Separate admin login — hidden from the visible interface** (no link from any page; reachable only by typing the URL directly); email only; only accounts with `role: admin` are accepted (verified on the backend against the database record — hiding the link never grants admin rights)
 - **Dashboard Overview** — total products, active products, in-stock, out-of-stock, **newly released**, total orders, registered customers, revenue, low-stock alerts, monthly sales chart, top products, status split, recent orders
 - **Manage Products** — full CRUD (create / edit / deactivate / permanent delete), includes inactive items, with *new* and *manually blocked* badges, per-product **demo rating**, **price-exemption badge** for owner-approved out-of-band prices, and an inline **“missing image”** badge when an image file no longer resolves; filter by **main category + subcategory** and live search
 - **Add New Product** — form with name, **three-level taxonomy cascade: main category → heading → subcategory** (the heading list follows the chosen main category; the subcategory list follows the heading; **Tapas offers its own 7 subcategories directly with no heading step**), a **live price-band hint** for the chosen category with an **“Authorize out-of-range price”** checkbox (audited as `priceExempt`), description, brand, price, **MRP**, pack size, image + **additional images**, stock, **newly-released toggle + release date**, active status, **manual out-of-stock switch**, **seasonal flag + seasonal display note** (drives the home-page Seasonal Products section), crops, specifications, **label & safety information**, batch number & expiry
@@ -63,7 +64,7 @@ The database is authoritative: the same rule is applied by the backend for catal
 Other protections in place:
 
 - JWT signed with a server-side secret (`.env`, never exposed to the frontend), with expiry (`JWT_EXPIRES_IN`, default `7d`); logout clears the session cookie
-- **Server-side login wall**: protected HTML pages redirect to the selection page without a valid signed session; product/category APIs require authentication
+- **Server-side login wall**: protected HTML pages redirect to the welcome page without a valid signed session; product/category APIs require authentication
 - Role-based authorization middleware (`protect` + `requireAdmin`) on every admin route and the admin page itself — **the role always comes from the MongoDB record**, never from the request body or the login page used
 - Registration always creates `role: customer` — no self-service admin signup; the admin account is only provisioned by `npm run create-admin`
 - Rate limiting on auth endpoints (50 req/15 min, 20 sign-ups/hour)
@@ -92,20 +93,20 @@ Other protections in place:
 ```
 .
 ├── client/                     # static frontend (served by Express)
-│   ├── index.html              # login selection page (site entry point)
+│   ├── index.html              # welcome/login entry page (site entry point)
 │   ├── css/
 │   │   ├── variables.css       # design tokens (forest green / beige palette)
 │   │   ├── base.css            # reset, buttons, forms, utilities
 │   │   ├── layout.css          # navbar, hero, footer, page headers
 │   │   ├── components.css      # cards, cart, checkout, admin, toast, modal
-│   │   └── entry.css           # login selection landing page
+│   │   └── entry.css           # welcome/login landing page
 │   ├── js/
 │   │   ├── api.js              # fetch wrapper + auth strategy
 │   │   ├── store.js            # cart (localStorage) + auth cache
 │   │   ├── taxonomy.js         # client mirror of the seven-category taxonomy (headings, subcategories, label helper)
 │   │   ├── pricing.js          # client mirror of the category price bands (admin form hints)
 │   │   ├── ui.js               # icons, toasts, navbar/footer, guards, shared product card + carousel helper
-│   │   ├── entry.js            # selection page (?next= support)
+│   │   ├── entry.js            # entry page (?next= support)
 │   │   ├── home.js  products.js  product-details.js  category.js
 │   │   ├── cart.js  checkout.js  order-confirmation.js
 │   │   └── auth.js  account.js  wishlist.js  admin.js
@@ -203,7 +204,7 @@ npm start             # production
 npm run dev           # development (auto-restart on changes)
 ```
 
-Open **http://localhost:5050** — you will land on the **login selection page**; choose *Login as User* (register first) or *Login as Admin* (admin email below). Express serves both the API and the frontend.
+Open **http://localhost:5050** — you will land on the **welcome page**; click **Login** (register first if you need an account). The admin sign-in is not linked anywhere in the UI — it stays reachable only via `http://localhost:5050/pages/admin-login.html` (admin email below). Express serves both the API and the frontend.
 
 **Live Server users:** `client/` can also be opened via VS Code Live Server (`:5500`/`:8080`/`:8000`); `api.js` automatically switches to `http://localhost:5050/api` and sends the JWT as a bearer token.
 
@@ -213,7 +214,7 @@ Open **http://localhost:5050** — you will land on the **login selection page**
 
 | Role | Email | How to sign in |
 |---|---|---|
-| Administrator | `admin@agroshield.in` | Admin Login page — enter the email, click **Login** |
+| Administrator | `admin@agroshield.in` | Hidden admin page `/pages/admin-login.html` (direct URL, not linked in the UI) — enter the email, click **Login** |
 | Customer | register your own account | User Login page — enter your email, click **Login** |
 
 > ⚠️ Email-only demo auth: anyone who knows an email can sign in as its owner. Change nothing here for local demos; implement OTP/magic-link/password login before any real deployment (see the security notice above).
@@ -294,7 +295,7 @@ Verified against a running instance (see §15 of the project prompt):
 
 - [x] Registration: valid data without any password field, duplicate email (409), invalid phone/PIN rejected
 - [x] Email-only login: registered email succeeds, unregistered email rejected with a clear 404 message (no stack traces), invalid email format → 400, missing auth (401)
-- [x] Login selection page is the site entry; protected pages redirect to `/?next=…` when logged out
+- [x] Welcome/login page is the site entry (no role selection, no admin option in the visible UI); protected pages redirect to `/?next=…` when logged out
 - [x] Admin login: by email; customer email rejected on the admin page (403); admin email rejected on the user login page (403); customers blocked from `/pages/admin.html` and all admin APIs
 - [x] Sessions expire (JWT `exp`) — an expired token gets 401; logout clears the cookie so the session is invalid immediately
 - [x] Product/category APIs return 401 without a valid session
@@ -314,7 +315,7 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Product cards/details show MRP + discount % only when a genuine discount (mrp > price) exists
 - [x] PDP gallery thumbnails + zoom lightbox; related carousel excludes the current product and shows ≥ 8 real database items
 - [x] Wishlist page: list, remove, move-to-cart (blocked for out-of-stock), availability always live
-- [x] Cart re-checks every line on load — unavailable items labelled, quantities capped, **Proceed to Checkout blocked** until the cart is purchasable
+- [x] Cart re-checks every line on load — unavailable items labelled, quantities capped, **Buy All blocked** until the cart is purchasable (empty cart → disabled Buy All)
 - [x] Checkout pre-verifies availability and blocks the Place Order button while issues remain
 - [x] Admin: manually mark a product out of stock → customers immediately see *Out of Stock* (even with stock > 0), Add to Cart/Buy Now disabled, **API checkout rejected with a clear message**
 - [x] Admin: restock (clears the manual block) → product becomes purchasable again only when active + qty > 0
@@ -331,7 +332,7 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Backend rejects impossible main-category/heading/subcategory combinations (create, partial update and listing all return 400)
 - [x] Admin product form: **three-level cascade (main category → heading → subcategory)**; Tapas offers its own 7 subcategories directly; seasonal flag + display note editable and pre-filled on edit; admin product/inventory search and filters work against the new taxonomy
 - [x] Navbar + footer Shop column list exactly the seven main categories; no retired category label (“Pesticides”, “Farming Essentials”, standalone “Fertilizers”) rendered as a category label or deep link
-- [x] Full **13-point** browser acceptance suite (headless Chrome + CDP): **95/95 checks** across the carousel, nav/footer, the exact heading/subcategory structure of all seven category pages, art loading, sub filtering + removed-category rejection, catalogue search/sort/filters, card chips + **demo-rating display**, the admin cascade + save round-trip + **price-band rejection/override/clear**, the out-of-stock flow, PDP breadcrumbs/specs/related/label panel + **demo-rating label**, a 375px mobile pass and page/API count parity (at 695 products)
+- [x] Full **15-point** browser acceptance suite (headless Chrome + CDP): **119/119 checks** across the carousel, nav/footer, the exact heading/subcategory structure of all seven category pages, art loading, sub filtering + removed-category rejection, catalogue search/sort/filters, card chips + **demo-rating display**, the admin cascade + save round-trip + **price-band rejection/override/clear**, the out-of-stock flow, PDP breadcrumbs/specs/related/label panel + **demo-rating label**, a 375px mobile pass, page/API count parity (at 695 products), the **Buy Now express checkout + Order Successful page + order history** flow (idempotency, stock round-trip, success-page details, confetti burst, single Buy All cart button) and the **login flow** (single login card, no admin option in the visible UI, no “User” wording, home-page redirect, logout)
 - [x] Demo ratings: every active product carries a stable 3.5–4.5 rating in 0.1 steps, rendered as stars + numeric text on cards, PDP (labelled “demo rating”) and related-product cards
 - [x] Category price bands enforced server-side on create/edit and the quick-price editor (400 with the allowed range; explicit `allowOutOfRangePrice` override stamps the audited `priceExempt` flag); the 93 legacy out-of-band demo prices are kept as owner-approved exemptions
 - [x] `npm run validate:catalogue` green: every image path resolves to a real local file, every product has a valid taxonomy pair, all active prices in-band or exempt, all ratings in 3.5–4.5, no duplicate slugs/names, orphan imported images reported (none), orders/users untouched
@@ -347,7 +348,7 @@ Verified against a running instance (see §15 of the project prompt):
 
 **Product** — name, slug, description, **primaryCategory (one of the seven main categories)**, **heading (derived from the taxonomy; empty for Tapas)**, **subcategory (validated as a legal `{primaryCategory, heading, subcategory}` combination against `server/utils/taxonomy.js`)**, **additionalCategories[] (extra main categories the product is also listed under — the single canonical record for the Organic overlap)**, brand, price, **mrp** (original price — discount shown only when mrp > price), packSize, image + images[], stockQuantity, **manualOutOfStock**, **isNewRelease** + **releaseDate**, **isSeasonal** + **seasonalNote** (home-page Seasonal Products section), crops[], seedInfo{}, labelInfo{}, specifications[], batch{}, **rating** (stable demo rating 3.5–4.5) + reviewCount, **priceExempt** (audited out-of-band price exception), demo/active/featured/bestseller flags, timestamps + indexes (incl. `active + isNewRelease + releaseDate`)
 
-**Order** — unique readable `orderId`, user ref, item snapshots (name/price/packSize/image/quantity at purchase time), address snapshot, subtotal, delivery, total, payment method/status, order status (`Placed → Confirmed → Processing → Shipped → Delivered | Cancelled`), status history, timestamps + indexes
+**Order** — unique readable `orderId`, user ref, item snapshots (name/price/packSize/image/quantity at purchase time), address snapshot, subtotal, delivery, total, payment method/status, order status (`Placed → Confirmed → Processing → Shipped → Delivered | Cancelled`), status history, **`clientRequestId` (per-page idempotency key with a partial unique index — repeat submissions collapse into the first order)**, timestamps + indexes
 
 **Category** — name + type as a **compound unique key (`{name, type}`)** — the same subcategory name may exist under two main categories (80 documents), image, description, active
 

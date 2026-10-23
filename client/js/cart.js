@@ -4,7 +4,7 @@
  *
  * Live availability: every line is re-checked against the database when the
  * page loads. Unavailable items are clearly labelled, quantities are capped
- * at the real stock and checkout is blocked until the cart is purchasable.
+ * at the real stock and Buy All is blocked until the cart is purchasable.
  * The server re-validates everything again when the order is placed.
  */
 (() => {
@@ -44,28 +44,30 @@
   }
 
   function applyCheckoutState() {
-    const btn = $('checkout-btn');
+    const buttons = document.querySelectorAll('[data-checkout-gate]');
     const alertBox = $('cart-alert');
-    if (!btn) return;
+    if (!buttons.length) return;
     const issues = blockers();
-    if (issues.length) {
-      alertBox.innerHTML = `<strong>Checkout unavailable</strong><br>${issues.map((i) => UI.esc(i)).join('<br>')}`;
-      alertBox.classList.add('show');
-      btn.classList.add('is-disabled');
-      btn.setAttribute('aria-disabled', 'true');
-      btn.addEventListener('click', blockClick, { once: true });
-    } else {
-      alertBox.classList.remove('show');
-      alertBox.innerHTML = '';
-      btn.classList.remove('is-disabled');
-      btn.removeAttribute('aria-disabled');
-    }
+    buttons.forEach((btn) => {
+      if (issues.length) {
+        alertBox.innerHTML = `<strong>Buy All unavailable</strong><br>${issues.map((i) => UI.esc(i)).join('<br>')}`;
+        alertBox.classList.add('show');
+        btn.classList.add('is-disabled');
+        btn.setAttribute('aria-disabled', 'true');
+        btn.addEventListener('click', blockClick, { once: true });
+      } else {
+        alertBox.classList.remove('show');
+        alertBox.innerHTML = '';
+        btn.classList.remove('is-disabled');
+        btn.removeAttribute('aria-disabled');
+      }
+    });
   }
 
   function blockClick(e) {
     if (blockers().length) {
       e.preventDefault();
-      toast('Please fix the cart issues above before checking out.', 'error');
+      toast('Please fix the cart issues above before using Buy All.', 'error');
     }
   }
 

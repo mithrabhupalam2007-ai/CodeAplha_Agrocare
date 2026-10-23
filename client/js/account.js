@@ -148,11 +148,14 @@
             <b>${UI.inr(o.total)}</b>
             <span class="text-muted"> · ${PAY_LABEL[o.paymentMethod] || o.paymentMethod} · ${PAY_STATUS_LABEL[o.paymentStatus] || o.paymentStatus}</span>
           </span>
-          ${
-            cancellable
-              ? `<button class="btn btn--danger btn--sm" data-cancel>Cancel order</button>`
-              : `<span class="text-muted" style="font-size:.82rem;">${o.orderStatus === 'Cancelled' ? 'This order was cancelled' : 'Track status above'}</span>`
-          }
+          <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <a class="btn btn--ghost btn--sm" href="/pages/order-confirmation.html?id=${encodeURIComponent(o.orderId)}">View Details</a>
+            ${
+              cancellable
+                ? `<button class="btn btn--danger btn--sm" data-cancel>Cancel order</button>`
+                : `<span class="text-muted" style="font-size:.82rem;">${o.orderStatus === 'Cancelled' ? 'This order was cancelled' : 'Track status above'}</span>`
+            }
+          </span>
         </div>`;
 
       const cancelBtn = card.querySelector('[data-cancel]');
