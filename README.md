@@ -1,6 +1,6 @@
 # 🌱 AgroShield — Farm & Garden E-Commerce Platform
 
-A complete, responsive **full-stack agricultural e-commerce website** built with the **MERN-style stack** (Express + MongoDB + vanilla HTML/CSS/JS). AgroShield is an online marketplace for farmers, gardeners and agricultural customers, organised into **seven main categories** — Seeds, Crop Protection, Crop Nutrition, Equipments, Animal Husbandry, Organic and Tapas — with **80 subcategories** in a validated three-level taxonomy (main category → heading → subcategory). The catalogue holds **695 active products**: 110 clearly-labelled demo listings plus **585 real-brand listings imported from the shop owner's product photographs** (see [Real catalogue import](#-real-catalogue-import-images--prices--ratings)).
+A complete, responsive **full-stack agricultural e-commerce website** built with the **MERN-style stack** (Express + MongoDB + vanilla HTML/CSS/JS). AgroShield is an online marketplace for farmers, gardeners and agricultural customers, organised into **seven main categories** — Seeds, Crop Protection, Crop Nutrition, Equipments, Animal Husbandry, Organic and Tapas — with **80 subcategories** in a validated three-level taxonomy (main category → heading → subcategory). The catalogue holds **585 active products — all real-brand listings imported from the shop owner's product photographs** (see [Real catalogue import](#-real-catalogue-import-images--prices--ratings)). The old fictional demo/sample products (110 seeded listings) were **removed from the catalogue, the database and the seed script** on 2026-10-23 — see [Demo product removal](#-demo-product-removal).
 
 > **Internship demo project.** All brands, prices and crop-protection label data are clearly labelled demonstration data. See [Demo data & legal notice](#-demo-data--legal-notice) before any real-world use.
 
@@ -85,7 +85,7 @@ Other protections in place:
 | Database | MongoDB + Mongoose |
 | Auth | JSONwebtoken (JWT in httpOnly cookie, bearer fallback) — email-only demo login; bcryptjs retained for legacy password hashes |
 | Security | helmet, cors, express-rate-limit, mongo-sanitize |
-| Images | Owner-supplied product photographs imported into `client/images/products/imported/` (585 real-brand pack-shots, `webp`/`avif`/`jpeg` + `jxl` rendered to PNG via Quick Look) + Wikimedia Commons photographs + generated SVG art (72 distinct subcategory-tile illustrations covering all 80 subcategory entries, 5 photo + 2 SVG main-category carousel cards, 55 demo pack-shots from `server/scripts/generateDemoArt.js`, plus a shared broken-image fallback) |
+| Images | Owner-supplied product photographs imported into `client/images/products/imported/` (585 real-brand pack-shots, `webp`/`avif`/`jpeg` + `jxl` rendered to PNG via Quick Look) + Wikimedia Commons photographs + generated SVG art (72 distinct subcategory-tile illustrations covering all 80 subcategory entries, 5 photo + 2 SVG main-category carousel cards; the 55 legacy demo pack-shots from `server/scripts/generateDemoArt.js` remain on disk but are **unused** since the demo products were removed — kept pending the owner's explicit approval to delete) + a shared broken-image fallback |
 
 ---
 
@@ -130,7 +130,7 @@ Other protections in place:
 │   ├── data/
 │   │   └── importedProducts.json  # 585 imported catalogue records (committed; read by the seed)
 │   ├── scripts/
-│   │   ├── seedProducts.js     # 110 demo + 585 imported products + 80 categories (idempotent, taxonomy-validated)
+│   │   ├── seedProducts.js     # 585 imported products + 80 categories (idempotent, taxonomy-validated; demo products no longer seeded)
 │   │   ├── importImages.js     # one-off: classify the owner's images/ folder → importedProducts.json + image copies
 │   │   ├── validateCatalogue.js # checks images/taxonomy/prices/ratings/duplicates, reports orphans
 │   │   ├── backupDb.js         # JSON safety dump of every collection → server/backups/
@@ -185,7 +185,7 @@ Then edit `server/.env`:
 ### 3. Seed the database
 
 ```bash
-npm run seed          # 110 demo + 585 imported catalogue products + 80 categories (safe to re-run, taxonomy-validated)
+npm run seed          # 585 imported catalogue products + 80 categories (safe to re-run, taxonomy-validated; demo products are not seeded)
 npm run create-admin  # creates the administrator from .env
 ```
 
@@ -300,7 +300,7 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Admin login: by email; customer email rejected on the admin page (403); admin email rejected on the user login page (403); customers blocked from `/pages/admin.html` and all admin APIs
 - [x] Sessions expire (JWT `exp`) — an expired token gets 401; logout clears the cookie so the session is invalid immediately
 - [x] Product/category APIs return 401 without a valid session
-- [x] Product data loaded from MongoDB (695 active products — 110 labelled demo + 585 imported real-brand listings — 80 subcategory documents)
+- [x] Product data loaded from MongoDB (**585 active products — all imported real-brand listings**; the 110 demo listings were removed, see [Demo product removal](#-demo-product-removal) — 80 subcategory documents)
 - [x] Search / main-category chip / subcategory / price / stock / crop filters, all 7 sort orders, empty state, pagination
 - [x] Out-of-stock: badge + disabled Add to Cart/Buy Now in the UI, backend rejects checkout for unavailable stock with a clear message
 - [x] Cart quantity updates, stock caps, subtotal/delivery/total math
@@ -335,11 +335,13 @@ Verified against a running instance (see §15 of the project prompt):
 - [x] Navbar + footer Shop column list exactly the seven main categories; no retired category label (“Pesticides”, “Farming Essentials”, standalone “Fertilizers”) rendered as a category label or deep link
 - [x] Full **15-point** browser acceptance suite (headless Chrome + CDP): **119/119 checks** across the carousel, nav/footer, the exact heading/subcategory structure of all seven category pages, art loading, sub filtering + removed-category rejection, catalogue search/sort/filters, card chips + **demo-rating display**, the admin cascade + save round-trip + **price-band rejection/override/clear**, the out-of-stock flow, PDP breadcrumbs/specs/related/label panel + **demo-rating label**, a 375px mobile pass, page/API count parity (at 695 products), the **Buy Now express checkout + Order Successful page + order history** flow (idempotency, stock round-trip, success-page details, confetti burst, single Buy All cart button) and the **login flow** (single login card, no admin option in the visible UI, no “User” wording, home-page redirect, logout)
 - [x] Demo ratings: every active product carries a stable 3.5–4.5 rating in 0.1 steps, rendered as stars + numeric text on cards, PDP (labelled “demo rating”) and related-product cards
-- [x] Category price bands enforced server-side on create/edit and the quick-price editor (400 with the allowed range; explicit `allowOutOfRangePrice` override stamps the audited `priceExempt` flag); the 93 legacy out-of-band demo prices are kept as owner-approved exemptions
+- [x] Category price bands enforced server-side on create/edit and the quick-price editor (400 with the allowed range; explicit `allowOutOfRangePrice` override stamps the audited `priceExempt` flag). The legacy out-of-band **demo** prices were removed together with their products — the live catalogue currently has **zero** `priceExempt` records
 - [x] `npm run validate:catalogue` green: every image path resolves to a real local file, every product has a valid taxonomy pair, all active prices in-band or exempt, all ratings in 3.5–4.5, no duplicate slugs/names, orphan imported images reported (none), orders/users untouched
 - [x] Subcategory imagery: all 80 subcategory entries render their own tile illustration (72 distinct files — shared only where the same subcategory name legitimately exists under two main categories) with alt text and lazy loading; clicking every tile opens the correct sub view with the correct products
 - [x] Every main-category card and subcategory tile has relevant demo art with a descriptive filename; the home carousel works at desktop and mobile widths (mobile: burger nav, swipeable track, no horizontal page overflow)
 - [x] Broken-image fallback: a global capture-phase handler swaps any failed `<img>` once for `/images/categories/image-fallback.svg`, preserving alt text and guarding against swap loops
+- [x] **Demo product removal (2026-10-23):** database backup taken first; 110 demo products deleted by the verified slug predicate (585 imported products preserved bit-for-bit — images, prices, ratings, stock, category mappings); demo ids pulled from wishlists (genuine wishlist entries kept); **all 5 order histories preserved with their full item snapshots** (orders store inline copies, so past demo-item receipts still render); seed script no longer seeds demo products (`npm run seed` re-run leaves the count at 585 — nothing resurrects on restart); `getWishlist` null-safe
+- [x] Post-removal surface verification (**14/14** headless-Chrome checks + **15/15** DB checks + `npm run validate:catalogue` green): home rails/seasonal degrade to empty states or clearly-labelled fallbacks; category pages list only genuine products; emptied subcategories (8 of them) show the empty state with **no placeholder products**; search returns no demo hits; PDP + related carousel work on genuine products; cart add + Buy All intact; wishlist renders without crashes; My Orders renders the 9-line demo-item snapshot receipt; zero uncaught page errors
 
 ---
 
@@ -378,7 +380,7 @@ The owner's `images/` photo dump (872 files across ~75 subcategory-named folders
 | Organic | ₹500 | ₹1,500 |
 | Tapas | ₹500 | ₹2,000 |
 
-Source of truth: `server/utils/pricing.js` (client mirror `client/js/pricing.js`, parity-checked). Every API-saved price must fall inside the band of the product's **primary** category; the explicit `allowOutOfRangePrice` override is the only way out and is audited as `priceExempt`. The **93 legacy demo prices** that sit outside a band (e.g. the ₹18,999 demo milking machine) were deliberately kept by the owner and are flagged `priceExempt`, so the validator reports them as known exceptions instead of failures. Cross-listed products price from their primary category — the import reports any conflict with an additional category's band (currently zero).
+Source of truth: `server/utils/pricing.js` (client mirror `client/js/pricing.js`, parity-checked). Every API-saved price must fall inside the band of the product's **primary** category; the explicit `allowOutOfRangePrice` override is the only way out and is audited as `priceExempt`. The legacy out-of-band demo prices (e.g. the ₹18,999 demo milking machine) were removed together with the demo products on 2026-10-23, so the catalogue currently has **no** `priceExempt` records. Cross-listed products price from their primary category — the import reports any conflict with an additional category's band (currently zero).
 
 ### Demo ratings
 
@@ -391,11 +393,32 @@ Every active product carries a **stable demo rating between 3.5 and 4.5 (0.1 ste
 
 ---
 
+## 🗑️ Demo product removal
+
+On 2026-10-23 the **110 fictional demo/sample products** were removed end-to-end. The catalogue now contains **only the 585 genuine listings imported from the owner's photographs**.
+
+**How demo was identified (verified, not guessed):** the authoritative source is `server/data/importedProducts.json` — every genuine product matches it by **slug** *and* stores its image under `/images/products/imported/`. The remaining 110 records were each defined in the old `seedProducts.js` demo array (16 of them lacked a “(Demo)” name marker but were confirmed seeded entries by name). The `isDemoData` schema flag was **not** usable as a filter — it was `true` on all 695 records, including imports.
+
+**What was changed**
+
+| Area | Change |
+|---|---|
+| Database | 110 demo products deleted (a full JSON backup lives in `server/backups/2026-10-23T17-55-42-423Z/`); deleted ids also pulled from user wishlists |
+| `server/scripts/seedProducts.js` | Demo `PRODUCTS` array, demo label/spec templates, new-release/discount passes and the demo upsert loop removed — `npm run seed` now seeds only the 585 imported products + 80 categories, so demo rows can never return on re-seed |
+| `server/controllers/userController.js` | `getWishlist` filters nulls, so a removed product can never crash the wishlist endpoint |
+| Category descriptions | Neutral wording (the seeded “(demo catalogue)” text was replaced) |
+
+**Preserved on purpose:** all 585 genuine products with their images, prices, ratings, stock and category mappings; all 80 category/subcategory records; every user account; genuine wishlist entries (e.g. mithra's two imported seeds); and **all order history** — orders store inline item snapshots, so past orders that contained demo items (e.g. `AS-20261023-684EA6`) still render their complete receipt. **No images were deleted** from `client/images/` — the old generated demo pack-shots remain on disk (unused) pending the owner's explicit approval.
+
+**Empty states, not placeholders:** 8 subcategories (e.g. Seeds → Urban Garden, Equipments → Garden Tools) now legitimately hold zero products and show the friendly *“No products have been listed in this section yet”* empty state; the home rails and seasonal section degrade the same way (the seasonal API's `demoFallback` picks are clearly labelled).
+
+---
+
 ## 🌾 Demo data & legal notice
 
-- Every crop-protection and other catalogue listing is **clearly marked as demo data** (`isDemoData: true`, “(Demo)” in the name, amber badges, warning banners on product pages).
-- Label, composition and registration fields are **placeholders**, not invented dosages or certifications.
-- Before any real sale: verify **Indian Insecticides Act registration** for regulated crop-protection products, seller licensing, and display genuine product label/safety information.
+- The fictional **demo/sample products were removed** on 2026-10-23 — the catalogue now contains only the owner's imported listings (see [Demo product removal](#-demo-product-removal)).
+- Imported listings still carry **demo-derived placeholder fields** computed at import time (`isDemoData: true`, stable 3.5–4.5 ratings, example prices/stock) and crop-protection products show a **“DEMO DATA” label-panel warning** — the label, composition and registration text is a placeholder, not an invented dosage or certification.
+- Before any real sale: verify **Indian Insecticides Act registration** for regulated crop-protection products, seller licensing, genuine prices/stock, and display genuine product label/safety information.
 
 ## 📸 Image credits
 

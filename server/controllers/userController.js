@@ -54,9 +54,11 @@ const getWishlist = asyncHandler(async (req, res) => {
     select:
       'name price mrp packSize image images primaryCategory heading subcategory additionalCategories stockQuantity manualOutOfStock active rating reviewCount brand',
   });
-  // Decorate with the shared availability fields (available / stockStatus /
-  // discountPercent) so the wishlist page can show live status.
-  const items = decorateAll(user.wishlist.map((p) => p.toObject()));
+  // Products removed from the catalogue (e.g. retired demo listings) leave
+  // nulls behind — drop them so the wishlist never crashes and never shows
+  // placeholders. The stored id stays on the user until it is explicitly
+  // removed from the wishlist page.
+  const items = decorateAll(user.wishlist.filter(Boolean).map((p) => p.toObject()));
   res.json({ success: true, wishlist: items });
 });
 
