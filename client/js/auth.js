@@ -73,10 +73,12 @@
   function nextAfterLogin(user) {
     const next = safeNext();
     if (next) {
+      // Deep links into the admin area stay admin-only.
       if (next.startsWith('/pages/admin')) return user.role === 'admin' ? next : '/pages/home.html';
       return next;
     }
-    return user.role === 'admin' ? '/pages/admin.html' : '/pages/home.html';
+    // Plain login always lands on the home page.
+    return '/pages/home.html';
   }
 
   /* ---------------- submit handlers ---------------- */
@@ -133,7 +135,7 @@
       });
 
       if (!data.user || data.user.role !== 'admin') {
-        flash('error', 'This account is not an administrator. Please use "Login as User".');
+        flash('error', 'This account is not an administrator. Please sign in from the main Login page.');
         return;
       }
 

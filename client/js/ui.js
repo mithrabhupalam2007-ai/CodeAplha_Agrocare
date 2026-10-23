@@ -42,6 +42,16 @@ const UI = (() => {
   const formatDate = (d) =>
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
+  /** Date AND time — used on the order success page ("ordered at"). */
+  const formatDateTime = (d) =>
+    new Date(d).toLocaleString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+
   const stars = (rating) => {
     const r = Math.round(Number(rating) || 0);
     return '★'.repeat(r) + '☆'.repeat(5 - r);
@@ -265,7 +275,7 @@ const UI = (() => {
   }
 
   /* ---------------- guards ---------------- */
-  /** Send the visitor to the login selection page, remembering where to come back to. */
+  /** Send the visitor to the welcome/login page, remembering where to come back to. */
   function requireLogin() {
     if (authStore.isLoggedIn) return true;
     const returnTo = location.pathname + location.search + location.hash;
@@ -435,7 +445,7 @@ const UI = (() => {
   }
 
   return {
-    I, inr, formatDate, stars, ratingInline, esc, toast,
+    I, inr, formatDate, formatDateTime, stars, ratingInline, esc, toast,
     mountNav, mountFooter, refreshBadges,
     requireLogin, requireAdmin, cartLine,
     productCard, toggleWishlist, wireCarousel,

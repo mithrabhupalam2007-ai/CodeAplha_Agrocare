@@ -125,7 +125,7 @@ const login = asyncHandler(async (req, res) => {
   // --- role checks, server-side, against the database record ---
   if (isAdminLogin && user.role !== 'admin') {
     logLoginFailure('customer account on admin login');
-    throw new ApiError(403, 'This account does not have administrator access. Please use "Login as User" instead.');
+    throw new ApiError(403, 'This account does not have administrator access.');
   }
   if (!isAdminLogin && user.role !== 'customer') {
     logLoginFailure('admin account on user login');

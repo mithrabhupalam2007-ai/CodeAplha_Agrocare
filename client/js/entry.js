@@ -1,7 +1,7 @@
 /**
- * Login selection page (client/index.html).
+ * Welcome/login entry page (client/index.html).
  * Carries a ?next= destination (set by the server login wall or the client
- * guards) through to the user login page so the visitor lands where they
+ * guards) through to the login page so the visitor lands where they
  * originally wanted to go.
  */
 (function () {
@@ -11,9 +11,9 @@
   var next = params.get('next') || '';
 
   if (next && /^\/pages\/[a-z-]+\.html/i.test(next)) {
-    var userBtn = document.getElementById('user-login-btn');
-    if (userBtn) {
-      userBtn.setAttribute('href', '/pages/login.html?next=' + encodeURIComponent(next));
+    var loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+      loginBtn.setAttribute('href', '/pages/login.html?next=' + encodeURIComponent(next));
     }
   }
 })();
