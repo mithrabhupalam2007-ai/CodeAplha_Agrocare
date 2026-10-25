@@ -10,6 +10,7 @@
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
+  --links-row-h: 51px; /* desktop links row height (measured) */
 }
 
 .nav__inner {
@@ -62,6 +63,14 @@
   text-transform: none;
 }
 
+/* Two-row desktop header: row 1 = brand left + icon group right, row 2 =
+   the single aligned horizontal links row (full container width, so long
+   labels like "Animal Husbandry" never squeeze the icons). */
+.nav__main {
+  background: var(--beige-50);
+}
+.nav__main .nav__links { padding: 5px 0; margin-inline: auto; }
+
 .nav__links {
   display: flex;
   align-items: center;
@@ -69,25 +78,95 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  white-space: nowrap;
 }
 
-.nav__links a {
+.nav__links > li { position: relative; }
+
+.nav__links > li > a {
+  position: relative;
   display: block;
-  padding: 8px 11px;
+  padding: 9px 10px;
   border-radius: var(--r-s);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--ink);
   transition: background 0.18s ease, color 0.18s ease;
 }
-.nav__links a:hover { background: var(--green-50); color: var(--green-800); }
-.nav__links a.active { color: var(--green-700); background: var(--green-50); }
-
-.nav__search {
-  flex: 1;
-  max-width: 300px;
-  position: relative;
+.nav__links > li > a:hover { background: var(--green-50); color: var(--green-800); }
+/* Active page: forest-green underline + soft green tint */
+.nav__links > li > a.active { color: var(--green-700); background: var(--green-50); }
+.nav__links > li > a.active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 4px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--green-700);
 }
+
+/* Rounded subcategory dropdown — CSS-only (hover + keyboard focus), so every
+   link keeps working with JS unavailable. Long lists (Equipments: 25 subs)
+   scroll inside the panel instead of stretching the page. */
+.nav__drop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 130;
+  min-width: 210px;
+  max-width: 264px;
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--sh-l);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+}
+.has-drop:hover .nav__drop,
+.has-drop:focus-within .nav__drop {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.nav__drop a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav__drop a:hover { background: var(--green-50); color: var(--green-800); }
+
+/* Search icon in the right-hand icon group → rounded popover panel */
+.nav__searchwrap { position: relative; display: flex; }
+.nav__search--pop {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(340px, 78vw);
+  padding: 9px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  box-shadow: var(--sh-l);
+}
+.nav__searchwrap.open .nav__search--pop { display: block; }
+/* On desktop the links row sits under row 1 — drop the panel below it. */
+@media (min-width: 1161px) {
+  .nav__search--pop { top: calc(100% + var(--links-row-h, 56px) + 10px); }
+}
+
+.nav__search { position: relative; }
 .nav__search input {
   width: 100%;
   padding: 9px 14px 9px 38px;
@@ -114,7 +193,7 @@
   pointer-events: none;
 }
 
-.nav__actions { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.nav__actions { display: flex; align-items: center; gap: 2px; flex: none; margin-left: auto; }
 
 .count-badge {
   position: absolute;
@@ -135,32 +214,17 @@
 
 .nav__burger { display: none; }
 
-.nav__mobile {
-  display: none;
-  border-top: 1px solid var(--line);
-  background: #fff;
-  padding: 10px 0 16px;
-}
-.nav__mobile.open { display: block; }
-.nav__mobile a {
-  display: block;
-  padding: 11px 4px;
-  font-weight: 600;
-  color: var(--ink);
-  border-bottom: 1px solid var(--line);
-}
-.nav__mobile a:last-child { border-bottom: none; }
-.nav__mobile .nav__search { max-width: none; margin-top: 12px; }
-
-@media (max-width: 1080px) {
+/* Responsive menu: links leave the bar and the burger takes over — at the
+   SAME breakpoint, so there is never a width with neither links nor menu. */
+@media (max-width: 1160px) {
+  .nav__main { display: none; }
   .nav__links { display: none; }
-  .nav__search { max-width: none; }
+  .nav__burger { display: inline-flex; }
 }
 @media (max-width: 760px) {
-  .nav__search--desktop { display: none; }
-  .nav__burger { display: inline-flex; }
-  /* Logged-in action row (wishlist, cart, account, burger) must stay inside
-     the viewport: tighter gaps and the actions are never squeezed. */
+  /* Search lives inside the burger menu on phones (keeps the icon group
+     from crowding the wordmark). */
+  .nav__searchwrap { display: none; }
   .nav__inner { gap: 10px; }
   .nav__actions { flex-shrink: 0; }
 }
@@ -174,6 +238,26 @@
   .brand__name { font-size: 1.08rem; }
   .nav__actions .icon-btn { width: 38px; height: 38px; }
 }
+
+/* ---------------- Mobile menu (rounded, no separator borders) ---------------- */
+.nav__mobile {
+  display: none;
+  border-top: 1px solid var(--line);
+  background: #fff;
+  padding: 10px 0 16px;
+}
+.nav__mobile.open { display: grid; gap: 2px; }
+.nav__mobile a {
+  display: block;
+  padding: 11px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav__mobile a:hover { background: var(--green-50); color: var(--green-800); }
+.nav__mobile a.active { background: var(--green-50); color: var(--green-700); }
+.nav__mobile .nav__search { max-width: none; margin-top: 12px; }
 
 /* ---------------- Hero (contained, rounded, directly under the header) ------------ */
 .hero-wrap {

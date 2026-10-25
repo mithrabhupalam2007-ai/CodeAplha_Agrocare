@@ -95,13 +95,18 @@ const UI = (() => {
 
   /* ---------------- navbar ---------------- */
   /* The seven main categories come straight from the store taxonomy (exact
-     order preserved), so nav links can never drift from the catalogue. */
+     order preserved), so nav links can never drift from the catalogue.
+     Layout order per spec: Home first, then the seven categories. Each
+     category link carries its own subcategories for the rounded dropdown. */
   const NAV_LINKS = [
     { href: '/pages/home.html', label: 'Home', match: (p) => p.includes('home.html') },
-    { href: '/pages/products.html', label: 'All Products', match: (p) => p.includes('products') && !location.search },
     ...TAXONOMY.MAIN.map((type) => ({
       href: TAXONOMY.categoryUrl(type),
       label: type,
+      subs: TAXONOMY.subcategoriesOf(type).map((sub) => ({
+        href: TAXONOMY.subcategoryUrl(type, sub),
+        label: sub,
+      })),
       match: () => new URLSearchParams(location.search).get('type') === type,
     })),
   ];
@@ -124,19 +129,15 @@ const UI = (() => {
               <span class="brand__tag">Smart Farming. Better Harvests.</span>
             </span>
           </a>
-          <nav aria-label="Main">
-            <ul class="nav__links">
-              ${NAV_LINKS.map(
-                (l) =>
-                  `<li><a href="${l.href}"${l.match(path) ? ' class="active" aria-current="page"' : ''}>${l.label}</a></li>`
-              ).join('')}
-            </ul>
-          </nav>
-          <form class="nav__search nav__search--desktop" role="search" data-nav-search>
-            ${I.search}
-            <input type="search" name="q" placeholder="Search seeds, tools..." value="${esc(q)}" aria-label="Search products" />
-          </form>
           <div class="nav__actions">
+            <div class="nav__searchwrap" data-search-wrap>
+              <button class="icon-btn" type="button" data-search-toggle aria-label="Search products"
+                aria-expanded="false" title="Search">${I.search}</button>
+              <form class="nav__search nav__search--pop" role="search" data-nav-search>
+                ${I.search}
+                <input type="search" name="q" placeholder="Search seeds, tools..." value="${esc(q)}" aria-label="Search products" />
+              </form>
+            </div>
             <a class="icon-btn" href="/pages/wishlist.html" title="Wishlist" aria-label="Wishlist">
               ${I.heart}<span class="count-badge" data-wish-count hidden>0</span>
             </a>
@@ -161,6 +162,19 @@ const UI = (() => {
             <button class="icon-btn nav__burger" type="button" aria-label="Menu" data-burger>${I.menu}</button>
           </div>
         </div>
+        <nav aria-label="Main" class="nav__main">
+          <ul class="nav__links container">
+            ${NAV_LINKS.map((l) => {
+              const drop = l.subs && l.subs.length
+                ? `<div class="nav__drop" aria-label="${esc(l.label)} subcategories">${l.subs
+                    .map((s) => `<a href="${s.href}">${esc(s.label)}</a>`)
+                    .join('')}</div>`
+                : '';
+              return `<li class="${l.subs && l.subs.length ? 'has-drop' : ''}">
+                <a href="${l.href}"${l.match(path) ? ' class="active" aria-current="page"' : ''}>${esc(l.label)}</a>${drop}</li>`;
+            }).join('')}
+          </ul>
+        </nav>
         <div class="nav__mobile container" data-mobile-menu>
           ${NAV_LINKS.map((l) => `<a href="${l.href}">${l.label}</a>`).join('')}
           <form class="nav__search" role="search" data-nav-search>
@@ -174,6 +188,29 @@ const UI = (() => {
     mount.querySelector('[data-burger]').addEventListener('click', () => {
       mount.querySelector('[data-mobile-menu]').classList.toggle('open');
     });
+
+    /* Search icon → rounded popover (same [data-nav-search] form contract,
+       so the shared submit wiring below keeps working unchanged). */
+    const sWrap = mount.querySelector('[data-search-wrap]');
+    const sBtn = mount.querySelector('[data-search-toggle]');
+    if (sWrap && sBtn) {
+      const closeSearch = () => {
+        sWrap.classList.remove('open');
+        sBtn.setAttribute('aria-expanded', 'false');
+      };
+      sBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = sWrap.classList.toggle('open');
+        sBtn.setAttribute('aria-expanded', String(open));
+        if (open) sWrap.querySelector('input').focus();
+      });
+      document.addEventListener('click', (e) => {
+        if (!sWrap.contains(e.target)) closeSearch();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSearch();
+      });
+    }
 
     // Account dropdown (profile / orders / wishlist / logout)
     const userMenu = mount.querySelector('[data-user-menu]');
