@@ -1161,9 +1161,11 @@
   overflow: hidden;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
-.mcat-card:hover { transform: translateY(-3px); box-shadow: var(--sh-m); border-color: var(--green-600); }
+.mcat-card:hover { transform: translateY(-4px); box-shadow: var(--sh-m); border-color: var(--green-600); }
+.mcat-card:hover .mcat-card__img { transform: scale(1.06); }
+.mcat-card:focus-visible { box-shadow: var(--focus); }
 .mcat-card.on { border: 2px solid var(--green-700); box-shadow: var(--sh-m); }
-.mcat-card__img { width: 100%; height: 140px; object-fit: cover; display: block; background: var(--beige-200); }
+.mcat-card__img { width: 100%; height: 140px; object-fit: cover; display: block; background: var(--beige-200); transition: transform 0.35s ease; }
 .mcat-card__body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .mcat-card__body h3 { margin: 0; color: var(--green-900); font-family: var(--font-display); font-size: 1.15rem; }
 .mcat-card__body p { margin: 0; color: var(--muted); font-size: 0.85rem; flex: 1; }
@@ -1174,6 +1176,49 @@
 @media (max-width: 560px) {
   .mcat-card { flex: 0 0 78%; min-width: 0; }
   .mcat-card__img { height: 120px; }
+}
+
+/* ---------------- Explore AgroShield benefit cards (home) ---------------- */
+.benefit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 22px;
+}
+.benefit-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-m);
+  padding: 30px 26px;
+  text-align: center;
+  box-shadow: var(--sh-s);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.benefit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sh-m);
+  border-color: var(--green-600);
+}
+.benefit-card__icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  background: var(--green-50);
+  border: 1px solid var(--green-100);
+  border-radius: 16px;
+  color: var(--green-700);
+}
+.benefit-card__icon svg { width: 28px; height: 28px; }
+.benefit-card h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  color: var(--green-900);
+}
+.benefit-card p { margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+@media (max-width: 900px) {
+  .benefit-card { padding: 24px 22px; }
 }
 
 /* ---------------- Subcategory slider tiles (category pages) ---------------- */

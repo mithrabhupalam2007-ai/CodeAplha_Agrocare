@@ -24,13 +24,36 @@
 
   <main id="main">
 
-    <!-- ======================= MAIN CATEGORIES (SLIDING) ======================= -->
+    <!-- ======================= HERO (directly below the header) ======================= -->
+    <section class="hero-wrap">
+      <div class="container">
+        <div class="hero">
+          <img class="hero__bg" src="/images/hero-field.jpg" alt="Farmer walking through a lush green crop field" fetchpriority="high" />
+          <div class="container hero__content">
+            <span class="hero__chip">🌱 Trusted by farmers across India</span>
+            <h1>Everything Your Farm Needs, All in One Place.</h1>
+            <p class="hero__sub">Explore quality seeds, crop protection, crop nutrition, farming equipment, and more.</p>
+            <div class="hero__cta">
+              <a class="btn btn--light btn--lg" href="#categories">Explore Categories</a>
+              <a class="btn btn--primary btn--lg" href="/pages/products.html">Shop Products</a>
+            </div>
+            <div class="hero__points">
+              <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 100% genuine products</span>
+              <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17V5H2v12h2"/><path d="M14 9h4l4 4v4h-2"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></svg> Free delivery over ₹499</span>
+              <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg> Safe handling guidance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= SHOP BY CATEGORY ======================= -->
     <section class="section" id="categories">
       <div class="container">
         <div class="section-head">
           <div>
-            <span class="eyebrow">Shop by category</span>
-            <h2>Everything your farm needs</h2>
+            <span class="eyebrow">Browse the catalogue</span>
+            <h2>Shop by Category</h2>
             <p>Seven main categories in the store — swipe or use the arrows to browse, then tap a card to open its category page.</p>
           </div>
           <div class="carousel__nav">
@@ -45,43 +68,33 @@
         </div>
       </div>
     </section>
-    <!-- ======================= HERO ======================= -->
-    <section class="hero">
-      <img class="hero__bg" src="/images/hero-field.jpg" alt="Farmer walking through a lush green crop field" />
-      <div class="container hero__content">
-        <span class="hero__chip">🌱 Trusted by farmers across India</span>
-        <h1>Protect Your Crops.<br />Grow Your Future.</h1>
-        <p class="hero__sub">Discover agricultural products, crop-protection solutions and quality seeds in one place.</p>
-        <div class="hero__cta">
-          <a class="btn btn--light btn--lg" href="/pages/products.html">Explore Products</a>
-          <a class="btn btn--primary btn--lg" href="#new-releases">Shop Newly Released Products</a>
+
+    <!-- ======================= FEATURED PRODUCTS ======================= -->
+    <section class="section section--beige" id="featured">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Handpicked</span>
+            <h2>Featured Products</h2>
+            <p>Popular picks from our catalogue, updated live from the store database.</p>
+          </div>
+          <a class="btn btn--ghost btn--sm" href="/pages/products.html">See more →</a>
         </div>
-        <div class="hero__points">
-          <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 100% genuine products</span>
-          <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17V5H2v12h2"/><path d="M14 9h4l4 4v4h-2"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></svg> Free delivery over ₹499</span>
-          <span class="hero__point"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg> Safe handling guidance</span>
+        <div class="demo-note hidden" id="featured-note" style="margin-bottom:18px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span></span>
         </div>
+        <div class="product-grid" id="featured-grid"></div>
       </div>
     </section>
 
-    <!-- ======================= TRUST STRIP ======================= -->
-    <div class="trust-strip">
-      <div class="container trust-strip__inner">
-        <span>🚚 Fast dispatch across India</span>
-        <span>🌱 Seeds with germination info</span>
-        <span>🔒 Secure login &amp; checkout</span>
-        <span>💰 Cash on Delivery available</span>
-        <span>📞 Farmer-friendly support</span>
-      </div>
-    </div>
-
-    <!-- ======================= SEASONAL PRODUCTS ======================= -->
-    <section class="section section--beige" id="seasonal">
+    <!-- ======================= SEASONAL FARMING ESSENTIALS ======================= -->
+    <section class="section" id="seasonal">
       <div class="container">
         <div class="section-head">
           <div>
             <span class="eyebrow">This season</span>
-            <h2>Seasonal Products</h2>
+            <h2>Seasonal Farming Essentials</h2>
             <p>Products our administrators marked as seasonal — pick of the current sowing season.</p>
           </div>
           <div class="carousel__nav">
@@ -105,6 +118,42 @@
       </div>
     </section>
 
+    <!-- ======================= EXPLORE AGROSHIELD ======================= -->
+    <section class="section section--beige" id="explore">
+      <div class="container">
+        <div class="section-head" style="justify-content:center;text-align:center;">
+          <div>
+            <span class="eyebrow">Why AgroShield</span>
+            <h2>Explore AgroShield</h2>
+            <p>Everything you need to shop with confidence — from the field to your doorstep.</p>
+          </div>
+        </div>
+        <div class="benefit-grid">
+          <article class="benefit-card reveal">
+            <span class="benefit-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+            </span>
+            <h3>Quality Agricultural Products</h3>
+            <p>Seeds, crop protection, crop nutrition and equipment sourced from trusted brands and clearly described on every product page.</p>
+          </article>
+          <article class="benefit-card reveal">
+            <span class="benefit-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </span>
+            <h3>Convenient Online Ordering</h3>
+            <p>Search, add to cart and order in a few taps — with saved addresses, Cash on Delivery and prices recalculated on the server.</p>
+          </article>
+          <article class="benefit-card reveal">
+            <span class="benefit-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17V5H2v12h2"/><path d="M14 9h4l4 4v4h-2"/><circle cx="7" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/></svg>
+            </span>
+            <h3>Easy Order Tracking</h3>
+            <p>Every order is saved to My Orders automatically, with live status, cancellations and full order history in one place.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <!-- ======================= NEWLY RELEASED PRODUCTS ======================= -->
     <section class="section" id="new-releases">
       <div class="container">
@@ -120,21 +169,6 @@
       </div>
     </section>
 
-    <!-- ======================= FEATURED PRODUCTS ======================= -->
-    <section class="section section--beige" id="featured">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">Handpicked</span>
-            <h2>Featured agricultural products</h2>
-            <p>Popular picks from our catalogue, updated live from the store database.</p>
-          </div>
-          <a class="btn btn--ghost btn--sm" href="/pages/products.html?sort=featured">See more →</a>
-        </div>
-        <div class="product-grid" id="featured-grid"></div>
-      </div>
-    </section>
-
     <!-- ======================= FEATURED SEEDS ======================= -->
     <section class="section" id="bestsellers">
       <div class="container">
@@ -145,6 +179,10 @@
             <p>Seeds farmers keep coming back for, season after season.</p>
           </div>
           <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Seeds">All seeds →</a>
+        </div>
+        <div class="demo-note hidden" id="seed-note" style="margin-bottom:18px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span></span>
         </div>
         <div class="product-grid" id="seed-grid"></div>
       </div>
@@ -157,7 +195,7 @@
           <div>
             <span class="eyebrow">Crop care</span>
             <h2>Crop Protection Products</h2>
-            <p>Demo insecticide, fungicide and herbicide listings with clear safety information.</p>
+            <p>Insecticide, fungicide and herbicide listings with clear safety information.</p>
           </div>
           <a class="btn btn--ghost btn--sm" href="/pages/category.html?type=Crop%20Protection">All crop protection →</a>
         </div>

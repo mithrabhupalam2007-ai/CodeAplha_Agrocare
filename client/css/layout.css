@@ -26,10 +26,10 @@
   font-family: var(--font-display);
   font-size: 1.32rem;
   font-weight: 700;
-  color: var(--green-900);
+  color: var(--green-700);
   white-space: nowrap;
 }
-.brand:hover { color: var(--green-700); }
+.brand:hover { color: var(--green-800); }
 .brand__mark {
   width: 36px;
   height: 36px;
@@ -39,9 +39,28 @@
   border-radius: 10px;
   color: #fff;
   box-shadow: var(--sh-s);
+  flex: none;
 }
 .brand__mark svg { width: 22px; height: 22px; }
 .brand em { font-style: normal; color: var(--green-600); }
+
+/* Wordmark + tagline stacked under it (site-wide header) */
+.brand__text { display: flex; flex-direction: column; line-height: 1.08; min-width: 0; }
+.brand__name {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--green-700);
+}
+.brand__tag {
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  text-transform: none;
+}
 
 .nav__links {
   display: flex;
@@ -147,21 +166,32 @@
 }
 @media (max-width: 430px) {
   .brand__mark { display: none; }
+  .brand__name { font-size: 1.18rem; }
+  .brand__tag { font-size: 0.57rem; letter-spacing: 0.03em; }
 }
 @media (max-width: 400px) {
   .brand { font-size: 1.1rem; }
+  .brand__name { font-size: 1.08rem; }
   .nav__actions .icon-btn { width: 38px; height: 38px; }
 }
 
-/* ---------------- Hero ---------------- */
+/* ---------------- Hero (contained, rounded, directly under the header) ------------ */
+.hero-wrap {
+  padding: 24px 0 4px;
+  background: linear-gradient(180deg, var(--green-50) 0%, rgba(238, 244, 239, 0) 100%);
+}
+.hero-wrap .container { width: min(var(--container), 96%); }
+
 .hero {
   position: relative;
-  min-height: 540px;
+  min-height: 500px;
   display: flex;
   align-items: center;
   color: #fff;
   overflow: hidden;
   background: var(--green-900);
+  border-radius: var(--r-l);
+  box-shadow: var(--sh-l);
 }
 
 .hero__bg {
@@ -172,6 +202,9 @@
   object-fit: cover;
   opacity: 0.85;
 }
+/* Image failed to load — the global handler swaps in generic fallback art;
+   inside the hero we hide it so the dark-green surface carries the copy. */
+.hero__bg[data-fallback-applied] { opacity: 0; }
 
 .hero::after {
   content: "";
@@ -231,6 +264,28 @@
 }
 .hero__point { display: flex; gap: 10px; align-items: center; font-size: 0.9rem; color: rgba(255,255,255,.92); }
 .hero__point svg { width: 20px; height: 20px; color: #9fe0a3; flex: none; }
+
+/* Subtle staggered entrance: chip → headline → description → buttons */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.hero__chip { animation: heroRise 0.55s ease-out both 0.05s; }
+.hero h1 { animation: heroRise 0.55s ease-out both 0.16s; }
+.hero__sub { animation: heroRise 0.55s ease-out both 0.28s; }
+.hero__cta { animation: heroRise 0.55s ease-out both 0.4s; }
+.hero__points { animation: heroRise 0.55s ease-out both 0.52s; }
+
+/* Scroll reveal — only active once ui.js has registered the observer
+   (body.reveal-ready), so content is never hidden if JS fails. */
+body.reveal-ready .reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+body.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
+body.reveal-ready .reveal:nth-child(2) { transition-delay: 0.09s; }
+body.reveal-ready .reveal:nth-child(3) { transition-delay: 0.18s; }
 
 @media (max-width: 640px) {
   .hero { min-height: 460px; }

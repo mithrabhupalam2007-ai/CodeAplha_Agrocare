@@ -119,7 +119,10 @@ const UI = (() => {
         <div class="container nav__inner">
           <a class="brand" href="/pages/home.html" aria-label="AgroShield home">
             <span class="brand__mark">${I.leaf}</span>
-            Agro<em>Shield</em>
+            <span class="brand__text">
+              <span class="brand__name">Agro<em>Shield</em></span>
+              <span class="brand__tag">Smart Farming. Better Harvests.</span>
+            </span>
           </a>
           <nav aria-label="Main">
             <ul class="nav__links">
@@ -471,6 +474,26 @@ window.addEventListener(
   },
   true
 );
+
+/* Subtle scroll fade-in for `.reveal` elements (home benefit cards).
+   body.reveal-ready gates the hidden state in CSS — if this script or the
+   IntersectionObserver never runs, the content simply stays visible. */
+(() => {
+  const els = [...document.querySelectorAll('.reveal')];
+  if (!els.length || !('IntersectionObserver' in window)) return;
+  document.body.classList.add('reveal-ready');
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('is-visible');
+        io.unobserve(en.target);
+      });
+    },
+    { threshold: 0.15, rootMargin: '0px 0px -30px' }
+  );
+  els.forEach((el) => io.observe(el));
+})();
 
 /* Re-export short names used by page scripts. */
 const toast = UI.toast;

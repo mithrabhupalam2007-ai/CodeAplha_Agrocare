@@ -1,25 +1,39 @@
 /**
- * Home page: main-category sliding carousel (seven categories, right below
- * the navbar), seasonal products carousel, featured / seed / crop-protection
- * / equipment product rails, newsletter.
+ * Home page: hero-adjacent main-category carousel (seven categories),
+ * featured / seasonal / seed / crop-protection / equipment product rails
+ * with honest labelled fallbacks, newsletter.
  */
 (() => {
   function skeleton(container) {
     container.innerHTML = '<div class="skeleton skeleton-card"></div>'.repeat(4);
   }
 
-  async function loadProducts(gridId, params) {
+  async function loadProducts(gridId, params, opts = {}) {
     const grid = document.getElementById(gridId);
     if (!grid) return;
     skeleton(grid);
     try {
-      const data = await api.get(`/products${api.qs(params)}`);
+      let data = await api.get(`/products${api.qs(params)}`);
+      let products = data.products;
+      // No products carry this merchandising flag (all demo flags were removed)
+      // — fall back to honest catalogue picks with a clearly-labelled note.
+      if (!products.length && opts.fallback) {
+        data = await api.get(`/products${api.qs(opts.fallback)}`);
+        products = data.products;
+        if (products.length && opts.noteId) {
+          const note = document.getElementById(opts.noteId);
+          if (note) {
+            note.querySelector('span').textContent = opts.note;
+            note.classList.remove('hidden');
+          }
+        }
+      }
       grid.innerHTML = '';
-      if (!data.products.length) {
+      if (!products.length) {
         grid.innerHTML = '<p class="text-muted">No products found in this section yet.</p>';
         return;
       }
-      data.products.forEach((p) => grid.appendChild(UI.productCard(p)));
+      products.forEach((p) => grid.appendChild(UI.productCard(p)));
     } catch (err) {
       grid.innerHTML = `<div class="alert show alert--error">${UI.esc(err.message)}</div>`;
     }
@@ -61,7 +75,23 @@
       const carousel = document.getElementById('seasonal-carousel');
 
       if (!data.products.length) {
-        // Nothing flagged and nothing to fall back to — friendly empty state.
+        // Nothing is flagged seasonal — show clearly-labelled popular picks
+        // from the real catalogue instead (never invented/demo products).
+        if (data.demoFallback) {
+          const alt = await api.get('/products?limit=8&sort=rating');
+          if (alt.products.length) {
+            note.querySelector('span').textContent =
+              'No seasonal products have been configured yet — these are popular picks from the catalogue instead.';
+            note.classList.remove('hidden');
+            alt.products.forEach((p) => {
+              const card = UI.productCard(p);
+              card.classList.add('carousel__card');
+              track.appendChild(card);
+            });
+            UI.wireCarousel(carousel.parentElement);
+            return;
+          }
+        }
         carousel.classList.add('hidden');
         empty.classList.remove('hidden');
         return;
@@ -134,8 +164,16 @@
     renderMainCategories();
     loadSeasonal();
     loadNewReleases();
-    loadProducts('featured-grid', { featured: true, limit: 4, sort: 'featured' });
-    loadProducts('seed-grid', { type: 'Seeds', bestseller: true, limit: 4, sort: 'rating' });
+    loadProducts('featured-grid', { featured: true, limit: 4, sort: 'featured' }, {
+      fallback: { limit: 4, sort: 'rating' },
+      noteId: 'featured-note',
+      note: 'No products are flagged as featured yet — these are top-rated picks from the catalogue instead.',
+    });
+    loadProducts('seed-grid', { type: 'Seeds', bestseller: true, limit: 4, sort: 'rating' }, {
+      fallback: { type: 'Seeds', limit: 4, sort: 'rating' },
+      noteId: 'seed-note',
+      note: 'No seed bestsellers have been flagged yet — these top-rated seeds from the catalogue are shown instead.',
+    });
     loadProducts('crop-grid', { type: 'Crop Protection', limit: 4, sort: 'rating' });
     loadProducts('recent-grid', { limit: 4, sort: 'newest' });
     loadProducts('essentials-grid', { type: 'Equipments', limit: 4, sort: 'featured' });

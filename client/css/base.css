@@ -329,3 +329,19 @@ textarea.input { resize: vertical; min-height: 96px; }
   .form-row { grid-template-columns: 1fr; }
   .section-head { flex-direction: column; align-items: flex-start; }
 }
+
+/* Respect reduced-motion: no entrance animations, no smooth scroll,
+   transitions collapse to their end state instantly. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+  body.reveal-ready .reveal { opacity: 1; transform: none; }
+}
