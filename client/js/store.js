@@ -7,20 +7,39 @@
  */
 const Store = (() => {
   const CART_KEY = 'agroshield_cart_v1';
+  const userCartKey = (userId) => `${CART_KEY}:u:${userId}`;
   const USER_KEY = 'agroshield_user';
 
   /* ---------------- cart ---------------- */
+  /** Storage slot for the current session: one per signed-in account,
+      else the shared guest/legacy key (so old carts are never lost).
+      The auth cache stores `id` (toSafeJSON), older sessions ` _id`. */
+  function activeCartKey() {
+    const u = Auth.user;
+    const uid = u && (u.id || u._id);
+    return uid ? userCartKey(uid) : CART_KEY;
+  }
+
   function readCart() {
     try {
-      const raw = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-      return Array.isArray(raw) ? raw.filter((i) => i && i.id && i.qty > 0) : [];
+      const key = activeCartKey();
+      let raw = localStorage.getItem(key);
+      if (raw === null && key !== CART_KEY) {
+        // First cart read for this account on this browser: adopt the
+        // guest/legacy cart (nothing is lost on upgrade or first login).
+        raw = localStorage.getItem(CART_KEY) || '[]';
+        localStorage.setItem(key, raw);
+        localStorage.removeItem(CART_KEY);
+      }
+      const list = JSON.parse(raw || '[]');
+      return Array.isArray(list) ? list.filter((i) => i && i.id && i.qty > 0) : [];
     } catch (e) {
       return [];
     }
   }
 
   function writeCart(items) {
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
+    localStorage.setItem(activeCartKey(), JSON.stringify(items));
     document.dispatchEvent(new CustomEvent('cart:changed'));
   }
 
@@ -29,7 +48,9 @@ const Store = (() => {
     count: () => readCart().reduce((n, i) => n + i.qty, 0),
     subtotal: () => Math.round(readCart().reduce((s, i) => s + i.price * i.qty, 0) * 100) / 100,
 
-    /** Add (or merge) a product. `product` = {id,name,price,packSize,image,stock,category} */
+    /** Add (or merge) a product. `product` = {id,name,price,packSize,image,stock,category}
+        Returns the quantity now in the cart for that product (capped at the
+        known stock) — the same value whether the line was new or merged. */
     add(product, qty = 1) {
       const items = readCart();
       const found = items.find((i) => i.id === product.id);
@@ -37,7 +58,7 @@ const Store = (() => {
       if (found) found.qty = Math.min(found.qty + qty, max);
       else items.push({ ...product, qty: Math.min(qty, max) });
       writeCart(items);
-      return found ? found.qty : qty;
+      return found ? found.qty : Math.min(qty, max);
     },
 
     setQty(id, qty) {

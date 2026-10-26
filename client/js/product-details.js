@@ -411,9 +411,24 @@
     $('add-cart').addEventListener('click', () => {
       if (!product || !isAvailable()) return;
       const qty = currentQty();
-      cart.add(UI.cartLine(product), qty);
+      // Merge (never a duplicate line), capped at real stock — `added` is the
+      // quantity actually in the cart after the merge.
+      const added = cart.add(UI.cartLine(product), qty);
       UI.refreshBadges();
-      toast(`${qty} × ${product.name} added to cart`);
+      toast(`Added to cart successfully — ${added} × ${product.name}`);
+      // Brief confirmed state on the button (re-clicks still add again).
+      const btn = $('add-cart');
+      if (!btn.dataset.busy) {
+        const label = btn.textContent;
+        btn.dataset.busy = '1';
+        btn.textContent = '✓ Added to Cart';
+        btn.classList.add('is-added');
+        setTimeout(() => {
+          btn.textContent = label;
+          btn.classList.remove('is-added');
+          delete btn.dataset.busy;
+        }, 1300);
+      }
     });
 
     $('buy-now').addEventListener('click', () => {

@@ -234,34 +234,48 @@
 .qty {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
+  padding: 4px;
   border: 1.5px solid var(--line-strong);
-  border-radius: var(--r-s);
-  overflow: hidden;
+  border-radius: var(--r-pill);
   background: #fff;
+  transition: opacity 0.18s ease;
 }
 .qty button {
-  width: 40px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
   border: none;
+  border-radius: 50%;
   background: var(--green-50);
   color: var(--green-900);
-  font-size: 1.15rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
 }
-.qty button:hover { background: var(--green-100); }
+.qty button:hover:not(:disabled) { background: var(--green-600); color: #fff; }
+.qty button:active:not(:disabled) { transform: scale(0.92); }
+.qty button:disabled { opacity: 0.45; cursor: not-allowed; }
 .qty input {
-  width: 54px;
-  height: 42px;
+  width: 46px;
+  height: 34px;
   border: none;
-  border-inline: 1px solid var(--line);
   text-align: center;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
+  background: transparent;
   -moz-appearance: textfield;
 }
 .qty input::-webkit-outer-spin-button, .qty input::-webkit-inner-spin-button { -webkit-appearance: none; }
-.qty input:focus { outline: none; background: var(--green-50); }
+.qty input:focus { outline: none; }
+.qty input:disabled { color: var(--muted); }
+
+/* "Update in progress": dimmed, non-interactive stepper — shown while the
+   stock/price re-check runs and for a beat after each quantity write. */
+.qty.is-busy { opacity: 0.5; pointer-events: none; }
 
 .pdp__actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
 .pdp__actions .btn { flex: 1; min-width: 170px; }
@@ -1137,6 +1151,24 @@
   border-radius: 0 var(--r-s) var(--r-s) 0;
 }
 .cart-item__blocked-note a { color: var(--green-700); }
+
+/* Neutral "checking stock…" note shown while the live re-check runs */
+.cart-item__checking {
+  color: var(--muted);
+  background: var(--beige-50);
+  border-left-color: var(--line-strong);
+  animation: cart-checking 1.2s ease-in-out infinite;
+}
+@keyframes cart-checking {
+  50% { opacity: 0.55; }
+}
+
+/* Brief "✓ Added" confirmation on Add to Cart buttons */
+.btn.is-added {
+  background: var(--green-800);
+  border-color: var(--green-800);
+  color: #fff;
+}
 
 /* Disabled-looking anchor buttons (checkout gating) */
 .btn.is-disabled,

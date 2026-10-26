@@ -239,6 +239,12 @@ const UI = (() => {
     });
 
     refreshBadges();
+    // Any cart mutation (add / qty change / remove / clear) from anywhere on
+    // the page updates the header counter — Store.writeCart dispatches this.
+    if (!mountNav._badgeWired) {
+      mountNav._badgeWired = true;
+      document.addEventListener('cart:changed', refreshBadges);
+    }
   }
 
   function refreshBadges() {
@@ -411,11 +417,26 @@ const UI = (() => {
         <a class="btn btn--ghost btn--sm" href="/pages/product-details.html?id=${p._id}">Details</a>
       </div>`;
 
-    d.querySelector('[data-add]').addEventListener('click', () => {
+    const addBtn = d.querySelector('[data-add]');
+    addBtn.addEventListener('click', () => {
       if (!available) return;
+      // Merges into an existing line (+1) instead of duplicating it, and is
+      // capped at the known stock — see Store.Cart.add.
       cart.add(cartLine(p), 1);
       refreshBadges();
-      toast(`${p.name} added to cart`);
+      toast(`Added to cart successfully — ${p.name}`);
+      // Brief confirmed state on the button (re-clicks still add again).
+      if (!addBtn.dataset.busy) {
+        const label = addBtn.textContent;
+        addBtn.dataset.busy = '1';
+        addBtn.textContent = '✓ Added';
+        addBtn.classList.add('is-added');
+        setTimeout(() => {
+          addBtn.textContent = label;
+          addBtn.classList.remove('is-added');
+          delete addBtn.dataset.busy;
+        }, 1300);
+      }
     });
 
     d.querySelector('[data-wish]').addEventListener('click', (e) => toggleWishlist(p, e.currentTarget));

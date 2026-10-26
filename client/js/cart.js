@@ -19,6 +19,27 @@
   const $ = (id) => document.getElementById(id);
   /** id -> latest known server state ({available, stock, price, status, gone}) */
   const live = new Map();
+  /** True while lines are being re-validated against the database — the qty
+     controls render disabled with a note until the check finishes. */
+  let checking = true;
+
+  /**
+   * Visual "update in progress" pulse on a freshly re-rendered row: the
+   * stepper dims and blocks clicks for a moment so feedback is visible even
+   * though the local write is synchronous.
+   */
+  function pulseQty(id) {
+    const row = document.querySelector(`#cart-items .cart-item[data-id="${CSS.escape(id)}"]`);
+    const qty = row && row.querySelector('.qty');
+    if (!qty) return;
+    qty.classList.add('is-busy');
+    qty.setAttribute('aria-busy', 'true');
+    setTimeout(() => {
+      if (!qty.isConnected) return;
+      qty.classList.remove('is-busy');
+      qty.removeAttribute('aria-busy');
+    }, 280);
+  }
 
   const infoOf = (item) => live.get(item.id) || null;
   const stockOf = (item) => {
@@ -225,9 +246,15 @@
       const stock = stockOf(item);
       const row = document.createElement('div');
       row.className = `cart-item${gone || oos ? ' cart-item--blocked' : ''}`;
+      row.dataset.id = item.id;
+      // While the database re-check is running, the stepper renders disabled
+      // with a note — no quantity can exceed stock before we know it.
+      const held = checking;
 
       let stateNote = '';
-      if (gone) {
+      if (held) {
+        stateNote = `<div class="cart-item__blocked-note cart-item__checking">⏳ Checking current stock and prices…</div>`;
+      } else if (gone) {
         stateNote = `<div class="cart-item__blocked-note">⚠ No longer available — this product was removed or deactivated. <a href="/pages/products.html">Find alternatives</a></div>`;
       } else if (oos) {
         stateNote = `<div class="cart-item__blocked-note">⚠ Out of Stock — unavailable for purchase right now. <a href="/pages/product-details.html?id=${item.id}">View product page</a></div>`;
@@ -246,10 +273,10 @@
           <button class="cart-item__remove" type="button" data-remove>Remove</button>
         </div>
         <div class="cart-item__right">
-          <div class="qty">
-            <button type="button" data-minus aria-label="Decrease" ${gone || oos ? 'disabled' : ''}>−</button>
-            <input type="number" value="${item.qty}" min="1" max="${stock}" data-qty aria-label="Quantity" ${gone || oos ? 'disabled' : ''} />
-            <button type="button" data-plus aria-label="Increase" ${gone || oos ? 'disabled' : ''}>+</button>
+          <div class="qty${held ? ' is-busy' : ''}"${held ? ' aria-busy="true"' : ''}>
+            <button type="button" data-minus aria-label="Decrease" ${gone || oos || held ? 'disabled' : ''}>−</button>
+            <input type="number" value="${item.qty}" min="1" max="${stock}" data-qty aria-label="Quantity" ${gone || oos || held ? 'disabled' : ''} />
+            <button type="button" data-plus aria-label="Increase" ${gone || oos || held ? 'disabled' : ''}>+</button>
           </div>
           <span class="price">${UI.inr(item.price * item.qty)}</span>
         </div>`;
@@ -262,10 +289,26 @@
         render();
       });
 
-      row.querySelector('[data-minus]').addEventListener('click', () => {
-        cart.setQty(item.id, item.qty - 1);
+      // One path for every quantity update: write → badge → re-render →
+      // visible "in progress" pulse on the fresh row's stepper.
+      const applyQty = (next) => {
+        cart.setQty(item.id, next);
         UI.refreshBadges();
         render();
+        pulseQty(item.id);
+      };
+
+      row.querySelector('[data-minus]').addEventListener('click', () => {
+        if (item.qty <= 1) {
+          // Existing design: quantity zero removes the line (never negative).
+          cart.remove(item.id);
+          live.delete(item.id);
+          UI.refreshBadges();
+          toast('Item removed from cart', 'info');
+          render();
+          return;
+        }
+        applyQty(item.qty - 1);
       });
 
       row.querySelector('[data-plus]').addEventListener('click', () => {
@@ -273,9 +316,7 @@
           toast(`Only ${stock} unit(s) in stock`, 'error');
           return;
         }
-        cart.setQty(item.id, item.qty + 1);
-        UI.refreshBadges();
-        render();
+        applyQty(item.qty + 1);
       });
 
       row.querySelector('[data-qty]').addEventListener('change', (e) => {
@@ -285,9 +326,7 @@
           q = stock;
           toast(`Quantity capped at stock level (${stock})`, 'info');
         }
-        cart.setQty(item.id, q);
-        UI.refreshBadges();
-        render();
+        applyQty(q);
       });
 
       wrap.appendChild(row);
@@ -317,7 +356,9 @@
    * and current price. Falls back to "no longer available" on 404.
    */
   async function checkAvailability() {
+    checking = true;
     const items = cart.items();
+    if (items.length) render(); // show the disabled "checking" state right away
     await Promise.all(
       items.map(async (item) => {
         try {
@@ -343,6 +384,7 @@
         }
       })
     );
+    checking = false;
     render();
   }
 
