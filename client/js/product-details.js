@@ -264,7 +264,7 @@
       if (!available) return;
       cart.add(UI.cartLine(p), 1);
       UI.refreshBadges();
-      toast(`${p.name} added to cart`);
+      toast(`Added to cart successfully — ${p.name}`);
     });
 
     d.querySelector('[data-wish]').addEventListener('click', async (e) => {
@@ -357,7 +357,10 @@
       (crumbSub ? `<span>/</span><a href="${TAXONOMY.subcategoryUrl(crumbMain, crumbSub)}">${UI.esc(crumbSub)}</a>` : '') +
       `<span>/</span><span class="current">${UI.esc(product.name)}</span>`;
 
-    $('pdp-cat').textContent = TAXONOMY.labelFor(product);
+    // Category + subcategory, both shown when they differ.
+    const mainCat = product.primaryCategory || '';
+    const subLabel = TAXONOMY.labelFor(product);
+    $('pdp-cat').textContent = mainCat && subLabel && subLabel !== mainCat ? `${mainCat} · ${subLabel}` : subLabel;
     $('pdp-name').textContent = product.name;
     $('pdp-stars').textContent = UI.stars(product.rating);
     // Stable demo rating (3.5–4.5), explicitly labelled — never presented
@@ -428,16 +431,64 @@
       }
     });
 
-    $('buy-now').addEventListener('click', () => {
+    /* -------------------------------------------------------------
+     * Buy Now — the existing direct order flow, straight from this page:
+     * no checkout page. The server re-validates availability/stock and
+     * recomputes the price from the database, the delivery address comes
+     * from the saved account profile and payment is Cash on Delivery
+     * (status stays pending). A per-page clientRequestId collapses
+     * repeated clicks into a single order; the cart is never touched.
+     * ------------------------------------------------------------- */
+    const buyNowRequestId = (() => {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return `cr-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+    })();
+    let placingOrder = false;
+
+    $('buy-now').addEventListener('click', async () => {
       if (!product) return;
       if (!isAvailable()) {
         toast('This product is currently unavailable.', 'error');
         return;
       }
-      // Express checkout for just this product and quantity — the cart is
-      // never touched. If the visitor is logged out, requireLogin (and the
-      // login page) preserve this query string, so they come straight back.
-      location.href = `/pages/checkout.html?buy=${product._id}&qty=${currentQty()}`;
+      if (!UI.requireLogin()) return;
+      if (placingOrder) return;
+      placingOrder = true;
+      const btn = $('buy-now');
+      const label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Placing your order…';
+      try {
+        const qty = currentQty();
+        // 1. Delivery address from the logged-in account (no checkout form).
+        const user = await authStore.refresh();
+        const { address, error } = UI.savedAddressOf(user);
+        if (error) {
+          toast(error, 'error');
+          throw new Error('stop'); // handled below without a generic message
+        }
+        // 2. Submit — the server owns pricing, stock and totals.
+        const data = await api.post('/orders', {
+          items: [{ product: product._id, quantity: qty }],
+          clientRequestId: buyNowRequestId,
+          paymentMethod: 'cod', // existing project method: pay on delivery
+          shippingAddress: address,
+        });
+        // 3. Straight to the Order Successful page (never via checkout).
+        toast(data.alreadyPlaced ? 'This order was already placed — showing your receipt.' : 'Order placed successfully!');
+        location.href = `/pages/order-confirmation.html?id=${encodeURIComponent(data.order.orderId)}`;
+      } catch (err) {
+        if (err && err.status === 401) {
+          location.href = '/pages/login.html?next=' + encodeURIComponent(location.pathname + location.search);
+          return;
+        }
+        if (!(err && err.message === 'stop')) {
+          toast((err && err.message) || 'Could not place the order. Please try again.', 'error');
+        }
+        placingOrder = false;
+        btn.disabled = !isAvailable();
+        btn.textContent = label;
+      }
     });
 
     $('add-wish').addEventListener('click', async (e) => {

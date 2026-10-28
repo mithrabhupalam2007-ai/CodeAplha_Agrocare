@@ -322,6 +322,41 @@ const UI = (() => {
 
   /* ---------------- guards ---------------- */
   /** Send the visitor to the welcome/login page, remembering where to come back to. */
+  /**
+   * The signed-in user's saved delivery address, shaped for the orders API,
+   * or a clear `error` message when it is incomplete. Shared by the cart's
+   * Buy All flow and the product page's Buy Now direct order.
+   */
+  function savedAddressOf(user) {
+    if (!user) return { error: 'Please log in again to place your order.' };
+    const a = user.address || {};
+    const missing = [];
+    if (!user.name || user.name.trim().length < 2) missing.push('full name');
+    if (!/^[6-9]\d{9}$/.test((user.phone || '').trim())) missing.push('a valid 10-digit mobile number');
+    if ((a.line1 || '').trim().length < 3) missing.push('address line');
+    if ((a.city || '').trim().length < 2) missing.push('city');
+    if ((a.state || '').trim().length < 2) missing.push('state');
+    if (!/^\d{6}$/.test((a.pincode || '').trim())) missing.push('6-digit PIN code');
+    if (missing.length) {
+      return {
+        error: `We need a complete delivery address to place your order — please save your ${missing.join(
+          ', '
+        )} in My Account, then try again.`,
+      };
+    }
+    return {
+      address: {
+        fullName: user.name.trim(),
+        phone: user.phone.trim(),
+        line1: a.line1.trim(),
+        line2: (a.line2 || '').trim(),
+        city: a.city.trim(),
+        state: a.state.trim(),
+        pincode: a.pincode.trim(),
+      },
+    };
+  }
+
   function requireLogin() {
     if (authStore.isLoggedIn) return true;
     const returnTo = location.pathname + location.search + location.hash;
@@ -508,7 +543,7 @@ const UI = (() => {
   return {
     I, inr, formatDate, formatDateTime, stars, ratingInline, esc, toast,
     mountNav, mountFooter, refreshBadges,
-    requireLogin, requireAdmin, cartLine,
+    requireLogin, requireAdmin, cartLine, savedAddressOf,
     productCard, toggleWishlist, wireCarousel,
   };
 })();

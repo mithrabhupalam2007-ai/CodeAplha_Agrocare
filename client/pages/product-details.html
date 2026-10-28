@@ -38,8 +38,8 @@
 
         <div id="pdp-root" class="hidden">
           <div class="pdp">
-            <!-- ============ GALLERY ============ -->
-            <div>
+            <!-- ============ PRODUCT IMAGE (top, centered) ============ -->
+            <div class="pdp__gallery-wrap">
               <div class="pdp__gallery">
                 <img id="pdp-image" src="" alt="" />
                 <button class="pdp__zoom-hint" type="button" id="pdp-zoom-btn">🔍 Click image to zoom</button>
@@ -48,18 +48,12 @@
               <div class="pdp__thumbs" id="pdp-thumbs" hidden></div>
             </div>
 
-            <!-- ============ INFO ============ -->
-            <div>
-              <span class="pdp__cat" id="pdp-cat"></span>
+            <!-- ============ PRODUCT INFORMATION (below the image) ============ -->
+            <div class="pdp__info">
+              <!-- 1. Product name -->
               <h1 id="pdp-name"></h1>
-              <div class="pdp__rating">
-                <span class="stars" id="pdp-stars"></span>
-                <span id="pdp-reviews"></span>
-                <span class="badge badge--grey" id="pdp-brand"></span>
-              </div>
 
-              <p id="pdp-desc" class="text-muted"></p>
-
+              <!-- 2. Price (₹) -->
               <div class="pdp__price-box">
                 <div>
                   <span class="price price--lg" id="pdp-price"></span>
@@ -67,8 +61,17 @@
                   <span class="badge badge--red" id="pdp-discount" hidden></span>
                   <span class="pack" id="pdp-pack"></span>
                 </div>
-                <div class="pdp__stock" id="pdp-stock"></div>
               </div>
+
+              <!-- 3. Rating -->
+              <div class="pdp__rating">
+                <span class="stars" id="pdp-stars"></span>
+                <span id="pdp-reviews"></span>
+                <span class="badge badge--grey" id="pdp-brand"></span>
+              </div>
+
+              <!-- 4. Availability (real inventory) -->
+              <div class="pdp__stock" id="pdp-stock"></div>
 
               <!-- Highly visible out-of-stock state (forest green + beige) -->
               <div class="pdp__oos hidden" id="pdp-oos">
@@ -76,6 +79,19 @@
                 <p>This product is currently unavailable. Please check back later.</p>
               </div>
 
+              <!-- 5. Category and subcategory -->
+              <span class="pdp__cat" id="pdp-cat"></span>
+
+              <!-- 6. Description -->
+              <p id="pdp-desc" class="text-muted"></p>
+
+              <!-- 7. Specifications -->
+              <div class="panel" id="spec-panel">
+                <h3>Product specifications</h3>
+                <table class="spec-table"><tbody id="spec-body"></tbody></table>
+              </div>
+
+              <!-- 8. Quantity selector · 9. Add to Cart · 10. Buy Now (+ wishlist) -->
               <div class="pdp__actions">
                 <div class="qty" role="group" aria-label="Quantity">
                   <button type="button" id="qty-minus" aria-label="Decrease quantity">−</button>
@@ -94,12 +110,7 @@
                 <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg> Easy cancellation before dispatch</div>
               </div>
 
-              <!-- specifications -->
-              <div class="panel" id="spec-panel">
-                <h3>Product specifications</h3>
-                <table class="spec-table"><tbody id="spec-body"></tbody></table>
-              </div>
-
+              <!-- Additional details — rendered only when verified data exists -->
               <!-- seed info -->
               <div class="panel hidden" id="seed-panel">
                 <h3>Seed information &amp; sowing</h3>
