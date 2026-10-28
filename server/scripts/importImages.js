@@ -453,7 +453,7 @@ for (const f of byHash.values()) {
     primaryCategory: pair.primaryCategory,
     subcategory: pair.subcategory,
     additionalCategories: pair.additionalCategories,
-    isDemoData: true,
+    isDemoData: false, // the import carries the owner's real catalogue — not demo listings
   };
   products.push(record);
   seenSlugs.set(slug, name);

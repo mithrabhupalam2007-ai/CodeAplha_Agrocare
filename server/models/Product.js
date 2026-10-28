@@ -99,8 +99,9 @@ const productSchema = new mongoose.Schema(
       batchNumber: { type: String, trim: true, default: '' },
       expiryDate: { type: Date, default: null },
     },
-    /** True while the product record uses clearly-labelled demo data. */
-    isDemoData: { type: Boolean, default: true },
+    /** True only when a record genuinely uses labelled demo data — the
+        imported real catalogue is not demo (flag corrected 2026-10-28). */
+    isDemoData: { type: Boolean, default: false },
     /** Admin switch to hide a listing without deleting history. */
     active: { type: Boolean, default: true, index: true },
     /**

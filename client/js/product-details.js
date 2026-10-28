@@ -137,9 +137,9 @@
   }
 
   function renderLabelInfo() {
-    // Label/registration demo panel belongs to crop-protection listings.
+    // Label/registration panel belongs to crop-protection listings that
+    // actually carry label content (the imported catalogue has none).
     if (product.primaryCategory !== 'Crop Protection') return;
-    $('label-panel').classList.remove('hidden');
 
     const l = product.labelInfo || {};
     const rows = [
@@ -150,11 +150,10 @@
       ['Storage', l.storage],
       ['Disposal guidance', l.disposal],
     ].filter(([, v]) => v);
+    if (!rows.length) return;
 
+    $('label-panel').classList.remove('hidden');
     $('label-rows').innerHTML =
-      (product.isDemoData
-        ? `<div class="alert show alert--demo" style="margin-bottom:14px;">⚠ DEMO DATA — this is placeholder label content for development. Do not rely on it for dosage, application or safety. Always follow the label of the actual product you purchase, and verify registration/licensing requirements under applicable Indian law before real sales.</div>`
-        : '') +
       `<table class="spec-table"><tbody>${rows
         .map(([k, v]) => `<tr><td>${UI.esc(k)}</td><td>${UI.esc(v)}</td></tr>`)
         .join('')}</tbody></table>`;
@@ -371,8 +370,6 @@
 
     renderGallery();
     renderAvailability();
-
-    if (product.isDemoData) $('pdp-demo').classList.remove('hidden');
 
     renderSpecs();
     renderSeedInfo();
